@@ -1,0 +1,49 @@
+.ppl-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: var(--s-3);
+  padding: var(--s-7) var(--s-4);
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.ppl-empty--compact {
+  padding: var(--s-5) var(--s-3);
+}
+
+.ppl-empty__badge {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin-bottom: var(--s-2);
+  transform: rotate(-4deg);
+}
+
+.ppl-empty__sheet {
+  position: absolute;
+  inset: 0;
+  filter: drop-shadow(0 6px 10px rgb(60 50 30 / 0.12));
+}
+
+.ppl-empty__icon {
+  position: absolute;
+  left: 30px;
+  top: 34px;
+  color: var(--accent);
+}
+
+.ppl-empty__body {
+  color: var(--ink-2);
+  font-size: var(--fs-md);
+  text-wrap: pretty;
+}
+
+.ppl-empty__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--s-3);
+  margin-top: var(--s-3);
+}

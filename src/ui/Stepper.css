@@ -1,0 +1,64 @@
+.ppl-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+}
+
+.ppl-stepper--controls {
+  justify-content: space-between;
+}
+
+.ppl-stepper__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ppl-stepper__dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 0;
+}
+
+/* Dots are a secondary way to jump (Back / Next are the full-size controls): 26 x 40 px each, so a 12-step
+   flow still fits a 360 px phone. */
+.ppl-stepper__hit {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.ppl-stepper__hit:disabled {
+  cursor: default;
+}
+
+.ppl-stepper__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--line);
+  transition:
+    width var(--dur-3) var(--ease),
+    background-color var(--dur-2) var(--ease);
+}
+
+.ppl-stepper__dot.is-done {
+  background: var(--sage);
+}
+
+.ppl-stepper__dot.is-current {
+  width: 20px;
+  background: var(--accent);
+}
+
+.ppl-stepper__count {
+  font-size: var(--fs-xs);
+  font-weight: 650;
+  color: var(--ink-2);
+}

@@ -1,0 +1,191 @@
+.ppl-btn,
+.ppl-iconbtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-2);
+  border-radius: var(--r-control);
+  border: var(--stroke) solid transparent;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition:
+    transform var(--dur-1) var(--ease),
+    box-shadow var(--dur-1) var(--ease),
+    background-color var(--dur-1) var(--ease),
+    color var(--dur-1) var(--ease);
+}
+
+/* Small controls draw 36 px but keep a 44 px hit area. */
+.ppl-btn--sm::before,
+.ppl-iconbtn--sm::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+}
+
+.ppl-btn--sm {
+  min-height: 36px;
+  padding: 0 var(--s-3);
+  font-size: var(--fs-sm);
+}
+
+.ppl-btn--md {
+  min-height: 48px;
+  padding: 0 var(--s-5);
+  font-size: var(--fs-md);
+}
+
+.ppl-btn--lg {
+  min-height: 56px;
+  padding: 0 var(--s-6);
+  font-size: var(--fs-md);
+  border-radius: 14px;
+}
+
+.ppl-btn--block {
+  display: flex;
+  width: 100%;
+}
+
+.ppl-btn__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Variants. Raised buttons sit on a 3 px "lip" and press into it. */
+.ppl-btn--primary {
+  background: var(--accent-strong);
+  color: var(--card);
+  box-shadow:
+    0 3px 0 var(--accent-lip),
+    0 6px 16px rgb(185 83 47 / 0.25),
+    inset 0 1px 0 rgb(255 255 255 / 0.22);
+}
+
+.ppl-btn--secondary {
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--outline-color);
+  box-shadow:
+    0 2px 0 rgb(47 46 43 / 0.1),
+    var(--shadow-sm);
+}
+
+.ppl-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+}
+
+.ppl-btn--danger {
+  background: var(--bad);
+  color: var(--card);
+  box-shadow:
+    0 3px 0 #872a2a,
+    0 6px 16px rgb(178 58 58 / 0.22);
+}
+
+@media (hover: hover) {
+  .ppl-btn--primary:hover:not(:disabled) {
+    background: #c25a35;
+  }
+
+  .ppl-btn--secondary:hover:not(:disabled) {
+    background: #fffdf7;
+    border-color: rgb(47 46 43 / 0.24);
+  }
+
+  .ppl-btn--ghost:hover:not(:disabled) {
+    background: rgb(47 46 43 / 0.06);
+  }
+
+  .ppl-btn--danger:hover:not(:disabled) {
+    background: #bd4040;
+  }
+}
+
+.ppl-btn--primary:active:not(:disabled),
+.ppl-btn--danger:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 var(--accent-lip);
+}
+
+.ppl-btn--danger:active:not(:disabled) {
+  box-shadow: 0 1px 0 #872a2a;
+}
+
+.ppl-btn--secondary:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgb(47 46 43 / 0.1);
+}
+
+.ppl-btn--ghost:active:not(:disabled) {
+  background: rgb(47 46 43 / 0.1);
+}
+
+.ppl-btn:disabled,
+.ppl-iconbtn:disabled {
+  opacity: 0.5;
+  box-shadow: none;
+}
+
+.ppl-btn.is-loading:disabled {
+  opacity: 0.85;
+}
+
+/* Icon buttons */
+.ppl-iconbtn {
+  padding: 0;
+  flex: none;
+}
+
+.ppl-iconbtn--sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.ppl-iconbtn--md {
+  width: var(--tap);
+  height: var(--tap);
+}
+
+.ppl-iconbtn--lg {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+}
+
+.ppl-iconbtn.is-pressed {
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+.ppl-iconbtn__badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 10px;
+  height: 10px;
+  padding: 0 3px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--card);
+  color: var(--card);
+  font-size: 11px;
+  line-height: 10px;
+  font-weight: 800;
+}
+
+.ppl-iconbtn__badge:not(:empty) {
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  line-height: 18px;
+}

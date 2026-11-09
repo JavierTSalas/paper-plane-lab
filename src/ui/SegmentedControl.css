@@ -1,0 +1,83 @@
+.ppl-seg {
+  display: inline-flex;
+  max-width: 100%;
+  padding: 4px;
+  border-radius: 14px;
+  background: var(--paper-2);
+  box-shadow: inset 0 1px 2px rgb(60 50 30 / 0.08);
+}
+
+.ppl-seg--block {
+  display: flex;
+  width: 100%;
+}
+
+.ppl-seg__track {
+  position: relative;
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.ppl-seg__thumb {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow:
+    0 0 0 1px rgb(47 46 43 / 0.08),
+    0 2px 6px rgb(60 50 30 / 0.14);
+  transition: transform var(--dur-3) var(--ease);
+}
+
+.ppl-seg__opt {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 var(--s-3);
+  border-radius: 10px;
+  color: var(--ink-2);
+  font-weight: 650;
+  white-space: nowrap;
+  transition: color var(--dur-2) var(--ease);
+}
+
+.ppl-seg--md .ppl-seg__opt {
+  min-height: 40px;
+  font-size: var(--fs-sm);
+}
+
+.ppl-seg--sm .ppl-seg__opt {
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: var(--fs-xs);
+}
+
+/* Small segments keep a 44 px hit area vertically. */
+.ppl-seg--sm .ppl-seg__opt::before {
+  content: '';
+  position: absolute;
+  inset: -6px 0;
+}
+
+.ppl-seg__opt.is-checked {
+  color: var(--ink);
+}
+
+.ppl-seg__opt:disabled {
+  opacity: 0.45;
+}
+
+.ppl-seg__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ppl-seg__opt:focus-visible {
+  outline-offset: -2px;
+}

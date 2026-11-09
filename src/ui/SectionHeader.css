@@ -1,0 +1,25 @@
+.ppl-sechead {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+
+.ppl-sechead__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ppl-sechead__sub {
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+  text-wrap: pretty;
+}
+
+.ppl-sechead__action {
+  flex: none;
+  margin-bottom: -6px;
+}

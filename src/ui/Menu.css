@@ -1,0 +1,92 @@
+/* Shared popover surface (Menu, InfoDot). Native popovers live in the top layer. */
+.ppl-pop {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0;
+  border: var(--outline);
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--ink);
+  box-shadow: var(--shadow-lg);
+  overflow: auto;
+  max-height: calc(100dvh - 16px);
+}
+
+.ppl-pop:popover-open {
+  animation: ppl-pop-in var(--dur-2) var(--ease);
+}
+
+@keyframes ppl-pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+
+.ppl-menu {
+  display: inline-flex;
+}
+
+.ppl-menu__list {
+  min-width: 220px;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+}
+
+.ppl-menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  width: 100%;
+  min-height: var(--tap);
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: var(--ink);
+  text-align: left;
+  text-decoration: none;
+  font-size: var(--fs-md);
+  font-weight: 600;
+}
+
+.ppl-menu__item:hover,
+.ppl-menu__item:focus-visible {
+  background: var(--paper-2);
+  outline: none;
+}
+
+.ppl-menu__item[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ppl-menu__item.is-danger {
+  color: var(--bad);
+}
+
+.ppl-menu__icon {
+  flex: none;
+  color: var(--ink-2);
+}
+
+.ppl-menu__item.is-danger .ppl-menu__icon {
+  color: var(--bad);
+}
+
+.ppl-menu__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ppl-menu__hint {
+  font-size: var(--fs-xs);
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.ppl-menu__sep {
+  height: 1px;
+  margin: 6px 8px;
+  background: var(--line);
+}

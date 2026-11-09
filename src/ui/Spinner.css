@@ -1,0 +1,8 @@
+.ppl-spinner {
+  display: inline-flex;
+  color: currentColor;
+}
+
+.ppl-spinner svg {
+  animation: ppl-spin 0.9s linear infinite;
+}
