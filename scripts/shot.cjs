@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 // Local visual check helper (not used in CI).
-// Usage: node scripts/shot.mjs <baseUrl> <hashRoute> <outPrefix> [waitMs] [--click "selector"]...
+// Usage: node scripts/shot.cjs <baseUrl> <hashRoute> <outPrefix> [waitMs] [--click "selector"]...
 // Writes <outPrefix>-mobile.png (390x844) and <outPrefix>-desktop.png (1280x800). Prints console errors.
-import { chromium } from 'playwright';
+const { chromium } = require('playwright');
 
+(async () => {
 const [, , base = 'http://localhost:5173', route = '/', out = '/tmp/shot', waitArg = '1200', ...rest] = process.argv;
 const waitMs = Number(waitArg) || 1200;
 const clicks = [];
@@ -32,3 +33,4 @@ for (const [name, viewport, mobile] of [
 }
 await browser.close();
 process.exit(failed ? 1 : 0);
+})();
