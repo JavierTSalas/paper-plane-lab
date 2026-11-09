@@ -29,6 +29,7 @@ export const ROUTES: readonly AppRoute[] = [
   { path: '/ranks', title: 'Ranks', page: lazy(() => import('../features/ranks/RanksPage')), tab: 'ranks' },
   { path: '/notebook/:topic?', title: 'Notebook', page: lazy(() => import('../features/notebook/NotebookPage')) },
   { path: '/_kit', title: 'UI kit', page: lazy(() => import('../ui/KitPage')), public: true },
+  { path: '/_views', title: 'Paper views', page: lazy(() => import('../features/fold/view/ViewDemo')), public: true },
 ];
 
 export interface TabDef {
