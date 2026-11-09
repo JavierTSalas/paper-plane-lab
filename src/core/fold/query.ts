@@ -1,5 +1,5 @@
 import { piecePolygon } from './flat';
-import { applyIso, centroid, containsPoint, EPS, MIN_FEATURE, mirrorPoint, spanAtY } from './geom';
+import { applyIso, boundsOf, centroid, containsPoint, EPS, MIN_FEATURE, mirrorPoint, spanAtY } from './geom';
 import type { Segment } from './geom';
 import type { FlatState, Vec2 } from '../types';
 
@@ -91,6 +91,43 @@ function crossing(p: Segment, q: Segment): Vec2 | null {
   return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? [p[0][0] + rx * t, p[0][1] + ry * t] : null;
 }
 
+/** A candidate snap point and the layer of the piece it was found on. */
+interface Mark {
+  p: Vec2;
+  layer: number;
+}
+
+/**
+ * Merge marks closer together than SNAP_MERGE. A merged mark keeps the place of its first copy and the
+ * layer of its highest one: a point can be seen when its highest copy can.
+ */
+function mergeMarks(marks: readonly Mark[]): Mark[] {
+  const cell = (v: number): number => Math.floor(v / SNAP_MERGE);
+  const grid = new Map<string, Mark[]>();
+  const merged: Mark[] = [];
+  for (const { p, layer } of marks) {
+    const cx = cell(p[0]);
+    const cy = cell(p[1]);
+    let known: Mark | undefined;
+    for (let dx = -1; dx <= 1 && !known; dx++) {
+      for (let dy = -1; dy <= 1 && !known; dy++) {
+        known = grid.get(`${cx + dx},${cy + dy}`)?.find((m) => Math.hypot(m.p[0] - p[0], m.p[1] - p[1]) <= SNAP_MERGE);
+      }
+    }
+    if (known) {
+      known.layer = Math.max(known.layer, layer);
+      continue;
+    }
+    const mark: Mark = { p, layer };
+    merged.push(mark);
+    const key = `${cx},${cy}`;
+    const bucket = grid.get(key);
+    if (bucket) bucket.push(mark);
+    else grid.set(key, [mark]);
+  }
+  return merged;
+}
+
 /**
  * Points worth snapping to, table frame: the corners and edge midpoints of every piece, and the ends
  * and crossings of reference creases. Points hidden under a higher layer are left out, duplicates merged.
@@ -98,7 +135,7 @@ function crossing(p: Segment, q: Segment): Vec2 | null {
 export function snapPoints(state: FlatState): Vec2[] {
   const tables = state.pieces.map(piecePolygon);
   const aux = state.creases.filter((c) => c.assignment === 'aux');
-  const found: Array<{ p: Vec2; layer: number }> = [];
+  const found: Mark[] = [];
   state.pieces.forEach((piece, i) => {
     const poly = tables[i];
     const add = (p: Vec2): void => {
@@ -123,16 +160,14 @@ export function snapPoints(state: FlatState): Vec2[] {
     });
   });
 
-  const cell = (v: number): number => Math.round(v / SNAP_MERGE);
-  const seen = new Set<string>();
-  const out: Vec2[] = [];
-  for (const { p, layer } of found) {
-    const hidden = state.pieces.some((other, i) => other.layer > layer && containsPoint(tables[i], p, -MIN_FEATURE));
-    if (hidden) continue;
-    const key = `${cell(p[0])},${cell(p[1])}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(p);
-  }
-  return out;
+  const boxes = tables.map((poly) => boundsOf([poly]));
+  const hidden = ({ p, layer }: Mark): boolean =>
+    state.pieces.some((other, i) => {
+      const { min, max } = boxes[i];
+      if (other.layer <= layer || p[0] < min[0] || p[0] > max[0] || p[1] < min[1] || p[1] > max[1]) return false;
+      return containsPoint(tables[i], p, -MIN_FEATURE);
+    });
+  return mergeMarks(found)
+    .filter((mark) => !hidden(mark))
+    .map((mark) => mark.p);
 }

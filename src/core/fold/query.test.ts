@@ -211,6 +211,23 @@ describe('snapPoints', () => {
     expect(has(markedCovered, [0.12, 0.1])).toBe(true);
   });
 
+  it('merges copies of a point whose coordinates sit on a rounding boundary', () => {
+    // On Letter paper, sixteenths of the height are odd multiples of half a micrometre.
+    const { width: w, height: h } = LETTER;
+    const { final, issues } = foldFlat(LETTER, [
+      { kind: 'fold', line: { a: [w, 0], b: [0, h / 2] }, moving: 'right', dir: 'mountain', layers: 'all' },
+      { kind: 'fold', line: { a: [0, 0], b: [w, h / 2] }, moving: 'left', dir: 'mountain', layers: 'all' },
+      { kind: 'fold', line: { a: [0, h / 8], b: [w, h / 8] }, moving: 'left', dir: 'valley', layers: 'flap' },
+      { kind: 'fold', line: { a: [0, h / 16], b: [w, h / 16] }, moving: 'right', dir: 'mountain', layers: 'all' },
+    ]);
+    expect(issues).toEqual([]);
+    const points = snapPoints(final);
+    expect(points.filter((p) => Math.abs(p[1] - h / 16) < 1e-9).length).toBeGreaterThan(4);
+    points.forEach((p, i) => {
+      for (let j = 0; j < i; j++) expect(Math.hypot(p[0] - points[j][0], p[1] - points[j][1])).toBeGreaterThan(1e-6);
+    });
+  });
+
   it('has no duplicates and stays inside the bounds', () => {
     for (const state of [fold(dartSteps(A4)), fold(lockSteps(A4)), foldFlat(A4, busySteps(A4)).final]) {
       const points = snapPoints(state);
@@ -221,7 +238,7 @@ describe('snapPoints', () => {
         expect(p[0]).toBeLessThanOrEqual(max[0] + 1e-9);
         expect(p[1]).toBeGreaterThanOrEqual(min[1] - 1e-9);
         expect(p[1]).toBeLessThanOrEqual(max[1] + 1e-9);
-        for (let j = 0; j < i; j++) expect(Math.hypot(p[0] - points[j][0], p[1] - points[j][1])).toBeGreaterThan(5e-7);
+        for (let j = 0; j < i; j++) expect(Math.hypot(p[0] - points[j][0], p[1] - points[j][1])).toBeGreaterThan(1e-6);
       });
     }
   });
