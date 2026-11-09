@@ -1,0 +1,2729 @@
+[
+ {
+  "doc": "01",
+  "file": "01-aerodynamics.md",
+  "title": "Aerodynamics of paper airplanes: low-Re, low-AR thin flat-plate element model",
+  "notes": [
+   "(Every URL came from search results returned in this session. Full texts were not opened, because WebFetch was blocked by the network policy.)",
+   "Sources [S34]-[S36] were added in the verification pass. Each is an open-source package downloaded from PyPI, and the named functions were read in the package source. They are code that implements the formulas (two of them cite the primary literature), not the primary papers themselves."
+  ],
+  "entries": [
+   {
+    "id": "01:S1",
+    "tag": "S1",
+    "text": "Pelletier, A., Mueller, T. J., \"Low Reynolds Number Aerodynamics of Low-Aspect-Ratio, Thin/Flat/Cambered-Plate Wings\", J. Aircraft 37(5):825-832, 2000, doi:10.2514/2.2676. https://www.researchgate.net/publication/245429843_Low_Reynolds_Number_Aerodynamics_of_Low-Aspect-Ratio_ThinFlatCambered-Plate_Wings",
+    "urls": [
+     "https://www.researchgate.net/publication/245429843_Low_Reynolds_Number_Aerodynamics_of_Low-Aspect-Ratio_ThinFlatCambered-Plate_Wings"
+    ]
+   },
+   {
+    "id": "01:S2",
+    "tag": "S2",
+    "text": "Torres, G. E., Mueller, T. J., \"Low-Aspect-Ratio Wing Aerodynamics at Low Reynolds Numbers\", AIAA J. 42(5):865-873, 2004, doi:10.2514/1.439. https://www.researchgate.net/publication/245425381_Low_Aspect_Ratio_Aerodynamics_at_Low_Reynolds_Numbers",
+    "urls": [
+     "https://www.researchgate.net/publication/245425381_Low_Aspect_Ratio_Aerodynamics_at_Low_Reynolds_Numbers"
+    ]
+   },
+   {
+    "id": "01:S3",
+    "tag": "S3",
+    "text": "Univ. of Notre Dame final report UNDAS-FR-2025, \"Aerodynamics of Low Aspect Ratio Wings at Low Reynolds Numbers\" (DTIC ADA397533). https://apps.dtic.mil/sti/pdfs/ADA397533.pdf",
+    "urls": [
+     "https://apps.dtic.mil/sti/pdfs/ADA397533.pdf"
+    ]
+   },
+   {
+    "id": "01:S4",
+    "tag": "S4",
+    "text": "Mueller, T. J., \"Aerodynamic Measurements at Low Reynolds Numbers for Fixed Wing Micro-Air Vehicles\", RTO/VKI course, 1999 (DTIC ADP010760). https://apps.dtic.mil/sti/tr/pdf/ADP010760.pdf",
+    "urls": [
+     "https://apps.dtic.mil/sti/tr/pdf/ADP010760.pdf"
+    ]
+   },
+   {
+    "id": "01:S5",
+    "tag": "S5",
+    "text": "Mueller, T. J., DeLaurier, J. D., \"Aerodynamics of Small Vehicles\", Annu. Rev. Fluid Mech. 35:89-111, 2003. https://www.annualreviews.org/content/journals/10.1146/annurev.fluid.35.101101.161102",
+    "urls": [
+     "https://www.annualreviews.org/content/journals/10.1146/annurev.fluid.35.101101.161102"
+    ]
+   },
+   {
+    "id": "01:S6",
+    "tag": "S6",
+    "text": "Ananda, G. K., Sukumar, P. P., Selig, M. S., \"Measured aerodynamic characteristics of wings at low Reynolds numbers\", Aerosp. Sci. Tech. 42:392-406, 2015. https://m-selig.ae.illinois.edu/pubs/AnandaSukumarSelig-2015-AeroSciTech-LowReWings.pdf",
+    "urls": [
+     "https://m-selig.ae.illinois.edu/pubs/AnandaSukumarSelig-2015-AeroSciTech-LowReWings.pdf"
+    ]
+   },
+   {
+    "id": "01:S7",
+    "tag": "S7",
+    "text": "Aguilar-Cabello, J. et al., \"On the lift curve slope for rectangular flat plate wings at moderate Reynolds number\", J. Wind Eng. Ind. Aerodyn. https://riuma.uma.es/xmlui/bitstream/handle/10630/35767/JWE_CorrCL_R1_black.pdf?sequence=1 ; https://www.sciencedirect.com/science/article/abs/pii/S016761052030369X",
+    "urls": [
+     "https://riuma.uma.es/xmlui/bitstream/handle/10630/35767/JWE_CorrCL_R1_black.pdf?sequence=1",
+     "https://www.sciencedirect.com/science/article/abs/pii/S016761052030369X"
+    ]
+   },
+   {
+    "id": "01:S8",
+    "tag": "S8",
+    "text": "ScienceDirect Topics, \"Lift-Curve Slope\" (Helmbold forms). https://www.sciencedirect.com/topics/engineering/lift-curve-slope",
+    "urls": [
+     "https://www.sciencedirect.com/topics/engineering/lift-curve-slope"
+    ]
+   },
+   {
+    "id": "01:S9",
+    "tag": "S9",
+    "text": "Mizoguchi, M., Itoh, H., \"Effect of Aspect Ratio on Aerodynamic Characteristics at Low Reynolds Numbers\", AIAA J. 51(7):1631-1639, 2013. https://arc.aiaa.org/doi/10.2514/1.J051915",
+    "urls": [
+     "https://arc.aiaa.org/doi/10.2514/1.J051915"
+    ]
+   },
+   {
+    "id": "01:S10",
+    "tag": "S10",
+    "text": "Mizoguchi, M., Kajikawa, Y., Itoh, H., \"Aerodynamic Characteristics of Low-Aspect-Ratio Wings with Various Aspect Ratios in Low Reynolds Number Flows\", Trans. JSASS 59(2):56-63, 2016. https://www.jstage.jst.go.jp/article/tjsass/59/2/59_T-15-28/_article",
+    "urls": [
+     "https://www.jstage.jst.go.jp/article/tjsass/59/2/59_T-15-28/_article"
+    ]
+   },
+   {
+    "id": "01:S11",
+    "tag": "S11",
+    "text": "Laitone, E. V., \"Wind tunnel tests of wings at Reynolds numbers below 70 000\", Exp. Fluids 23:405-409, 1997. https://link.springer.com/content/pdf/10.1007%2Fs003480050128.pdf",
+    "urls": [
+     "https://link.springer.com/content/pdf/10.1007%2Fs003480050128.pdf"
+    ]
+   },
+   {
+    "id": "01:S12",
+    "tag": "S12",
+    "text": "Okamoto, M., Jinba, Y., wing-planform study at Re of about 1e4 (Akita National College of Technology), 2009. https://akita.repo.nii.ac.jp/record/927/files/KJ00005254825.pdf",
+    "urls": [
+     "https://akita.repo.nii.ac.jp/record/927/files/KJ00005254825.pdf"
+    ]
+   },
+   {
+    "id": "01:S13",
+    "tag": "S13",
+    "text": "Shields, M., Mohseni, K., \"Effects of Sideslip on the Aerodynamics of Low-Aspect-Ratio Low-Reynolds-Number Wings\", AIAA J., 2012. https://arc.aiaa.org/doi/10.2514/1.J051151",
+    "urls": [
+     "https://arc.aiaa.org/doi/10.2514/1.J051151"
+    ]
+   },
+   {
+    "id": "01:S14",
+    "tag": "S14",
+    "text": "Traub, L. W., \"Examination and Prediction of the Lift Components of Low Aspect Ratio Rectangular Flat Plate Wings\", Aerospace 10(7):597, 2023. https://www.mdpi.com/2226-4310/10/7/597",
+    "urls": [
+     "https://www.mdpi.com/2226-4310/10/7/597"
+    ]
+   },
+   {
+    "id": "01:S15",
+    "tag": "S15",
+    "text": "Polhamus, E. C., NASA TN D-3767, 1966 (leading-edge-suction analogy). https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19670003842.pdf",
+    "urls": [
+     "https://ntrs.nasa.gov/archive/nasa/casi.ntrs.nasa.gov/19670003842.pdf"
+    ]
+   },
+   {
+    "id": "01:S16",
+    "tag": "S16",
+    "text": "NASA TN D-7631 (Kp, Kv definitions). https://ntrs.nasa.gov/api/citations/19740023303/downloads/19740023303.pdf",
+    "urls": [
+     "https://ntrs.nasa.gov/api/citations/19740023303/downloads/19740023303.pdf"
+    ]
+   },
+   {
+    "id": "01:S17",
+    "tag": "S17",
+    "text": "Lamar, J. E., NASA TR R-428, 1974 (side-edge suction analogy; ESDU abstract). https://www.esdu.com/cgi-bin/ps.pl?t=doc&p=nasa_trr428",
+    "urls": [
+     "https://www.esdu.com/cgi-bin/ps.pl?t=doc&p=nasa_trr428"
+    ]
+   },
+   {
+    "id": "01:S18",
+    "tag": "S18",
+    "text": "Winter, H., \"Flow Phenomena on Plates and Airfoils of Short Span\", NACA TM-798, 1936. https://ntrs.nasa.gov/citations/19930094619",
+    "urls": [
+     "https://ntrs.nasa.gov/citations/19930094619"
+    ]
+   },
+   {
+    "id": "01:S19",
+    "tag": "S19",
+    "text": "Ortiz, X., Rival, D., Wood, D., \"Forces and Moments on Flat Plates of Small Aspect Ratio...\", Energies 8(4):2438-2453, 2015. https://mdpi-res.com/d_attachment/energies/energies-08-02438/article_deploy/energies-08-02438.pdf",
+    "urls": [
+     "https://mdpi-res.com/d_attachment/energies/energies-08-02438/article_deploy/energies-08-02438.pdf"
+    ]
+   },
+   {
+    "id": "01:S20",
+    "tag": "S20",
+    "text": "NREL forum, \"Using Viterna method in AirfoilPrep\" (CDmax = 1.11 + 0.018 AR; Viterna & Janetzke, NASA TM-82944). https://forums.nrel.gov/t/using-viterna-method-in-airfoilprep/1283",
+    "urls": [
+     "https://forums.nrel.gov/t/using-viterna-method-in-airfoilprep/1283"
+    ]
+   },
+   {
+    "id": "01:S21",
+    "tag": "S21",
+    "text": "NASA report reproducing the Viterna equations and Texas A&M basis. https://ntrs.nasa.gov/api/citations/20090001311/downloads/20090001311.pdf",
+    "urls": [
+     "https://ntrs.nasa.gov/api/citations/20090001311/downloads/20090001311.pdf"
+    ]
+   },
+   {
+    "id": "01:S22",
+    "tag": "S22",
+    "text": "\"A Generalized Model for Predicting the Drag Coefficient of Arbitrary Bluff Shaped Bodies at High Reynolds Numbers\" (Kirchhoff-Rayleigh 0.88 versus 2.0). https://arxiv.org/pdf/2308.05272",
+    "urls": [
+     "https://arxiv.org/pdf/2308.05272"
+    ]
+   },
+   {
+    "id": "01:S23",
+    "tag": "S23",
+    "text": "Li, H., Goodwill, T., Wang, Z. J., Ristroph, L., \"Centre of mass location, flight modes, stability and dynamic modelling of gliders\", JFM 937 A6, 2022. https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/centre-of-mass-location-flight-modes-stability-and-dynamic-modelling-of-gliders/D4983A693B836A364D19C95B4D5FFC3B",
+    "urls": [
+     "https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/centre-of-mass-location-flight-modes-stability-and-dynamic-modelling-of-gliders/D4983A693B836A364D19C95B4D5FFC3B"
+    ]
+   },
+   {
+    "id": "01:S24",
+    "tag": "S24",
+    "text": "ScienceDaily, \"For new insights into aerodynamics, scientists turn to paper airplanes\", 2022. https://www.sciencedaily.com/releases/2022/03/220301131114.htm",
+    "urls": [
+     "https://www.sciencedaily.com/releases/2022/03/220301131114.htm"
+    ]
+   },
+   {
+    "id": "01:S25",
+    "tag": "S25",
+    "text": "Andersen, A., Pesavento, U., Wang, Z. J., \"Unsteady aerodynamics of fluttering and tumbling plates\", JFM 541:65-90, 2005. https://dragonfly.tam.cornell.edu/publications/S002211200500594Xa.pdf",
+    "urls": [
+     "https://dragonfly.tam.cornell.edu/publications/S002211200500594Xa.pdf"
+    ]
+   },
+   {
+    "id": "01:S26",
+    "tag": "S26",
+    "text": "Andersen, Pesavento, Wang, \"Analysis of transitions between fluttering, tumbling and steady descent of falling cards\", JFM 541:91-104, 2005. https://dragonfly.tam.cornell.edu/publications/S0022112005005847a.pdf",
+    "urls": [
+     "https://dragonfly.tam.cornell.edu/publications/S0022112005005847a.pdf"
+    ]
+   },
+   {
+    "id": "01:S27",
+    "tag": "S27",
+    "text": "Falling-plate literature quoting I* thresholds and the CL = 1.2 sin 2a, CD = 1.4 - cos 2a fits (secondary): https://arxiv.org/pdf/1804.05099 ; https://arxiv.org/pdf/2406.01785 ; https://arxiv.org/html/2503.22606v1",
+    "urls": [
+     "https://arxiv.org/pdf/1804.05099",
+     "https://arxiv.org/pdf/2406.01785",
+     "https://arxiv.org/html/2503.22606v1"
+    ]
+   },
+   {
+    "id": "01:S28",
+    "tag": "S28",
+    "text": "Pomerenk, O., Ristroph, L., \"Quasi-steady aerodynamics predicts the dynamics of flapping locomotion\" (dynamic CoP and added mass in falling-paper models). https://arxiv.org/pdf/2508.19899",
+    "urls": [
+     "https://arxiv.org/pdf/2508.19899"
+    ]
+   },
+   {
+    "id": "01:S29",
+    "tag": "S29",
+    "text": "Ng B. F., Kng Q. M., Pey Y. Y., Schlueter J. U., \"On the Aerodynamics of Paper Airplanes\", AIAA 2009-3958. https://arc.aiaa.org/doi/abs/10.2514/6.2009-3958 (as cited in doc 02)",
+    "urls": [
+     "https://arc.aiaa.org/doi/abs/10.2514/6.2009-3958"
+    ]
+   },
+   {
+    "id": "01:S30",
+    "tag": "S30",
+    "text": "Improbable Research, \"Paper Airplanes in Water\", 2010. https://improbable.com/2010/04/10/paper-airplanes-in-water/",
+    "urls": [
+     "https://improbable.com/2010/04/10/paper-airplanes-in-water/"
+    ]
+   },
+   {
+    "id": "01:S31",
+    "tag": "S31",
+    "text": "\"CFD Analysis on Dart Paperplane\", Jurnal Mekanikal (UTM). https://jurnalmekanikal.utm.my/index.php/jurnalmekanikal/article/view/550",
+    "urls": [
+     "https://jurnalmekanikal.utm.my/index.php/jurnalmekanikal/article/view/550"
+    ]
+   },
+   {
+    "id": "01:S32",
+    "tag": "S32",
+    "text": "\"Aerodynamic Performances of Paper Planes\", J. Adv. Res. Fluid Mech. Therm. Sci. https://semarakilmu.com.my/journals/index.php/fluid_mechanics_thermal_sciences/article/view/7107",
+    "urls": [
+     "https://semarakilmu.com.my/journals/index.php/fluid_mechanics_thermal_sciences/article/view/7107"
+    ]
+   },
+   {
+    "id": "01:S33",
+    "tag": "S33",
+    "text": "\"Aerodynamic study of the dart paper airplane for micro air vehicle application\" (listing). https://metatoc.com/papers/12971-aerodynamic-study-of-the-dart-paper-airplane-for-micro-air-vehicle-application",
+    "urls": [
+     "https://metatoc.com/papers/12971-aerodynamic-study-of-the-dart-paper-airplane-for-micro-air-vehicle-application"
+    ]
+   },
+   {
+    "id": "01:S34",
+    "tag": "S34",
+    "text": "AeroSandbox 4.2.10 (P. Sharpe, MIT). aerosandbox/library/aerodynamics/viscous.py, function Cf_flat_plate (Blasius 1.328/sqrt(Re_L), citing Cengel & Cimbala Table 10-4, valid Re_L <= 5e5, \"double it (two sides)\"). aerosandbox/library/aerodynamics/inviscid.py, function CL_over_Cl (Helmbold form AR/(2 + sqrt(4 + AR^2)); DATCOM form with sweep, citing Raymer sect. 12.4.1). https://pypi.org/project/AeroSandbox/4.2.10/",
+    "urls": [
+     "https://pypi.org/project/AeroSandbox/4.2.10/"
+    ]
+   },
+   {
+    "id": "01:S35",
+    "tag": "S35",
+    "text": "WISDEM 4.2.9 (NREL). wisdem/ccblade/Polar.py, methods extrapolate and __Viterna (cdmax = 1.11 + 0.018 AR; A, B, CL and CD forms; cites Viterna & Janetzke 1982). https://pypi.org/project/wisdem/4.2.9/",
+    "urls": [
+     "https://pypi.org/project/wisdem/4.2.9/"
+    ]
+   },
+   {
+    "id": "01:S36",
+    "tag": "S36",
+    "text": "pyfly-fixed-wing 0.1.2 (E. Bohn; 6-DOF fixed-wing simulator for the Skywalker X8). pyfly/pyfly.py, lines 1203-1215 (the same sigmoid blend and flat-plate post-stall CL). The package does not name Beard & McLain; that attribution stays model knowledge. https://pypi.org/project/pyfly-fixed-wing/0.1.2/",
+    "urls": [
+     "https://pypi.org/project/pyfly-fixed-wing/0.1.2/"
+    ]
+   }
+  ]
+ },
+ {
+  "doc": "02",
+  "file": "02-flight-dynamics-validation.md",
+  "title": "Flight dynamics, numerical method, human launch and validation targets",
+  "notes": [
+   "Sources [S45]-[S48] were added and opened in full during the verification pass (GitHub raw files were the only reachable host)."
+  ],
+  "entries": [
+   {
+    "id": "02:S1",
+    "tag": "S1",
+    "text": "Guinness World Records, \"Farthest flight by a paper aircraft\". https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "02:S2",
+    "tag": "S2",
+    "text": "AFPBB News (CGTN report), 98.43 m Chinese youth record. https://www.afpbb.com/articles/-/3618713",
+    "urls": [
+     "https://www.afpbb.com/articles/-/3618713"
+    ]
+   },
+   {
+    "id": "02:S3",
+    "tag": "S3",
+    "text": "Guinness World Records, \"Longest flying paper aircraft - duration\". https://www.guinnessworldrecords.com/world-records/longest-time-flying-a-paper-aircraft/",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/longest-time-flying-a-paper-aircraft/"
+    ]
+   },
+   {
+    "id": "02:S4",
+    "tag": "S4",
+    "text": "Ratopati, \"Chinese Teenagers Shatter 15-Year-Old World Record...\". https://english.ratopati.com/story/49683",
+    "urls": [
+     "https://english.ratopati.com/story/49683"
+    ]
+   },
+   {
+    "id": "02:S5",
+    "tag": "S5",
+    "text": "Guinness World Records news (May 2026), \"Evolution of the paper plane flight and how far it's actually possible to throw one\". https://www.guinnessworldrecords.com/news/2026/5/evolution-of-the-paper-plane-flight-and-how-far-its-actually-possible-to-throw-one",
+    "urls": [
+     "https://www.guinnessworldrecords.com/news/2026/5/evolution-of-the-paper-plane-flight-and-how-far-its-actually-possible-to-throw-one"
+    ]
+   },
+   {
+    "id": "02:S6",
+    "tag": "S6",
+    "text": "Business Insider via Yahoo, \"Boeing engineers designed a paper airplane...\" https://ca.news.yahoo.com/boeing-engineers-designed-paper-airplane-143032179.html ; Flying Magazine. https://www.flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane/",
+    "urls": [
+     "https://ca.news.yahoo.com/boeing-engineers-designed-paper-airplane-143032179.html",
+     "https://www.flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane/"
+    ]
+   },
+   {
+    "id": "02:S7",
+    "tag": "S7",
+    "text": "ESPN (2012), \"Joe Ayoob sets paper airplane record\". https://www.espn.com/espn/page2/story/_/id/7625552/former-cal-quarterback-joe-ayoob-sets-world-record-longest-throw-paper-airplane",
+    "urls": [
+     "https://www.espn.com/espn/page2/story/_/id/7625552/former-cal-quarterback-joe-ayoob-sets-world-record-longest-throw-paper-airplane"
+    ]
+   },
+   {
+    "id": "02:S8",
+    "tag": "S8",
+    "text": "Japan Times (2009), \"New flight record for paper plane set\". https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/",
+    "urls": [
+     "https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/"
+    ]
+   },
+   {
+    "id": "02:S9",
+    "tag": "S9",
+    "text": "Wikipedia, \"Ken Blackburn (aeronautical engineer)\". https://en.wikipedia.org/wiki/Ken_Blackburn_(aeronautical_engineer)",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Ken_Blackburn_(aeronautical_engineer)"
+    ]
+   },
+   {
+    "id": "02:S10",
+    "tag": "S10",
+    "text": "Christian Science Monitor (1997), \"A Light Flight for the Record Books\". https://www.csmonitor.com/1997/0429/042997.home.kidspace.1.html",
+    "urls": [
+     "https://www.csmonitor.com/1997/0429/042997.home.kidspace.1.html"
+    ]
+   },
+   {
+    "id": "02:S11",
+    "tag": "S11",
+    "text": "Back, Hall, Brown, Turner (2011), \"P1_6 Paper Planes - Long-Haul Flight\", Journal of Physics Special Topics, Univ. of Leicester. https://journals.le.ac.uk/index.php/pst/article/view/2045 ; PDF https://core.ac.uk/download/267013002.pdf",
+    "urls": [
+     "https://journals.le.ac.uk/index.php/pst/article/view/2045",
+     "https://core.ac.uk/download/267013002.pdf"
+    ]
+   },
+   {
+    "id": "02:S12",
+    "tag": "S12",
+    "text": "Ng et al. (with J. Schluter), \"On the Aerodynamics of Paper Airplanes\", AIAA 2009-3958. https://arc.aiaa.org/doi/abs/10.2514/6.2009-3958 ; full text https://lactea.ufpr.br/wp-content/uploads/2018/08/On_the_Aerodynamics_of_Paper_Airplanes.pdf",
+    "urls": [
+     "https://arc.aiaa.org/doi/abs/10.2514/6.2009-3958",
+     "https://lactea.ufpr.br/wp-content/uploads/2018/08/On_the_Aerodynamics_of_Paper_Airplanes.pdf"
+    ]
+   },
+   {
+    "id": "02:S13",
+    "tag": "S13",
+    "text": "Schluter, \"Aerodynamic study of the dart paper airplane for micro air vehicle application\", Proc. IMechE Part G (abstract). https://metatoc.com/papers/12971-aerodynamic-study-of-the-dart-paper-airplane-for-micro-air-vehicle-application",
+    "urls": [
+     "https://metatoc.com/papers/12971-aerodynamic-study-of-the-dart-paper-airplane-for-micro-air-vehicle-application"
+    ]
+   },
+   {
+    "id": "02:S14",
+    "tag": "S14",
+    "text": "\"Flow analysis on the ventral gap of a paper airplane\" (NWPU). https://pure.nwpu.edu.cn/zh/publications/flow-analysis-on-the-ventral-gap-of-a-paper-airplane/",
+    "urls": [
+     "https://pure.nwpu.edu.cn/zh/publications/flow-analysis-on-the-ventral-gap-of-a-paper-airplane/"
+    ]
+   },
+   {
+    "id": "02:S15",
+    "tag": "S15",
+    "text": "Selig (2010), \"Modeling Full-Envelope Aerodynamics of Small UAVs in Realtime\", AIAA 2010-7635. https://m-selig.web.engr.illinois.edu/pubs/Selig-2010-AIAA-2010-7635-FullEnvelopeAeroSim.pdf",
+    "urls": [
+     "https://m-selig.web.engr.illinois.edu/pubs/Selig-2010-AIAA-2010-7635-FullEnvelopeAeroSim.pdf"
+    ]
+   },
+   {
+    "id": "02:S16",
+    "tag": "S16",
+    "text": "Selig (2014), \"Real-Time Flight Simulation of Highly Maneuverable Unmanned Aerial Vehicles\", J. Aircraft. https://m-selig.web.engr.illinois.edu/pubs/Selig-2014-JofAC-FlightSim-FINAL.pdf",
+    "urls": [
+     "https://m-selig.web.engr.illinois.edu/pubs/Selig-2014-JofAC-FlightSim-FINAL.pdf"
+    ]
+   },
+   {
+    "id": "02:S17",
+    "tag": "S17",
+    "text": "Khan, W. (2016), PhD thesis, McGill (dynamics modelling of agile fixed-wing UAVs; with Khan & Nahon 2015 ICUAS). https://escholarship.mcgill.ca/downloads/dj52w7317",
+    "urls": [
+     "https://escholarship.mcgill.ca/downloads/dj52w7317"
+    ]
+   },
+   {
+    "id": "02:S18",
+    "tag": "S18",
+    "text": "Andersen, Pesavento, Wang (2005), \"Unsteady aerodynamics of fluttering and tumbling plates\", J. Fluid Mech. 541:65-90. https://dragonfly.tam.cornell.edu/publications/2005_JFM_Andersen_Pesavento_Wang_a.pdf",
+    "urls": [
+     "https://dragonfly.tam.cornell.edu/publications/2005_JFM_Andersen_Pesavento_Wang_a.pdf"
+    ]
+   },
+   {
+    "id": "02:S19",
+    "tag": "S19",
+    "text": "arXiv:2408.08864, \"Aerodynamic equilibria and flight stability of plates at intermediate Reynolds numbers\". https://arxiv.org/pdf/2408.08864",
+    "urls": [
+     "https://arxiv.org/pdf/2408.08864"
+    ]
+   },
+   {
+    "id": "02:S20",
+    "tag": "S20",
+    "text": "\"Quantification of added-mass effects using particle image velocimetry data for a translating and rotating flat plate\", J. Fluid Mech. (2019). https://www.repository.cam.ac.uk/handle/1810/290433",
+    "urls": [
+     "https://www.repository.cam.ac.uk/handle/1810/290433"
+    ]
+   },
+   {
+    "id": "02:S21",
+    "tag": "S21",
+    "text": "Wikipedia, \"Phugoid\". https://en.wikipedia.org/wiki/Phugoid",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Phugoid"
+    ]
+   },
+   {
+    "id": "02:S22",
+    "tag": "S22",
+    "text": "MIT OCW 16.01 Unified Engineering, phugoid notes. https://ocw.mit.edu/courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/4e932d24f9d4b17918820220ce1bd11e_phugoid.pdf",
+    "urls": [
+     "https://ocw.mit.edu/courses/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/4e932d24f9d4b17918820220ce1bd11e_phugoid.pdf"
+    ]
+   },
+   {
+    "id": "02:S23",
+    "tag": "S23",
+    "text": "arXiv:1309.1317 (internal stability of explicit RK methods; RK4 real interval [-2.7853, 0]). https://arxiv.org/pdf/1309.1317 ; RK stability function notes. https://jonshiach.github.io/ODEs-book/_pages/4.2_RK_stability_function.html",
+    "urls": [
+     "https://arxiv.org/pdf/1309.1317",
+     "https://jonshiach.github.io/ODEs-book/_pages/4.2_RK_stability_function.html"
+    ]
+   },
+   {
+    "id": "02:S24",
+    "tag": "S24",
+    "text": "Torres & Mueller (2004), \"Low-aspect-ratio wing aerodynamics at low Reynolds numbers\", AIAA J. 42(5):865-873 (AR 0.5-2, Re 7e4-2e5). https://doi.org/10.2514/1.439",
+    "urls": [
+     "https://doi.org/10.2514/1.439"
+    ]
+   },
+   {
+    "id": "02:S25",
+    "tag": "S25",
+    "text": "UTM lecture notes, \"Finite Wing Theory\" (Helmbold equation). https://people.utm.my/shabudin/wp-content/blogs.dir/1281/files/2018/03/2-Finite-wing-Theory.pdf",
+    "urls": [
+     "https://people.utm.my/shabudin/wp-content/blogs.dir/1281/files/2018/03/2-Finite-wing-Theory.pdf"
+    ]
+   },
+   {
+    "id": "02:S26",
+    "tag": "S26",
+    "text": "Red Bull, \"Red Bull Paper Wings World Final 2022 results\". https://www.redbull.com/us-en/red-bull-paper-wings-world-final-results",
+    "urls": [
+     "https://www.redbull.com/us-en/red-bull-paper-wings-world-final-results"
+    ]
+   },
+   {
+    "id": "02:S27",
+    "tag": "S27",
+    "text": "Red Bull, \"Red Bull Paper Wings World Finals report\". https://www.redbull.com/int-en/red-bull-paper-wings-world-finals-report",
+    "urls": [
+     "https://www.redbull.com/int-en/red-bull-paper-wings-world-finals-report"
+    ]
+   },
+   {
+    "id": "02:S28",
+    "tag": "S28",
+    "text": "Red Bull, \"Red Bull Paper Wings World Final rules\". https://www.redbull.com/int-en/events/red-bull-paper-wings-world-final/red-bull-paper-wings-world-final-rules",
+    "urls": [
+     "https://www.redbull.com/int-en/events/red-bull-paper-wings-world-final/red-bull-paper-wings-world-final-rules"
+    ]
+   },
+   {
+    "id": "02:S29",
+    "tag": "S29",
+    "text": "Wings Magazine (2009), \"Higher, faster, further: Red Bull Paper Wings is ready for takeoff\". https://wingsmagazine.com/higher-faster-further-red-bull-paper-wings-is-ready-for-takeoff-2549",
+    "urls": [
+     "https://wingsmagazine.com/higher-faster-further-red-bull-paper-wings-is-ready-for-takeoff-2549"
+    ]
+   },
+   {
+    "id": "02:S30",
+    "tag": "S30",
+    "text": "Kwantlen Polytechnic University, Paper Airplane Contest Rules 2014. https://www.kpu.ca/sites/default/files/Science%20and%20Horticulture/PaperAirplaneContestRules2014.pdf",
+    "urls": [
+     "https://www.kpu.ca/sites/default/files/Science%20and%20Horticulture/PaperAirplaneContestRules2014.pdf"
+    ]
+   },
+   {
+    "id": "02:S31",
+    "tag": "S31",
+    "text": "Fold'N Fly, \"Paper Airplane Launchers\". https://www.foldnfly.com/lounge/paper-airplane-launcher.php",
+    "urls": [
+     "https://www.foldnfly.com/lounge/paper-airplane-launcher.php"
+    ]
+   },
+   {
+    "id": "02:S32",
+    "tag": "S32",
+    "text": "Tennis-Warehouse forum, \"How fast can you throw a paper airplane?\" https://tt.tennis-warehouse.com/index.php?threads/how-fast-can-you-throw-a-paper-airplane.540107/",
+    "urls": [
+     "https://tt.tennis-warehouse.com/index.php?threads/how-fast-can-you-throw-a-paper-airplane.540107/"
+    ]
+   },
+   {
+    "id": "02:S33",
+    "tag": "S33",
+    "text": "Kobe High School (2021) poster, \"How to fly a paper airplane optimally\". https://seika.ssh.kobe-hs.org/media/common/KagakuEigo/2021/poster/2021-HowToFlyAPaperAirplane---.pdf",
+    "urls": [
+     "https://seika.ssh.kobe-hs.org/media/common/KagakuEigo/2021/poster/2021-HowToFlyAPaperAirplane---.pdf"
+    ]
+   },
+   {
+    "id": "02:S34",
+    "tag": "S34",
+    "text": "John Collins, National Paper Airplane Contest, \"Sink Rate\". https://johncollins333.wixsite.com/paperairplanecontest/sink-rate",
+    "urls": [
+     "https://johncollins333.wixsite.com/paperairplanecontest/sink-rate"
+    ]
+   },
+   {
+    "id": "02:S35",
+    "tag": "S35",
+    "text": "Virginia Tech AOE 3104, \"Gliding Flight (Steady State)\". https://archive.aoe.vt.edu/lutze/AOE3104/glidingflight.pdf",
+    "urls": [
+     "https://archive.aoe.vt.edu/lutze/AOE3104/glidingflight.pdf"
+    ]
+   },
+   {
+    "id": "02:S36",
+    "tag": "S36",
+    "text": "MIT OCW 2.154 Lecture 23 (Kirchhoff relations, added mass). https://ocw.iti.hr/courses/mechanical-engineering/2-154-maneuvering-and-control-of-surface-and-underwater-vehicles-13-49-fall-2004/lecture-notes/lec23.pdf ; MIT Fluids modules (Munk moment). https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec12/node1.html",
+    "urls": [
+     "https://ocw.iti.hr/courses/mechanical-engineering/2-154-maneuvering-and-control-of-surface-and-underwater-vehicles-13-49-fall-2004/lecture-notes/lec23.pdf",
+     "https://web.mit.edu/fluids-modules/www/potential_flows/LecturesHTML/lec12/node1.html"
+    ]
+   },
+   {
+    "id": "02:S37",
+    "tag": "S37",
+    "text": "Univ. of Alaska Fairbanks student page, paper airplane design (CG, elevator). https://ffden-2.phys.uaf.edu/211_fall2013.web.dir/Cody_Gaines/Design.html",
+    "urls": [
+     "https://ffden-2.phys.uaf.edu/211_fall2013.web.dir/Cody_Gaines/Design.html"
+    ]
+   },
+   {
+    "id": "02:S38",
+    "tag": "S38",
+    "text": "Fold'N Fly, \"How to Steer a Paper Airplane\". https://www.foldnfly.com/lounge/steer-aim.php",
+    "urls": [
+     "https://www.foldnfly.com/lounge/steer-aim.php"
+    ]
+   },
+   {
+    "id": "02:S39",
+    "tag": "S39",
+    "text": "TIME (2009), Sky King, \"27.9 seconds after leaving his hand\". https://content.time.com/time/specials/packages/article/0,28804,1934027_1934003_1933991,00.html",
+    "urls": [
+     "https://content.time.com/time/specials/packages/article/0,28804,1934027_1934003_1933991,00.html"
+    ]
+   },
+   {
+    "id": "02:S40",
+    "tag": "S40",
+    "text": "Popular Science (2012), \"How to Fold the Longest-Flying Paper Airplanes\". https://www.popsci.com/technology/article/2012-04/video-how-fold-longest-flying-paper-airplanes/",
+    "urls": [
+     "https://www.popsci.com/technology/article/2012-04/video-how-fold-longest-flying-paper-airplanes/"
+    ]
+   },
+   {
+    "id": "02:S41",
+    "tag": "S41",
+    "text": "Wikipedia, \"Red Bull Paper Wings\". https://en.wikipedia.org/wiki/Red_Bull_Paper_Wings",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Red_Bull_Paper_Wings"
+    ]
+   },
+   {
+    "id": "02:S42",
+    "tag": "S42",
+    "text": "Sports247 (2022), Red Bull Paper Wings airtime result. https://www.sports247.my/?p=293441",
+    "urls": [
+     "https://www.sports247.my/?p=293441"
+    ]
+   },
+   {
+    "id": "02:S43",
+    "tag": "S43",
+    "text": "Highlights in Science, Engineering and Technology (2024), video-tracked paper-plane glide angles. https://drpress.org/ojs/index.php/HSET/article/download/28138/27637/40038",
+    "urls": [
+     "https://drpress.org/ojs/index.php/HSET/article/download/28138/27637/40038"
+    ]
+   },
+   {
+    "id": "02:S44",
+    "tag": "S44",
+    "text": "Highlights in Science, Engineering and Technology, vol. 81 and vol. 93 (2024), paper-plane aspect-ratio and L/D studies. https://pdfs.semanticscholar.org/c318/735c0c0d41453e131fef5fc4284834530ff4.pdf ; https://pdfs.semanticscholar.org/e278/ab3bf021116646e1a27ef6baa6f624d07070.pdf",
+    "urls": [
+     "https://pdfs.semanticscholar.org/c318/735c0c0d41453e131fef5fc4284834530ff4.pdf",
+     "https://pdfs.semanticscholar.org/e278/ab3bf021116646e1a27ef6baa6f624d07070.pdf"
+    ]
+   },
+   {
+    "id": "02:S45",
+    "tag": "S45",
+    "text": "AeroSandbox (P. Sharpe), aerosandbox/library/aerodynamics/inviscid.py, function CL_over_Cl: CL/Cl = A / (2 + sqrt(4 + A^2 beta^2/eta^2 + (tan(sweep) A/eta)^2)), with the code comment \"Formulation from Raymer, Sect. 12.4.1; citing DATCOM\". Secondary source (open-source library quoting the textbook). https://raw.githubusercontent.com/peterdsharpe/AeroSandbox/master/aerosandbox/library/aerodynamics/inviscid.py",
+    "urls": [
+     "https://raw.githubusercontent.com/peterdsharpe/AeroSandbox/master/aerosandbox/library/aerodynamics/inviscid.py"
+    ]
+   },
+   {
+    "id": "02:S46",
+    "tag": "S46",
+    "text": "R. Tedrake, \"Underactuated Robotics\" course notes (MIT), trajectory-optimisation chapter, case study \"A glider that can land on a perch like a bird\": c_lift = 2 sin(alpha) cos(alpha), c_drag = 2 sin^2(alpha), citing Cory & Tedrake 2008 and Hoerner. https://raw.githubusercontent.com/RussTedrake/underactuated/master/book/trajopt.html",
+    "urls": [
+     "https://raw.githubusercontent.com/RussTedrake/underactuated/master/book/trajopt.html"
+    ]
+   },
+   {
+    "id": "02:S47",
+    "tag": "S47",
+    "text": "Beard & McLain, mavsim_public (companion code to \"Small Unmanned Aircraft: Theory and Practice\"), aerosonde_parameters.py: M = 50.0, alpha0 = 0.47, epsilon = 0.16. https://raw.githubusercontent.com/byu-magicc/mavsim_public/main/mavsim_python/parameters/aerosonde_parameters.py",
+    "urls": [
+     "https://raw.githubusercontent.com/byu-magicc/mavsim_public/main/mavsim_python/parameters/aerosonde_parameters.py"
+    ]
+   },
+   {
+    "id": "02:S48",
+    "tag": "S48",
+    "text": "L. A. Barba et al., \"Practical Numerical Methods with Python\" (the numerical-mooc course, George Washington University), module 1 \"The phugoid model of glider flight\": lesson 2 (period 2 pi sqrt(z_t/g) = pi sqrt(2) v_t/g) and lesson 3 (paper-airplane challenge: L/D 5.0 and trim velocity 4.9 m/s, citing Feng et al., \"On the aerodynamics of paper airplanes\", AIAA paper 2009-3958). https://raw.githubusercontent.com/numerical-mooc/numerical-mooc/master/lessons/01_phugoid/01_02_Phugoid_Oscillation.ipynb ; https://raw.githubusercontent.com/numerical-mooc/numerical-mooc/master/lessons/01_phugoid/01_03_PhugoidFullModel.ipynb",
+    "urls": [
+     "https://raw.githubusercontent.com/numerical-mooc/numerical-mooc/master/lessons/01_phugoid/01_02_Phugoid_Oscillation.ipynb",
+     "https://raw.githubusercontent.com/numerical-mooc/numerical-mooc/master/lessons/01_phugoid/01_03_PhugoidFullModel.ipynb"
+    ]
+   }
+  ]
+ },
+ {
+  "doc": "03",
+  "file": "03-wind-atmosphere.md",
+  "title": "Air, Wind, Turbulence, Gusts, Thermals and Indoor Air",
+  "notes": [],
+  "entries": [
+   {
+    "id": "03:S1",
+    "tag": "S1",
+    "text": "U.S. Standard Atmosphere, 1976 (NOAA/NASA/USAF), DTIC copy - https://apps.dtic.mil/sti/pdfs/ADA035728.pdf",
+    "urls": [
+     "https://apps.dtic.mil/sti/pdfs/ADA035728.pdf"
+    ]
+   },
+   {
+    "id": "03:S2",
+    "tag": "S2",
+    "text": "COESA76 implementation docs (β = 1.458e-6 kg/(m s K^0.5), S = 110.4 K) - https://hapsira.readthedocs.io/en/latest/autoapi/hapsira/earth/atmosphere/coesa76/index.html ; PDAS atmos76 listing - https://www.pdas.com/programs/atmos76.f90",
+    "urls": [
+     "https://hapsira.readthedocs.io/en/latest/autoapi/hapsira/earth/atmosphere/coesa76/index.html",
+     "https://www.pdas.com/programs/atmos76.f90"
+    ]
+   },
+   {
+    "id": "03:S3",
+    "tag": "S3",
+    "text": "US 1976 atmosphere calculator (μ0 = 1.78938e-5 kg/(m s)) - https://www.luizmonteiro.com/StdAtm.aspx",
+    "urls": [
+     "https://www.luizmonteiro.com/StdAtm.aspx"
+    ]
+   },
+   {
+    "id": "03:S4",
+    "tag": "S4",
+    "text": "CFD-Wiki, Sutherland's law (μ0 = 1.716e-5 at 273.15 K, S = 110.4 K, C1 = 1.458e-6) - https://mail.cfd-online.com/Wiki/Sutherland_law",
+    "urls": [
+     "https://mail.cfd-online.com/Wiki/Sutherland_law"
+    ]
+   },
+   {
+    "id": "03:S5",
+    "tag": "S5",
+    "text": "NASA Glenn Wind-US, VISCOSITY keyword (Sutherland default, T > 180 °R) - https://www.grc.nasa.gov/www/winddocs/user/keywords/viscosity.html",
+    "urls": [
+     "https://www.grc.nasa.gov/www/winddocs/user/keywords/viscosity.html"
+    ]
+   },
+   {
+    "id": "03:S6",
+    "tag": "S6",
+    "text": "Picard, Davis, Gläser, Fujii, \"Revised formula for the density of moist air (CIPM-2007)\", Metrologia 45 (2008) 149-155 - https://www.nist.gov/sites/default/files/documents/calibrations/CIPM-2007.pdf",
+    "urls": [
+     "https://www.nist.gov/sites/default/files/documents/calibrations/CIPM-2007.pdf"
+    ]
+   },
+   {
+    "id": "03:S7",
+    "tag": "S7",
+    "text": "Alduchov & Eskridge, \"Improved Magnus form approximation of saturation vapor pressure\", J. Appl. Meteor. 35 (1996) 601-609 - https://www.osti.gov/biblio/548871 ; coefficient documentation - https://rdrr.io/github/laubblatt/phaselag/man/Magnus_Alduchov1996Improved.html",
+    "urls": [
+     "https://www.osti.gov/biblio/548871",
+     "https://rdrr.io/github/laubblatt/phaselag/man/Magnus_Alduchov1996Improved.html"
+    ]
+   },
+   {
+    "id": "03:S8",
+    "tag": "S8",
+    "text": "Stull, Practical Meteorology, ch. 18 \"Atmospheric Boundary Layer\" (LibreTexts; roughness table) - https://geo.libretexts.org/Bookshelves/Meteorology_and_Climate_Science/Practical_Meteorology_(Stull)/18:_Atmospheric_Boundary_Layer/18.03:_Section_4-",
+    "urls": [
+     "https://geo.libretexts.org/Bookshelves/Meteorology_and_Climate_Science/Practical_Meteorology_(Stull)/18:_Atmospheric_Boundary_Layer/18.03:_Section_4-"
+    ]
+   },
+   {
+    "id": "03:S9",
+    "tag": "S9",
+    "text": "Hammond et al. (2012), \"Roughness length estimation along road transects using airborne LIDAR data\", Meteorol. Appl. (reproduces the Wieringa et al. 2001 table) - https://rmets.onlinelibrary.wiley.com/doi/10.1002/met.273",
+    "urls": [
+     "https://rmets.onlinelibrary.wiley.com/doi/10.1002/met.273"
+    ]
+   },
+   {
+    "id": "03:S10",
+    "tag": "S10",
+    "text": "Wieringa, revised Davenport roughness classification (AMS) - https://ams.confex.com/ams/AugDavis/webprogram/Paper15611.html ; WMO code register, Davenport classes - https://codes.wmo.int/wmdr/SurfaceRoughnessDavenport",
+    "urls": [
+     "https://ams.confex.com/ams/AugDavis/webprogram/Paper15611.html",
+     "https://codes.wmo.int/wmdr/SurfaceRoughnessDavenport"
+    ]
+   },
+   {
+    "id": "03:S11",
+    "tag": "S11",
+    "text": "Boundary-layer meteorology lecture ch. 9 (log profile, d and z0) - https://www.meteo.physik.uni-muenchen.de/~roger/Lectures/Boundary_layer_meteorology/BLMet_Ch09_SS2006.pdf",
+    "urls": [
+     "https://www.meteo.physik.uni-muenchen.de/~roger/Lectures/Boundary_layer_meteorology/BLMet_Ch09_SS2006.pdf"
+    ]
+   },
+   {
+    "id": "03:S12",
+    "tag": "S12",
+    "text": "\"The Wind Shear Exponent: Comparing Measured Against...\" - https://lru.praxis.dk/Lru/microsites/virksomhederiundervisningen/Vestas/vestas_ekstramateriale/4-b%20The_Wind_Shear_Exponent_Comparing_Measured_Against.pdf ; OSTI report on power law vs similarity - https://www.osti.gov/servlets/purl/6176146",
+    "urls": [
+     "https://lru.praxis.dk/Lru/microsites/virksomhederiundervisningen/Vestas/vestas_ekstramateriale/4-b%20The_Wind_Shear_Exponent_Comparing_Measured_Against.pdf",
+     "https://www.osti.gov/servlets/purl/6176146"
+    ]
+   },
+   {
+    "id": "03:S13",
+    "tag": "S13",
+    "text": "MeteoSwiss Beaufort table - https://www.meteoswiss.admin.ch/dam/jcr:c1064242-4a6e-4df2-8d21-96e68d1def7a/Beaufort_Tabelle_en.pdf ; Met Office - https://weather.metoffice.gov.uk/guides/coast-and-sea/beaufort-scale ; SKYbrary - https://skybrary.aero/articles/beaufort-wind-force-scale ; RMetS - https://www.rmets.org/metmatters/beaufort-scale",
+    "urls": [
+     "https://www.meteoswiss.admin.ch/dam/jcr:c1064242-4a6e-4df2-8d21-96e68d1def7a/Beaufort_Tabelle_en.pdf",
+     "https://weather.metoffice.gov.uk/guides/coast-and-sea/beaufort-scale",
+     "https://skybrary.aero/articles/beaufort-wind-force-scale",
+     "https://www.rmets.org/metmatters/beaufort-scale"
+    ]
+   },
+   {
+    "id": "03:S14",
+    "tag": "S14",
+    "text": "MathWorks Aerospace Blockset, Dryden Wind Turbulence Model (Continuous) - https://www.mathworks.com/help/aeroblks/drydenwindturbulencemodelcontinuous.html ; (Discrete) - https://www.mathworks.com/help/aeroblks/drydenwindturbulencemodeldiscrete.html",
+    "urls": [
+     "https://www.mathworks.com/help/aeroblks/drydenwindturbulencemodelcontinuous.html",
+     "https://www.mathworks.com/help/aeroblks/drydenwindturbulencemodeldiscrete.html"
+    ]
+   },
+   {
+    "id": "03:S15",
+    "tag": "S15",
+    "text": "arXiv 2403.12378 (low-altitude Dryden σ and L formulas) - https://arxiv.org/pdf/2403.12378",
+    "urls": [
+     "https://arxiv.org/pdf/2403.12378"
+    ]
+   },
+   {
+    "id": "03:S16",
+    "tag": "S16",
+    "text": "arXiv 1908.00372, \"Assessment of low-altitude atmospheric turbulence models for aircraft aeroelasticity\" (MIL-HDBK-1797: 2L_w = h, L_u = 2L_v) - https://arxiv.org/pdf/1908.00372",
+    "urls": [
+     "https://arxiv.org/pdf/1908.00372"
+    ]
+   },
+   {
+    "id": "03:S17",
+    "tag": "S17",
+    "text": "arXiv 1901.07951, \"Modeling and Simulation of UAV Carrier Landings\" (σ_w = 0.1 W20) - https://arxiv.org/pdf/1901.07951 ; Modelica Dryden example - https://doc.modelica.org/Modelica%204.0.0/Resources/helpWSM/Modelica/Modelica.Blocks.Examples.Noise.DrydenContinuousTurbulence.html",
+    "urls": [
+     "https://arxiv.org/pdf/1901.07951",
+     "https://doc.modelica.org/Modelica%204.0.0/Resources/helpWSM/Modelica/Modelica.Blocks.Examples.Noise.DrydenContinuousTurbulence.html"
+    ]
+   },
+   {
+    "id": "03:S18",
+    "tag": "S18",
+    "text": "Madden (NASA LaRC), \"Verifying Implementation of the Dryden Turbulence Model and MIL-F-8785 Gust Gradient\", AIAA Aviation 2018 - https://ntrs.nasa.gov/citations/20190000875",
+    "urls": [
+     "https://ntrs.nasa.gov/citations/20190000875"
+    ]
+   },
+   {
+    "id": "03:S19",
+    "tag": "S19",
+    "text": "Yeager, \"Implementation and Testing of Turbulence Models for the F18-HARV Simulation\", NASA/CR-1998-206937 - https://ntrs.nasa.gov/citations/19980028448",
+    "urls": [
+     "https://ntrs.nasa.gov/citations/19980028448"
+    ]
+   },
+   {
+    "id": "03:S20",
+    "tag": "S20",
+    "text": "MathWorks Answers, discrete Dryden u_g difference equation from MIL-F-8785C - https://www.mathworks.com/matlabcentral/answers/304578-how-is-the-equation-for-u_g-given-in-matlab-s-discrete-dryden-wind-turbulence-model-a-difference-equ",
+    "urls": [
+     "https://www.mathworks.com/matlabcentral/answers/304578-how-is-the-equation-for-u_g-given-in-matlab-s-discrete-dryden-wind-turbulence-model-a-difference-equ"
+    ]
+   },
+   {
+    "id": "03:S21",
+    "tag": "S21",
+    "text": "AMS conference papers quoting Panofsky & Dutton (1984) / Tillman (1972) σ_u,v,w/u* = 2.4, 1.9, 1.25 and the 2-3 scatter - https://ams.confex.com/ams/pdfpapers/101146.pdf ; https://ams.confex.com/ams/pdfpapers/43325.pdf",
+    "urls": [
+     "https://ams.confex.com/ams/pdfpapers/101146.pdf",
+     "https://ams.confex.com/ams/pdfpapers/43325.pdf"
+    ]
+   },
+   {
+    "id": "03:S22",
+    "tag": "S22",
+    "text": "MathWorks Aerospace Blockset, Discrete Wind Gust Model (MIL-F-8785C 1-cosine) - https://www.mathworks.com/help/aeroblks/discretewindgustmodel.html",
+    "urls": [
+     "https://www.mathworks.com/help/aeroblks/discretewindgustmodel.html"
+    ]
+   },
+   {
+    "id": "03:S23",
+    "tag": "S23",
+    "text": "14 CFR 25.341 Gust and turbulence loads - https://www.ecfr.gov/current/title-14/chapter-I/subchapter-C/part-25/subpart-C/subject-group-ECFR3e855ea22ea15d0/section-25.341 ; 2013 edition - https://www.gpo.gov/fdsys/pkg/CFR-2013-title14-vol1/pdf/CFR-2013-title14-vol1-sec25-341.pdf",
+    "urls": [
+     "https://www.ecfr.gov/current/title-14/chapter-I/subchapter-C/part-25/subpart-C/subject-group-ECFR3e855ea22ea15d0/section-25.341",
+     "https://www.gpo.gov/fdsys/pkg/CFR-2013-title14-vol1/pdf/CFR-2013-title14-vol1-sec25-341.pdf"
+    ]
+   },
+   {
+    "id": "03:S24",
+    "tag": "S24",
+    "text": "Harper, Kepert & Ginger (2010), Guidelines for converting between various wind averaging periods in tropical cyclone conditions, WMO/TD-No. 1555 - https://community.wmo.int/node/37087 ; 2008 progress paper - https://ams.confex.com/ams/pdfpapers/138064.pdf",
+    "urls": [
+     "https://community.wmo.int/node/37087",
+     "https://ams.confex.com/ams/pdfpapers/138064.pdf"
+    ]
+   },
+   {
+    "id": "03:S25",
+    "tag": "S25",
+    "text": "Holmes et al., \"Gust durations, gust factors and gust response factors in wind codes and standards\" (Durst ↔ I_u = 16.5 %) - https://portfolio.jcu.edu.au/publications/JCU150674",
+    "urls": [
+     "https://portfolio.jcu.edu.au/publications/JCU150674"
+    ]
+   },
+   {
+    "id": "03:S26",
+    "tag": "S26",
+    "text": "Seoul National University lecture notes, \"Part I Wind Properties\" (3 s gust vs 10 min and hourly means, open terrain) - https://ocw.snu.ac.kr/sites/default/files/NOTE/1~2%EC%A3%BC%EC%B0%A8_Part%20I%20Wind%20Properties_v14.pdf",
+    "urls": [
+     "https://ocw.snu.ac.kr/sites/default/files/NOTE/1~2%EC%A3%BC%EC%B0%A8_Part%20I%20Wind%20Properties_v14.pdf"
+    ]
+   },
+   {
+    "id": "03:S27",
+    "tag": "S27",
+    "text": "Gust factor study vs Durst (GF ≈ 1.43 at z0 ≈ 0.03 m) - https://ams.confex.com/ams/pdfpapers/36949.pdf ; Frontiers in Built Environment (2025), Durst limited to open terrain at 10 m - https://www.frontiersin.org/journals/built-environment/articles/10.3389/fbuil.2025.1498984/pdf",
+    "urls": [
+     "https://ams.confex.com/ams/pdfpapers/36949.pdf",
+     "https://www.frontiersin.org/journals/built-environment/articles/10.3389/fbuil.2025.1498984/pdf"
+    ]
+   },
+   {
+    "id": "03:S28",
+    "tag": "S28",
+    "text": "Allen, M. J., \"Updraft Model for Development of Autonomous Soaring Uninhabited Air Vehicles\", AIAA 2006-1510, NASA DFRC - https://ntrs.nasa.gov/citations/20060004052",
+    "urls": [
+     "https://ntrs.nasa.gov/citations/20060004052"
+    ]
+   },
+   {
+    "id": "03:S29",
+    "tag": "S29",
+    "text": "arXiv 1707.05668 (summary of the Allen model: w ∝ w*(z/z_i)^(1/3)(1 - 1.1 z/z_i), radial structure) - https://arxiv.org/pdf/1707.05668 ; ISAE survey of thermal updraft models - https://websites.isae-supaero.fr/IMG/pdf/report.pdf",
+    "urls": [
+     "https://arxiv.org/pdf/1707.05668",
+     "https://websites.isae-supaero.fr/IMG/pdf/report.pdf"
+    ]
+   },
+   {
+    "id": "03:S30",
+    "tag": "S30",
+    "text": "AMS Glossary, \"Deardorff velocity\" - https://glossary.ametsoc.org/wiki/Deardorff_velocity ; CBL lecture - https://boundary-layer-meteo.github.io/lectures/11_cbl.html",
+    "urls": [
+     "https://glossary.ametsoc.org/wiki/Deardorff_velocity",
+     "https://boundary-layer-meteo.github.io/lectures/11_cbl.html"
+    ]
+   },
+   {
+    "id": "03:S31",
+    "tag": "S31",
+    "text": "Walton, Kaminer, Dobrokhodov, Jones, \"Alternate Strategies for Optimal UAV Thermaling\" (Gedeon model) - https://calhoun.nps.edu/entities/publication/cb6411ea-a93d-4c79-8306-82de3daccd2c",
+    "urls": [
+     "https://calhoun.nps.edu/entities/publication/cb6411ea-a93d-4c79-8306-82de3daccd2c"
+    ]
+   },
+   {
+    "id": "03:S32",
+    "tag": "S32",
+    "text": "ASHRAE 55 summary (air-speed and vertical-gradient limits) - https://en.wikipedia.org/wiki/ASHRAE_55",
+    "urls": [
+     "https://en.wikipedia.org/wiki/ASHRAE_55"
+    ]
+   },
+   {
+    "id": "03:S33",
+    "tag": "S33",
+    "text": "ISO 7730 (1994 sample) - https://cdn.standards.iteh.ai/samples/14567/8b424422c77b49239f1c385829105f0c/ISO-7730-1994.pdf ; Utrecht study on the draught-rating model - https://research-portal.uu.nl/en/publications/the-significance-of-air-velocity-and-turbulence-intensity-for-res/",
+    "urls": [
+     "https://cdn.standards.iteh.ai/samples/14567/8b424422c77b49239f1c385829105f0c/ISO-7730-1994.pdf",
+     "https://research-portal.uu.nl/en/publications/the-significance-of-air-velocity-and-turbulence-intensity-for-res/"
+    ]
+   },
+   {
+    "id": "03:S34",
+    "tag": "S34",
+    "text": "Guinness World Records, Farthest flight by a paper aircraft - https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft ; (JP) - https://www.guinnessworldrecords.jp/world-records/farthest-flight-by-a-paper-aircraft ; Business Insider (A4, ≤ 100 gsm) - https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft",
+     "https://www.guinnessworldrecords.jp/world-records/farthest-flight-by-a-paper-aircraft",
+     "https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms"
+    ]
+   },
+   {
+    "id": "03:S35",
+    "tag": "S35",
+    "text": "Guinness World Records (JP), Longest time flying a paper aircraft - https://www.guinnessworldrecords.jp/world-records/longest-time-flying-a-paper-aircraft ; Japan Times (2009) - https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/ ; The Register (2009) - https://www.theregister.com/2009/12/29/paper_plane_record/ ; humid-conditions attempt - https://reuters.screenocean.com/record/467151 , https://www.dailymotion.com/video/xc8t51",
+    "urls": [
+     "https://www.guinnessworldrecords.jp/world-records/longest-time-flying-a-paper-aircraft",
+     "https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/",
+     "https://www.theregister.com/2009/12/29/paper_plane_record/",
+     "https://reuters.screenocean.com/record/467151",
+     "https://www.dailymotion.com/video/xc8t51"
+    ]
+   },
+   {
+    "id": "03:S36",
+    "tag": "S36",
+    "text": "ScienceDirect Topics, \"Continuous Turbulence\" (low-altitude Dryden L forms) - https://www.sciencedirect.com/topics/engineering/continuous-turbulence",
+    "urls": [
+     "https://www.sciencedirect.com/topics/engineering/continuous-turbulence"
+    ]
+   },
+   {
+    "id": "03:S37",
+    "tag": "S37",
+    "text": "arXiv 1905.09954, \"Spatio-Temporal Wind Modeling for UAV Simulations\" (von Kármán forms) - https://arxiv.org/pdf/1905.09954",
+    "urls": [
+     "https://arxiv.org/pdf/1905.09954"
+    ]
+   }
+  ]
+ },
+ {
+  "doc": "04",
+  "file": "04-paper-and-competition-rules.md",
+  "title": "Paper, Sizes, Mechanics and Competition Rules",
+  "notes": [
+   "All were confirmed via search-result text; direct page fetches were blocked by the network policy (see note at top)."
+  ],
+  "entries": [
+   {
+    "id": "04:S1",
+    "tag": "S1",
+    "text": "M. Kuhn, \"International standard paper sizes\" (ISO 216 summary, tolerances). https://www.cl.cam.ac.uk/~mgk25/iso-paper.html",
+    "urls": [
+     "https://www.cl.cam.ac.uk/~mgk25/iso-paper.html"
+    ]
+   },
+   {
+    "id": "04:S2",
+    "tag": "S2",
+    "text": "papersizes.org, \"Dimensions of A series paper sizes\". https://papersizes.org/a-paper-sizes.htm",
+    "urls": [
+     "https://papersizes.org/a-paper-sizes.htm"
+    ]
+   },
+   {
+    "id": "04:S3",
+    "tag": "S3",
+    "text": "Wikipedia, \"ANSI/ASME Y14.1\". https://en.wikipedia.org/wiki/ANSI/ASME_Y14.1",
+    "urls": [
+     "https://en.wikipedia.org/wiki/ANSI/ASME_Y14.1"
+    ]
+   },
+   {
+    "id": "04:S4",
+    "tag": "S4",
+    "text": "Designing Buildings Wiki, \"North American paper sizes\". https://www.designingbuildings.co.uk/wiki/North_American_Paper_Sizes",
+    "urls": [
+     "https://www.designingbuildings.co.uk/wiki/North_American_Paper_Sizes"
+    ]
+   },
+   {
+    "id": "04:S5",
+    "tag": "S5",
+    "text": "PrintWiki, \"Grammage\". https://printwiki.org/Grammage",
+    "urls": [
+     "https://printwiki.org/Grammage"
+    ]
+   },
+   {
+    "id": "04:S6",
+    "tag": "S6",
+    "text": "papersizes.org, \"US to UK & International paper weights\". https://www.papersizes.org/us-international-weights.htm",
+    "urls": [
+     "https://www.papersizes.org/us-international-weights.htm"
+    ]
+   },
+   {
+    "id": "04:S7",
+    "tag": "S7",
+    "text": "Lomax, 80 g/m² copy paper technical data sheet. https://cdn.lomax.dk/image/upload/dokumenter/1515200_4.pdf",
+    "urls": [
+     "https://cdn.lomax.dk/image/upload/dokumenter/1515200_4.pdf"
+    ]
+   },
+   {
+    "id": "04:S8",
+    "tag": "S8",
+    "text": "Navigator Organizer brand datasheet. https://pim.igepa.nl/Office/Kopieerpapier/Multifunctioneel/Navigator/Navigator%20Organizer%20Brand%20Datasheet.pdf",
+    "urls": [
+     "https://pim.igepa.nl/Office/Kopieerpapier/Multifunctioneel/Navigator/Navigator%20Organizer%20Brand%20Datasheet.pdf"
+    ]
+   },
+   {
+    "id": "04:S9",
+    "tag": "S9",
+    "text": "International Paper \"IP Basic\" 80 g/m² data sheet (Conrad). https://asset.conrad.com/media10/add/160267/c1/-/en/000885055DS01/tehnicni-podatki-885055-papir-za-brizgalnelaserske-tiskalnikekopirnike-ip-basic-din-a4-80-gm2-500-listov-88070920-international-paper.pdf",
+    "urls": [
+     "https://asset.conrad.com/media10/add/160267/c1/-/en/000885055DS01/tehnicni-podatki-885055-papir-za-brizgalnelaserske-tiskalnikekopirnike-ip-basic-din-a4-80-gm2-500-listov-88070920-international-paper.pdf"
+    ]
+   },
+   {
+    "id": "04:S10",
+    "tag": "S10",
+    "text": "Xerox Business A4 80 g/m² product data (Icecat). https://icecat.fr/p/xerox/003r91895/papiers-jet-d-encre-Business+A4+80g-m-+White+5x500+Sheets-802495.html",
+    "urls": [
+     "https://icecat.fr/p/xerox/003r91895/papiers-jet-d-encre-Business+A4+80g-m-+White+5x500+Sheets-802495.html"
+    ]
+   },
+   {
+    "id": "04:S11",
+    "tag": "S11",
+    "text": "Antalis, Explorer iPerformance. https://www.paper.co.uk/products/office-printing-copier/explorer-iperformance/",
+    "urls": [
+     "https://www.paper.co.uk/products/office-printing-copier/explorer-iperformance/"
+    ]
+   },
+   {
+    "id": "04:S12",
+    "tag": "S12",
+    "text": "Lomax office-paper grade datasheets. https://cdn.lomax.dk/image/upload/dokumenter/70232740_1.pdf and https://cdn.lomax.dk/image/upload/dokumenter/70232760_1.pdf",
+    "urls": [
+     "https://cdn.lomax.dk/image/upload/dokumenter/70232740_1.pdf",
+     "https://cdn.lomax.dk/image/upload/dokumenter/70232760_1.pdf"
+    ]
+   },
+   {
+    "id": "04:S13",
+    "tag": "S13",
+    "text": "ISO 187:2022 / ISO 187:1990, paper conditioning atmosphere. https://iteh.eu/catalog/standards/iso/341979c1-78e8-4823-a546-6abcc265fd41/iso-187-2022 ; https://webstore.ansi.org/preview-pages/ISO/preview_ISO+187-1990.pdf",
+    "urls": [
+     "https://iteh.eu/catalog/standards/iso/341979c1-78e8-4823-a546-6abcc265fd41/iso-187-2022",
+     "https://webstore.ansi.org/preview-pages/ISO/preview_ISO+187-1990.pdf"
+    ]
+   },
+   {
+    "id": "04:S14",
+    "tag": "S14",
+    "text": "Holmen Iggesund, \"General technical information\" (ISO 2493-1 bending resistance in mN; ISO 5628 bending stiffness in mN·m). https://www.iggesund.com/insights/paperboard-know-how/general-technical-information/",
+    "urls": [
+     "https://www.iggesund.com/insights/paperboard-know-how/general-technical-information/"
+    ]
+   },
+   {
+    "id": "04:S15",
+    "tag": "S15",
+    "text": "KTU study on paperboard MD/CD properties. https://epubl.ktu.edu/object/elaba:3062177/3062177.pdf",
+    "urls": [
+     "https://epubl.ktu.edu/object/elaba:3062177/3062177.pdf"
+    ]
+   },
+   {
+    "id": "04:S16",
+    "tag": "S16",
+    "text": "\"Regulating the deformation properties of paper by varying the degree of its anisotropy\" (Forestry Journal, NArFU). https://cyberleninka.ru/article/n/regulating-the-deformation-properties-of-paper-by-varying-the-degree-of-its-anisotropy",
+    "urls": [
+     "https://cyberleninka.ru/article/n/regulating-the-deformation-properties-of-paper-by-varying-the-degree-of-its-anisotropy"
+    ]
+   },
+   {
+    "id": "04:S17",
+    "tag": "S17",
+    "text": "A. Benusiglio, V. Mansard, A.-L. Biance, L. Bocquet, \"The anatomy of a crease, from folding to ironing\", Soft Matter 8, 3342 (2012), doi:10.1039/C2SM07151G. https://pubs.rsc.org/en/content/articlelanding/2012/sm/c2sm07151g",
+    "urls": [
+     "https://pubs.rsc.org/en/content/articlelanding/2012/sm/c2sm07151g"
+    ]
+   },
+   {
+    "id": "04:S18",
+    "tag": "S18",
+    "text": "B. Thiria, M. Adda-Bedia, \"Relaxation mechanisms in the unfolding of thin sheets\", Phys. Rev. Lett. 107, 025506 (2011). https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.107.025506",
+    "urls": [
+     "https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.107.025506"
+    ]
+   },
+   {
+    "id": "04:S19",
+    "tag": "S19",
+    "text": "K. Farain, \"A relaxation constant in the folding of thin viscoelastic sheets\", arXiv:1905.09220; Phys. Rev. Applied 13, 014031 (2020). https://arxiv.org/pdf/1905.09220",
+    "urls": [
+     "https://arxiv.org/pdf/1905.09220"
+    ]
+   },
+   {
+    "id": "04:S20",
+    "tag": "S20",
+    "text": "Nagasawa et al., \"Effect of bending velocity on time-dependent release behavior of creased white-coated paperboard\", Mech. Eng. J. (2016). https://doaj.org/article/0b63e666ceb14103ae8c0e1bc1a801f7",
+    "urls": [
+     "https://doaj.org/article/0b63e666ceb14103ae8c0e1bc1a801f7"
+    ]
+   },
+   {
+    "id": "04:S21",
+    "tag": "S21",
+    "text": "\"The combined effects of moisture and temperature on the mechanical response of paper\" (Salmén–Back relation). https://typeset.io/pdf/the-combined-effects-of-moisture-and-temperature-on-the-35mg21ny8c.pdf",
+    "urls": [
+     "https://typeset.io/pdf/the-combined-effects-of-moisture-and-temperature-on-the-35mg21ny8c.pdf"
+    ]
+   },
+   {
+    "id": "04:S22",
+    "tag": "S22",
+    "text": "Cellulose (2021), AFM study of paper fibres versus RH, doi:10.1007/s10570-021-04355-y. https://link.springer.com/article/10.1007/s10570-021-04355-y",
+    "urls": [
+     "https://link.springer.com/article/10.1007/s10570-021-04355-y"
+    ]
+   },
+   {
+    "id": "04:S23",
+    "tag": "S23",
+    "text": "FRC Symposium 1985, \"Influence of temperature and humidity on the elastic and expansional properties of paper and the constituent fibre\". https://bioresources.cnr.ncsu.edu/resources/influence-of-temperature-and-humidity-on-the-elastic-and-expansional-properties-of-paper-and-the-constituent-fibre/",
+    "urls": [
+     "https://bioresources.cnr.ncsu.edu/resources/influence-of-temperature-and-humidity-on-the-elastic-and-expansional-properties-of-paper-and-the-constituent-fibre/"
+    ]
+   },
+   {
+    "id": "04:S24",
+    "tag": "S24",
+    "text": "Roughness methods (PPS µm, Bendtsen ml/min, Bekk s): UPC/TAPPI article https://www.cd6.upc.edu/content/cd6_upload/contribucions/2012013009375014873999294f2656de69333.pdf ; Smithers https://www.smithers.com/industries/packaging/manufacturers-and-users/packaging-materials-testing/paper-testing-surface-properties/roughness-and-smoothness",
+    "urls": [
+     "https://www.cd6.upc.edu/content/cd6_upload/contribucions/2012013009375014873999294f2656de69333.pdf",
+     "https://www.smithers.com/industries/packaging/manufacturers-and-users/packaging-materials-testing/paper-testing-surface-properties/roughness-and-smoothness"
+    ]
+   },
+   {
+    "id": "04:S25",
+    "tag": "S25",
+    "text": "\"Modulation of near-wall turbulence in the transitionally rough regime\" (Nikuradse k_s⁺ thresholds), arXiv:1808.10825. https://arxiv.org/pdf/1808.10825",
+    "urls": [
+     "https://arxiv.org/pdf/1808.10825"
+    ]
+   },
+   {
+    "id": "04:S26",
+    "tag": "S26",
+    "text": "arXiv:1810.05743 (flat-plate friction; admissible roughness vs Schlichting). https://arxiv.org/abs/1810.05743v1",
+    "urls": [
+     "https://arxiv.org/abs/1810.05743v1"
+    ]
+   },
+   {
+    "id": "04:S27",
+    "tag": "S27",
+    "text": "arXiv:2107.14674 (cites Braslow & Knox, Re_k ≥ 600). https://arxiv.org/pdf/2107.14674",
+    "urls": [
+     "https://arxiv.org/pdf/2107.14674"
+    ]
+   },
+   {
+    "id": "04:S28",
+    "tag": "S28",
+    "text": "Guinness World Records, \"Farthest flight by a paper aircraft\". https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "04:S29",
+    "tag": "S29",
+    "text": "Guinness World Records, \"Longest time flying a paper aircraft\". https://www.guinnessworldrecords.com/world-records/longest-time-flying-a-paper-aircraft",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/longest-time-flying-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "04:S30",
+    "tag": "S30",
+    "text": "Guinness World Records news (May 2026), \"Evolution of the paper plane flight and how far it's actually possible to throw one\". https://www.guinnessworldrecords.com/news/2026/5/evolution-of-the-paper-plane-flight-and-how-far-its-actually-possible-to-throw-one",
+    "urls": [
+     "https://www.guinnessworldrecords.com/news/2026/5/evolution-of-the-paper-plane-flight-and-how-far-its-actually-possible-to-throw-one"
+    ]
+   },
+   {
+    "id": "04:S31",
+    "tag": "S31",
+    "text": "Fold 'N Fly, \"World record paper airplanes\" (GWR rules summary). https://www.foldnfly.com/lounge/world-record-paper-airplanes.php",
+    "urls": [
+     "https://www.foldnfly.com/lounge/world-record-paper-airplanes.php"
+    ]
+   },
+   {
+    "id": "04:S32",
+    "tag": "S32",
+    "text": "Red Bull Paper Wings, \"Rules\". https://paperwings.redbull.com/us-en/rules.html",
+    "urls": [
+     "https://paperwings.redbull.com/us-en/rules.html"
+    ]
+   },
+   {
+    "id": "04:S33",
+    "tag": "S33",
+    "text": "Red Bull, \"Paper Wings World Final 2022 – Rules\". https://www.redbull.com/int-en/event-series/red-bull-paper-wings/red-bull-paper-wings-world-final-rules",
+    "urls": [
+     "https://www.redbull.com/int-en/event-series/red-bull-paper-wings/red-bull-paper-wings-world-final-rules"
+    ]
+   },
+   {
+    "id": "04:S34",
+    "tag": "S34",
+    "text": "Red Bull, \"Red Bull Paper Wings World Final 2022: Results\". https://www.redbull.com/int-en/red-bull-paper-wings-world-final-results",
+    "urls": [
+     "https://www.redbull.com/int-en/red-bull-paper-wings-world-final-results"
+    ]
+   },
+   {
+    "id": "04:S35",
+    "tag": "S35",
+    "text": "CGTN (2022), \"Man throws paper plane 61m at World Finals\". https://news.cgtn.com/news/2022-05-18/Man-throws-paper-plane-61m-at-World-Finals-1a8dn38mS64/index.html",
+    "urls": [
+     "https://news.cgtn.com/news/2022-05-18/Man-throws-paper-plane-61m-at-World-Finals-1a8dn38mS64/index.html"
+    ]
+   },
+   {
+    "id": "04:S36",
+    "tag": "S36",
+    "text": "Yorkshire Post (2022), Red Bull Paper Wings final coverage. https://www.yorkshirepost.co.uk/news/people/red-bull-paper-wings-yorkshire-student-comes-sixth-in-worlds-biggest-paper-plane-throwing-competition-3694446",
+    "urls": [
+     "https://www.yorkshirepost.co.uk/news/people/red-bull-paper-wings-yorkshire-student-comes-sixth-in-worlds-biggest-paper-plane-throwing-competition-3694446"
+    ]
+   },
+   {
+    "id": "04:S37",
+    "tag": "S37",
+    "text": "AFPBB News (2026), 98.43 m record. https://www.afpbb.com/articles/-/3618713",
+    "urls": [
+     "https://www.afpbb.com/articles/-/3618713"
+    ]
+   },
+   {
+    "id": "04:S38",
+    "tag": "S38",
+    "text": "Shanghai Daily via City News Service (2026). https://www.citynewsservice.cn/articles/shanghaidaily/news/chinese-teens-set-paper-plane-world-record-nearing-100-meters-png9o7pm",
+    "urls": [
+     "https://www.citynewsservice.cn/articles/shanghaidaily/news/chinese-teens-set-paper-plane-world-record-nearing-100-meters-png9o7pm"
+    ]
+   },
+   {
+    "id": "04:S39",
+    "tag": "S39",
+    "text": "Oddity Central (2026), \"Teen paper plane enthusiasts break 2 long-standing world records\". https://www.odditycentral.com/news/teen-paper-plane-enthusiasts-break-2-long-standing-world-records-in-under-two-months.html",
+    "urls": [
+     "https://www.odditycentral.com/news/teen-paper-plane-enthusiasts-break-2-long-standing-world-records-in-under-two-months.html"
+    ]
+   },
+   {
+    "id": "04:S40",
+    "tag": "S40",
+    "text": "Ratopati (2026), \"Chinese teenagers shatter 15-year-old world record\". https://english.ratopati.com/story/49683/chinese-teens-set-world-record-by-flying-paper-planes-breaking-15-year-old-record",
+    "urls": [
+     "https://english.ratopati.com/story/49683/chinese-teens-set-world-record-by-flying-paper-planes-breaking-15-year-old-record"
+    ]
+   },
+   {
+    "id": "04:S41",
+    "tag": "S41",
+    "text": "HK01 (2026), report citing Toda's 29.2 s record of Dec 2010. https://global.hk01.com/大国小事/60322098/31-22秒-上海19岁少年有望再创纸飞机滞空时间健力士世界纪录",
+    "urls": [
+     "https://global.hk01.com/大国小事/60322098/31-22秒-上海19岁少年有望再创纸飞机滞空时间健力士世界纪录"
+    ]
+   },
+   {
+    "id": "04:S42",
+    "tag": "S42",
+    "text": "CNN (14 Apr 2023), Boeing engineers' paper airplane record. https://amp.cnn.com/cnn/2023/04/14/world/paper-airplane-boeing-engineers-world-record-scn",
+    "urls": [
+     "https://amp.cnn.com/cnn/2023/04/14/world/paper-airplane-boeing-engineers-world-record-scn"
+    ]
+   },
+   {
+    "id": "04:S43",
+    "tag": "S43",
+    "text": "Flying magazine, \"Boeing engineers set new distance record with paper airplane\". https://flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane",
+    "urls": [
+     "https://flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane"
+    ]
+   },
+   {
+    "id": "04:S44",
+    "tag": "S44",
+    "text": "Business Insider India (2023), Jensen quote on A4, 100 g/m². https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms",
+    "urls": [
+     "https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms"
+    ]
+   },
+   {
+    "id": "04:S45",
+    "tag": "S45",
+    "text": "Mental Floss, \"The perfect paper airplane\" (Collins, Ayoob, Suzanne). https://www.mentalfloss.com/article/54488/perfect-paper-airplane",
+    "urls": [
+     "https://www.mentalfloss.com/article/54488/perfect-paper-airplane"
+    ]
+   },
+   {
+    "id": "04:S46",
+    "tag": "S46",
+    "text": "Ingeniøren (2012), Ayoob/Collins record. https://ing.dk/artikel/tidligere-quarterback-saetter-verdensrekord-papirfly",
+    "urls": [
+     "https://ing.dk/artikel/tidligere-quarterback-saetter-verdensrekord-papirfly"
+    ]
+   },
+   {
+    "id": "04:S47",
+    "tag": "S47",
+    "text": "Wikipedia, \"Ken Blackburn (aeronautical engineer)\". https://en.wikipedia.org/wiki/Ken_Blackburn_(aeronautical_engineer)",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Ken_Blackburn_(aeronautical_engineer)"
+    ]
+   },
+   {
+    "id": "04:S48",
+    "tag": "S48",
+    "text": "Japan Times (17 May 2009), \"New flight record for paper plane set\". https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/",
+    "urls": [
+     "https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/"
+    ]
+   },
+   {
+    "id": "04:S49",
+    "tag": "S49",
+    "text": "Reuters/Screenocean (2010), Toda record attempt (10 tries). https://reuters.screenocean.com/record/467151",
+    "urls": [
+     "https://reuters.screenocean.com/record/467151"
+    ]
+   },
+   {
+    "id": "04:S50",
+    "tag": "S50",
+    "text": "Wikipedia, \"National Paper Airplane Day\" (records summary). https://en.wikipedia.org/wiki/National_Paper_Airplane_Day",
+    "urls": [
+     "https://en.wikipedia.org/wiki/National_Paper_Airplane_Day"
+    ]
+   },
+   {
+    "id": "04:S51",
+    "tag": "S51",
+    "text": "J. U. Schlüter, \"Aerodynamic study of the dart paper airplane for micro air vehicle application\", Proc. IMechE G 228(4):567–576 (2014), doi:10.1177/0954410013476778. https://journals.sagepub.com/doi/10.1177/0954410013476778",
+    "urls": [
+     "https://journals.sagepub.com/doi/10.1177/0954410013476778"
+    ]
+   },
+   {
+    "id": "04:S52",
+    "tag": "S52",
+    "text": "B. F. Ng, Q. M. Kng, Y. Y. Pey, J. Schlüter, \"On the aerodynamics of paper airplanes\", AIAA 2009-3958. https://lactea.ufpr.br/wp-content/uploads/2018/08/On_the_Aerodynamics_of_Paper_Airplanes.pdf",
+    "urls": [
+     "https://lactea.ufpr.br/wp-content/uploads/2018/08/On_the_Aerodynamics_of_Paper_Airplanes.pdf"
+    ]
+   },
+   {
+    "id": "04:S53",
+    "tag": "S53",
+    "text": "\"CFD analysis on dart paper plane\", Jurnal Mekanikal (UTM). https://jurnalmekanikal.utm.my/index.php/jurnalmekanikal/article/view/550",
+    "urls": [
+     "https://jurnalmekanikal.utm.my/index.php/jurnalmekanikal/article/view/550"
+    ]
+   },
+   {
+    "id": "04:S54",
+    "tag": "S54",
+    "text": "\"Centre of mass location, flight modes, stability and dynamic modelling of gliders\", J. Fluid Mech. https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/centre-of-mass-location-flight-modes-stability-and-dynamic-modelling-of-gliders/D4983A693B836A364D19C95B4D5FFC3B",
+    "urls": [
+     "https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/centre-of-mass-location-flight-modes-stability-and-dynamic-modelling-of-gliders/D4983A693B836A364D19C95B4D5FFC3B"
+    ]
+   },
+   {
+    "id": "04:S55",
+    "tag": "S55",
+    "text": "Kentucky Kernel, \"Red Bull hosts paper plane contest\" (two distance throws, best counts). https://kykernel.com/6170/news/red-bull-hosts-paper-plane-contest/",
+    "urls": [
+     "https://kykernel.com/6170/news/red-bull-hosts-paper-plane-contest/"
+    ]
+   },
+   {
+    "id": "04:S56",
+    "tag": "S56",
+    "text": "Guinness World Records, \"Farthest distance to hit a target with a paper aircraft\". https://www.guinnessworldrecords.com/world-records/425597-farthest-distance-to-hit-a-target-with-a-paper-aircraft",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/425597-farthest-distance-to-hit-a-target-with-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "04:S57",
+    "tag": "S57",
+    "text": "WFAE/NPR (20 May 2022), Korean–Malaysian team record. https://www.wfae.org/2022-05-20/paper-airplane-enthusiasts-break-record-for-farthest-flight-by-a-paper-aircraft",
+    "urls": [
+     "https://www.wfae.org/2022-05-20/paper-airplane-enthusiasts-break-record-for-farthest-flight-by-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "04:S58",
+    "tag": "S58",
+    "text": "DSAuk, \"GWR individual record – fold and throw paper planes\" (unmodified flat standard A4). https://dsauk.org/guinness-world-records-challenge/gwr-individual-record-paper-plane",
+    "urls": [
+     "https://dsauk.org/guinness-world-records-challenge/gwr-individual-record-paper-plane"
+    ]
+   },
+   {
+    "id": "04:S59",
+    "tag": "S59",
+    "text": "Yahoo News (2023), \"Engineers break record for farthest paper airplane flight\" (prior mark 252 ft 7 in). https://news.yahoo.com/engineers-break-record-farthest-paper-203009388.html",
+    "urls": [
+     "https://news.yahoo.com/engineers-break-record-farthest-paper-203009388.html"
+    ]
+   }
+  ]
+ },
+ {
+  "doc": "05",
+  "file": "05-designs-darts.md",
+  "title": "Dart-family designs: exact, machine-codable fold sequences",
+  "notes": [],
+  "entries": [
+   {
+    "id": "05:S1",
+    "tag": "S1",
+    "text": "Fold'N Fly, \"Basic Dart\". https://www.foldnfly.com/1.html",
+    "urls": [
+     "https://www.foldnfly.com/1.html"
+    ]
+   },
+   {
+    "id": "05:S2",
+    "tag": "S2",
+    "text": "Fold'N Fly, \"How to Make a Paper Airplane\". https://www.foldnfly.com/lounge/how-to-make-a-paper-airplane.php",
+    "urls": [
+     "https://www.foldnfly.com/lounge/how-to-make-a-paper-airplane.php"
+    ]
+   },
+   {
+    "id": "05:S3",
+    "tag": "S3",
+    "text": "Fold'N Fly, \"The Stable\" (stats, 75 gsm test paper note, rear-flap tricks). https://www.foldnfly.com/2.html",
+    "urls": [
+     "https://www.foldnfly.com/2.html"
+    ]
+   },
+   {
+    "id": "05:S4",
+    "tag": "S4",
+    "text": "2017 saved copy of Fold'N Fly \"The Stable\" (PDF). https://scienceclass3000.weebly.com/uploads/5/4/5/9/5459088/fold_n_fly_%E2%9C%88_the_stable_3.pdf",
+    "urls": [
+     "https://scienceclass3000.weebly.com/uploads/5/4/5/9/5459088/fold_n_fly_%E2%9C%88_the_stable_3.pdf"
+    ]
+   },
+   {
+    "id": "05:S5",
+    "tag": "S5",
+    "text": "Fold'N Fly, \"Zip Dart\". https://www.foldnfly.com/23.html",
+    "urls": [
+     "https://www.foldnfly.com/23.html"
+    ]
+   },
+   {
+    "id": "05:S6",
+    "tag": "S6",
+    "text": "Fold'N Fly, \"Heavy-Nosed Plane\". https://www.foldnfly.com/7.html",
+    "urls": [
+     "https://www.foldnfly.com/7.html"
+    ]
+   },
+   {
+    "id": "05:S7",
+    "tag": "S7",
+    "text": "Fold'N Fly, \"Hunting Flight\". https://www.foldnfly.com/6.html",
+    "urls": [
+     "https://www.foldnfly.com/6.html"
+    ]
+   },
+   {
+    "id": "05:S8",
+    "tag": "S8",
+    "text": "Pima Air & Space Museum, \"The Basic Dart\" (from Blackburn & Lammers, The World Record Paper Airplane Book). https://pimaair.org/wp-content/uploads/2020/01/The-basic-dart_120911.pdf",
+    "urls": [
+     "https://pimaair.org/wp-content/uploads/2020/01/The-basic-dart_120911.pdf"
+    ]
+   },
+   {
+    "id": "05:S9",
+    "tag": "S9",
+    "text": "Smithsonian NASM, How Things Fly, \"Dart\" printout. https://howthingsfly.si.edu/sites/default/files/paper-airplane/NASM_paper_plane_printout_b1p3i5.pdf",
+    "urls": [
+     "https://howthingsfly.si.edu/sites/default/files/paper-airplane/NASM_paper_plane_printout_b1p3i5.pdf"
+    ]
+   },
+   {
+    "id": "05:S10",
+    "tag": "S10",
+    "text": "Maine State Museum, \"Basic Dart Guide\". https://mainestatemuseum.org/wp-content/uploads/2025/08/Basic-Dart-Guide.pdf",
+    "urls": [
+     "https://mainestatemuseum.org/wp-content/uploads/2025/08/Basic-Dart-Guide.pdf"
+    ]
+   },
+   {
+    "id": "05:S11",
+    "tag": "S11",
+    "text": "Amazing Paper Airplanes \"Basic Dart\" (UBC PHYS 420 copy). https://phys420.phas.ubc.ca/p420_2018/guanting/media/Basic%20Dart%20Paper%20Airplane.pdf",
+    "urls": [
+     "https://phys420.phas.ubc.ca/p420_2018/guanting/media/Basic%20Dart%20Paper%20Airplane.pdf"
+    ]
+   },
+   {
+    "id": "05:S12",
+    "tag": "S12",
+    "text": "Museums Victoria, Air Playground teacher guide. https://calico-prod.museumsvictoria.com.au/media/kmxl0mbf/air-playground-teacher-guide.pdf",
+    "urls": [
+     "https://calico-prod.museumsvictoria.com.au/media/kmxl0mbf/air-playground-teacher-guide.pdf"
+    ]
+   },
+   {
+    "id": "05:S13",
+    "tag": "S13",
+    "text": "paperairplanes.co.uk, \"Classic Dart\". https://paperairplanes.co.uk/classic-dart-paper-airplane",
+    "urls": [
+     "https://paperairplanes.co.uk/classic-dart-paper-airplane"
+    ]
+   },
+   {
+    "id": "05:S14",
+    "tag": "S14",
+    "text": "Paper Plane Depot, \"Basic Dart\". https://paperplanedepot.com/basic-dart/",
+    "urls": [
+     "https://paperplanedepot.com/basic-dart/"
+    ]
+   },
+   {
+    "id": "05:S15",
+    "tag": "S15",
+    "text": "Instructables, \"Best Paper Airplane in the World (a.k.a. Bulldog Dart)\". https://www.instructables.com/Best-Paper-Airplane-in-the-World-aka-Bulldog-Dart/",
+    "urls": [
+     "https://www.instructables.com/Best-Paper-Airplane-in-the-World-aka-Bulldog-Dart/"
+    ]
+   },
+   {
+    "id": "05:S16",
+    "tag": "S16",
+    "text": "Art of Manliness, \"How to Make the World's Best Paper Airplanes\". https://www.artofmanliness.com/skills/just-for-fun/how-to-make-the-worlds-best-paper-airplanes/",
+    "urls": [
+     "https://www.artofmanliness.com/skills/just-for-fun/how-to-make-the-worlds-best-paper-airplanes/"
+    ]
+   },
+   {
+    "id": "05:S17",
+    "tag": "S17",
+    "text": "LewRockwell reprint of [S16] (2014). https://www.lewrockwell.com/2014/09/jeremy-andenberg/the-worlds-best-paper-airplanes/",
+    "urls": [
+     "https://www.lewrockwell.com/2014/09/jeremy-andenberg/the-worlds-best-paper-airplanes/"
+    ]
+   },
+   {
+    "id": "05:S18",
+    "tag": "S18",
+    "text": "Our Pastimes, \"How to Make a Bulldog Dart Paper Airplane\". https://ourpastimes.com/how-to-make-a-bulldog-dart-paper-airplane-12131546.html",
+    "urls": [
+     "https://ourpastimes.com/how-to-make-a-bulldog-dart-paper-airplane-12131546.html"
+    ]
+   },
+   {
+    "id": "05:S19",
+    "tag": "S19",
+    "text": "Medium (HeavenlyHandcrafts), \"The Art of Crafting the Perfect Paper Airplane\". https://medium.com/@HeavenlyHandcrafts/the-art-of-crafting-the-perfect-paper-airplane-56808ffb670c",
+    "urls": [
+     "https://medium.com/@HeavenlyHandcrafts/the-art-of-crafting-the-perfect-paper-airplane-56808ffb670c"
+    ]
+   },
+   {
+    "id": "05:S20",
+    "tag": "S20",
+    "text": "Instructables, \"How to Fold the Harrier Origami Paper Airplane\". https://www.instructables.com/How-to-Fold-the-Harrier-Origami-Paper-Airplane/",
+    "urls": [
+     "https://www.instructables.com/How-to-Fold-the-Harrier-Origami-Paper-Airplane/"
+    ]
+   },
+   {
+    "id": "05:S21",
+    "tag": "S21",
+    "text": "Instructables, \"To Fold the Harrier Paper Airplane\". https://www.instructables.com/To-Fold-The-Harrier-Paper-Airplane/",
+    "urls": [
+     "https://www.instructables.com/To-Fold-The-Harrier-Paper-Airplane/"
+    ]
+   },
+   {
+    "id": "05:S22",
+    "tag": "S22",
+    "text": "Brit.co, \"How to make a 'harrier' paper airplane\". https://guides.brit.co/guides/make-a-harrier-paper-airplane",
+    "urls": [
+     "https://guides.brit.co/guides/make-a-harrier-paper-airplane"
+    ]
+   },
+   {
+    "id": "05:S23",
+    "tag": "S23",
+    "text": "Guinness World Records, \"Farthest flight by a paper aircraft\". https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft",
+    "urls": [
+     "https://www.guinnessworldrecords.com/world-records/farthest-flight-by-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "05:S24",
+    "tag": "S24",
+    "text": "Flying Magazine, \"Boeing Engineers Set New Distance Record With Paper Airplane\". https://flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane",
+    "urls": [
+     "https://flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane"
+    ]
+   },
+   {
+    "id": "05:S25",
+    "tag": "S25",
+    "text": "General Aviation News (21 Mar 2023), \"Paper airplane sets world record\". https://generalaviationnews.com/2023/03/21/paper-airplane-sets-world-record",
+    "urls": [
+     "https://generalaviationnews.com/2023/03/21/paper-airplane-sets-world-record"
+    ]
+   },
+   {
+    "id": "05:S26",
+    "tag": "S26",
+    "text": "Hachette Book Group, The World Record Paper Airplane Book (Blackburn & Lammers). https://www.hbglibrary.com/titles/ken-blackburn/the-world-record-paper-airplane-book/9780761143833/",
+    "urls": [
+     "https://www.hbglibrary.com/titles/ken-blackburn/the-world-record-paper-airplane-book/9780761143833/"
+    ]
+   },
+   {
+    "id": "05:S27",
+    "tag": "S27",
+    "text": "Fold'N Fly, \"The Best Paper Airplane\" (average flight under 2 s). https://www.foldnfly.com/lounge/best-paper-airplane.php (background only; no claim in the text rests on it)",
+    "urls": [
+     "https://www.foldnfly.com/lounge/best-paper-airplane.php"
+    ]
+   },
+   {
+    "id": "05:S28",
+    "tag": "S28",
+    "text": "Dream Flight Charities, \"Paper Airplane Folding Instructions\" (PDF). https://dreamflightcharities.org/wp-content/uploads/2025/07/Paper-Airplane-Folding-Instructions.pdf (background only; no claim in the text rests on it)",
+    "urls": [
+     "https://dreamflightcharities.org/wp-content/uploads/2025/07/Paper-Airplane-Folding-Instructions.pdf"
+    ]
+   },
+   {
+    "id": "05:S29",
+    "tag": "S29",
+    "text": "Sibling doc docs/research/04-paper-and-competition-rules.md §6, which cites AFPBB https://www.afpbb.com/articles/-/3618713 and CNN https://amp.cnn.com/cnn/2023/04/14/world/paper-airplane-boeing-engineers-world-record-scn. I did not open these.",
+    "urls": [
+     "https://www.afpbb.com/articles/-/3618713",
+     "https://amp.cnn.com/cnn/2023/04/14/world/paper-airplane-boeing-engineers-world-record-scn"
+    ]
+   },
+   {
+    "id": "05:S30",
+    "tag": "S30",
+    "text": "wikiHow \"Make a Simple Paper Airplane\" (Kiwix mirror; folds kept inside). https://kiwix.lema.org/wikihow_en_maxi_2023-03/Make-a-Simple-Paper-Airplane",
+    "urls": [
+     "https://kiwix.lema.org/wikihow_en_maxi_2023-03/Make-a-Simple-Paper-Airplane"
+    ]
+   },
+   {
+    "id": "05:S31",
+    "tag": "S31",
+    "text": "Studocu, \"Instructions for Making Paper Airplanes: Bulldog Dart & Hammer\". https://www.studocu.com/en-us/document/harford-community-college/technical-writing/instructions-to-make-a-paper-airplane-k-carter/32807488",
+    "urls": [
+     "https://www.studocu.com/en-us/document/harford-community-college/technical-writing/instructions-to-make-a-paper-airplane-k-carter/32807488"
+    ]
+   },
+   {
+    "id": "05:S32",
+    "tag": "S32",
+    "text": "Business Insider India (2023), Jensen quote on A4 at 100 gsm. https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms",
+    "urls": [
+     "https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms"
+    ]
+   }
+  ]
+ },
+ {
+  "doc": "06",
+  "file": "06-designs-gliders-records.md",
+  "title": "Glider and record designs as fold sequences",
+  "notes": [
+   "(S7 was dropped because its search snippet did not support any claim used here.)"
+  ],
+  "entries": [
+   {
+    "id": "06:S1",
+    "tag": "S1",
+    "text": "CSIRO Double Helix, \"Nakamura lock plane\". https://blog.doublehelix.csiro.au/nakamura-lock-plane/",
+    "urls": [
+     "https://blog.doublehelix.csiro.au/nakamura-lock-plane/"
+    ]
+   },
+   {
+    "id": "06:S2",
+    "tag": "S2",
+    "text": "Mr Matthews, \"Nakamura Lock – Paper Airplane Instructions\" (PDF). http://themrmatthews.weebly.com/uploads/5/4/5/3/5453968/nakamura_lock.pdf",
+    "urls": [
+     "http://themrmatthews.weebly.com/uploads/5/4/5/3/5453968/nakamura_lock.pdf"
+    ]
+   },
+   {
+    "id": "06:S3",
+    "tag": "S3",
+    "text": "Boredom Wizard, \"Best paper airplane designs\" (≈ 1 inch below the tip). https://boredomwizard.com/paper-airplane-designs/",
+    "urls": [
+     "https://boredomwizard.com/paper-airplane-designs/"
+    ]
+   },
+   {
+    "id": "06:S4",
+    "tag": "S4",
+    "text": "Kidspot NZ, \"Make a Nakamura Lock paper plane\". https://kidspot.co.nz/activities/how-to-make-a-nakamura-lock-paper-plane/",
+    "urls": [
+     "https://kidspot.co.nz/activities/how-to-make-a-nakamura-lock-paper-plane/"
+    ]
+   },
+   {
+    "id": "06:S5",
+    "tag": "S5",
+    "text": "The Kid Should See This, \"How to fold the Nakamura Lock paper airplane\". https://thekidshouldseethis.com/post/how-to-fold-the-nakamura-lock-paper-airplane",
+    "urls": [
+     "https://thekidshouldseethis.com/post/how-to-fold-the-nakamura-lock-paper-airplane"
+    ]
+   },
+   {
+    "id": "06:S6",
+    "tag": "S6",
+    "text": "Chikicha, \"Long-distance flyer (Nakamura Lock)\". https://www.chikicha.com/buzz-buzz/how-to-make-the-best-paper-airplane--the-long-distance-flyer--nakamura-lock",
+    "urls": [
+     "https://www.chikicha.com/buzz-buzz/how-to-make-the-best-paper-airplane--the-long-distance-flyer--nakamura-lock"
+    ]
+   },
+   {
+    "id": "06:S8",
+    "tag": "S8",
+    "text": "Guinness World Records news, Feb 2012, \"Is this the farthest ever flight by a paper airplane?\" https://www.guinnessworldrecords.com/news/2012/2/video-is-this-the-farthest-ever-flight-by-a-paper-airplane",
+    "urls": [
+     "https://www.guinnessworldrecords.com/news/2012/2/video-is-this-the-farthest-ever-flight-by-a-paper-airplane"
+    ]
+   },
+   {
+    "id": "06:S9",
+    "tag": "S9",
+    "text": "HowStuffWorks, \"Guy who set the paper airplane world record shows how it's done\". https://science.howstuffworks.com/innovation/everyday-innovations/paper-airplane-guy-john-collins-world-record.htm",
+    "urls": [
+     "https://science.howstuffworks.com/innovation/everyday-innovations/paper-airplane-guy-john-collins-world-record.htm"
+    ]
+   },
+   {
+    "id": "06:S10",
+    "tag": "S10",
+    "text": "Ingeniøren (2012), Ayoob record report. https://ing.dk/artikel/tidligere-quarterback-saetter-verdensrekord-papirfly",
+    "urls": [
+     "https://ing.dk/artikel/tidligere-quarterback-saetter-verdensrekord-papirfly"
+    ]
+   },
+   {
+    "id": "06:S11",
+    "tag": "S11",
+    "text": "Bookey summary of J. M. Collins, The New World Champion Paper Airplane Book (PDF). https://cdn.bookey.app/files/pdf/book/en/the-new-world-champion-paper-airplane-book.pdf",
+    "urls": [
+     "https://cdn.bookey.app/files/pdf/book/en/the-new-world-champion-paper-airplane-book.pdf"
+    ]
+   },
+   {
+    "id": "06:S12",
+    "tag": "S12",
+    "text": "HobbyCaptain, \"World record paper plane Suzanne\" (2021). https://hobbycaptain.com/2021/04/29/world-record-paper-plane-suzanne/",
+    "urls": [
+     "https://hobbycaptain.com/2021/04/29/world-record-paper-plane-suzanne/"
+    ]
+   },
+   {
+    "id": "06:S13",
+    "tag": "S13",
+    "text": "L. Kratzke, \"How to make the Suzanne paper airplane (easier)\" (2021). http://lankratzke.blogspot.com/2021/01/how-to-make-paper-airplane-with-less.html",
+    "urls": [
+     "http://lankratzke.blogspot.com/2021/01/how-to-make-paper-airplane-with-less.html"
+    ]
+   },
+   {
+    "id": "06:S14",
+    "tag": "S14",
+    "text": "MIT Press Bookstore listing, ISBN 9781580085779 (Collins). https://mitpressbookstore.mit.edu/book/9781580085779",
+    "urls": [
+     "https://mitpressbookstore.mit.edu/book/9781580085779"
+    ]
+   },
+   {
+    "id": "06:S15",
+    "tag": "S15",
+    "text": "Japan Times, 17 May 2009, \"New flight record for paper plane set\". https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/",
+    "urls": [
+     "https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/"
+    ]
+   },
+   {
+    "id": "06:S16",
+    "tag": "S16",
+    "text": "TIME (2009), Sky King. https://content.time.com/time/specials/packages/article/0,28804,1934027_1934003_1933991,00.html",
+    "urls": [
+     "https://content.time.com/time/specials/packages/article/0,28804,1934027_1934003_1933991,00.html"
+    ]
+   },
+   {
+    "id": "06:S17",
+    "tag": "S17",
+    "text": "The Register, 29 Dec 2009, paper-plane record. https://www.theregister.com/2009/12/29/paper_plane_record/",
+    "urls": [
+     "https://www.theregister.com/2009/12/29/paper_plane_record/"
+    ]
+   },
+   {
+    "id": "06:S18",
+    "tag": "S18",
+    "text": "Guinness World Records Japan, \"Longest time flying a paper aircraft\". https://www.guinnessworldrecords.jp/world-records/longest-time-flying-a-paper-aircraft",
+    "urls": [
+     "https://www.guinnessworldrecords.jp/world-records/longest-time-flying-a-paper-aircraft"
+    ]
+   },
+   {
+    "id": "06:S19",
+    "tag": "S19",
+    "text": "Popular Science (Apr 2012), \"How to fold the longest-flying paper airplanes\". https://www.popsci.com/technology/article/2012-04/video-how-fold-longest-flying-paper-airplanes/",
+    "urls": [
+     "https://www.popsci.com/technology/article/2012-04/video-how-fold-longest-flying-paper-airplanes/"
+    ]
+   },
+   {
+    "id": "06:S20",
+    "tag": "S20",
+    "text": "BBS Bhutan, report on Toda. https://www.bbs.bt/news/?p=122229",
+    "urls": [
+     "https://www.bbs.bt/news/?p=122229"
+    ]
+   },
+   {
+    "id": "06:S21",
+    "tag": "S21",
+    "text": "Linden Tree Books, T. Toda, Ultra Long Flight Paper Airplanes (Tuttle). https://www.lindentreebooks.com/ultra-long-flight-paper-airplanes-20-incredible-pl.html",
+    "urls": [
+     "https://www.lindentreebooks.com/ultra-long-flight-paper-airplanes-20-incredible-pl.html"
+    ]
+   },
+   {
+    "id": "06:S22",
+    "tag": "S22",
+    "text": "News24, 27 Dec 2009, paper-plane flying record. https://www.news24.com/world/news/paper-plane-flying-record-20091227",
+    "urls": [
+     "https://www.news24.com/world/news/paper-plane-flying-record-20091227"
+    ]
+   },
+   {
+    "id": "06:D02",
+    "tag": "D02",
+    "text": "docs/research/02-flight-dynamics-validation.md (sibling doc: records, launch speeds, trim recipe).",
+    "urls": []
+   },
+   {
+    "id": "06:D04",
+    "tag": "D04",
+    "text": "docs/research/04-paper-and-competition-rules.md (sibling doc: GWR/Red Bull rules, record ladder, dart geometry).",
+    "urls": []
+   },
+   {
+    "id": "06:C",
+    "tag": "C",
+    "text": "Computed in this document with a scratch flat-fold engine (facet split and reflect, 0.5 mm raster). Reproducible from the formulas above.",
+    "urls": []
+   }
+  ]
+ },
+ {
+  "doc": "07",
+  "file": "07-computational-origami.md",
+  "title": "Computational origami for the simple-fold engine",
+  "notes": [],
+  "entries": [
+   {
+    "id": "07:S1",
+    "tag": "S1",
+    "text": "E. Demaine et al., FOLD file format spec v1.2 – https://raw.githubusercontent.com/edemaine/fold/main/doc/spec.md (opened)",
+    "urls": [
+     "https://raw.githubusercontent.com/edemaine/fold/main/doc/spec.md"
+    ]
+   },
+   {
+    "id": "07:S2",
+    "tag": "S2",
+    "text": "npm fold 0.12.0, MIT – https://registry.npmjs.org/fold (opened)",
+    "urls": [
+     "https://registry.npmjs.org/fold"
+    ]
+   },
+   {
+    "id": "07:S3",
+    "tag": "S3",
+    "text": "R. Kraft, Rabbit Ear 0.9.41 source (graph/fold/flatFold.js, simpleFold.js, axioms/axioms.js, math/constant.js, licence), GPL-3.0 – https://registry.npmjs.org/rabbit-ear ; https://rabbitear.org (opened)",
+    "urls": [
+     "https://registry.npmjs.org/rabbit-ear",
+     "https://rabbitear.org"
+    ]
+   },
+   {
+    "id": "07:S4",
+    "tag": "S4",
+    "text": "A. Ghassaei, Origami Simulator README, LICENSE (MIT) and source js/pattern.js, js/globals.js, js/beam.js, js/crease.js, js/dynamic/dynamicSolver.js – https://raw.githubusercontent.com/amandaghassaei/OrigamiSimulator/master/README.md (opened)",
+    "urls": [
+     "https://raw.githubusercontent.com/amandaghassaei/OrigamiSimulator/master/README.md"
+    ]
+   },
+   {
+    "id": "07:S5",
+    "tag": "S5",
+    "text": "Ghassaei, Demaine, Gershenfeld, \"Fast, Interactive Origami Simulation using GPU Computation\", Origami7 (OSME 2018) pp. 1151–1166 – https://erikdemaine.org/papers/OrigamiSimulator_Origami7/ (search-confirmed)",
+    "urls": [
+     "https://erikdemaine.org/papers/OrigamiSimulator_Origami7/"
+    ]
+   },
+   {
+    "id": "07:S6",
+    "tag": "S6",
+    "text": "Arkin, Bender, Demaine, Demaine, Mitchell, Sethia, Skiena, \"When Can You Fold a Map?\", Comput. Geom. 29 (2004) 23–46; arXiv cs/0011026 – https://arxiv.org/abs/cs/0011026 (search-confirmed)",
+    "urls": [
+     "https://arxiv.org/abs/cs/0011026"
+    ]
+   },
+   {
+    "id": "07:S7",
+    "tag": "S7",
+    "text": "Akitaya, Demaine, Ku, \"Simple Folding is Really Hard\", J. Inf. Process. 25 (2017) 580–589 – https://www.jstage.jst.go.jp/article/ipsjjip/25/0/25_580/_article (search-confirmed)",
+    "urls": [
+     "https://www.jstage.jst.go.jp/article/ipsjjip/25/0/25_580/_article"
+    ]
+   },
+   {
+    "id": "07:S8",
+    "tag": "S8",
+    "text": "Akitaya et al., \"Infinite All-Layers Simple Foldability\", arXiv 1901.08564 – https://arxiv.org/abs/1901.08564 (search-confirmed)",
+    "urls": [
+     "https://arxiv.org/abs/1901.08564"
+    ]
+   },
+   {
+    "id": "07:S9",
+    "tag": "S9",
+    "text": "Akitaya et al., \"Box Pleating is Hard\" (cites Bern & Hayes 1996) – https://scripts.mit.edu/~jasonku/pdf/BOXPLEATINGHARD_LNCS2016.pdf (search-confirmed)",
+    "urls": [
+     "https://scripts.mit.edu/~jasonku/pdf/BOXPLEATINGHARD_LNCS2016.pdf"
+    ]
+   },
+   {
+    "id": "07:S10",
+    "tag": "S10",
+    "text": "\"Huzita–Hatori axioms\", Wikipedia – https://en.wikipedia.org/wiki/Huzita%E2%80%93Hatori_axioms (search-confirmed)",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Huzita%E2%80%93Hatori_axioms"
+    ]
+   },
+   {
+    "id": "07:S11",
+    "tag": "S11",
+    "text": "R. J. Lang, \"Huzita-Justin Axioms\" – https://langorigami.com/article/huzita-justin-axioms/ (search-confirmed)",
+    "urls": [
+     "https://langorigami.com/article/huzita-justin-axioms/"
+    ]
+   },
+   {
+    "id": "07:S12",
+    "tag": "S12",
+    "text": "Alperin & Lang, \"One-, Two-, and Multi-Fold Origami Axioms\" (4OSME) – https://websites.math.leidenuniv.nl/edixhoven/talks/2017/2017_03_27origami_LiOdag/o4_multifold_axioms.pdf (search-confirmed)",
+    "urls": [
+     "https://websites.math.leidenuniv.nl/edixhoven/talks/2017/2017_03_27origami_LiOdag/o4_multifold_axioms.pdf"
+    ]
+   },
+   {
+    "id": "07:S13",
+    "tag": "S13",
+    "text": "J. C. Lucero, \"On the elementary single-fold operations of origami\", arXiv 1610.09923 – https://arxiv.org/abs/1610.09923 (search-confirmed)",
+    "urls": [
+     "https://arxiv.org/abs/1610.09923"
+    ]
+   },
+   {
+    "id": "07:S14",
+    "tag": "S14",
+    "text": "T. Hull, \"The Combinatorics of Flat Folds: a Survey\", arXiv 1307.1065 – https://arxiv.org/abs/1307.1065 (search-confirmed)",
+    "urls": [
+     "https://arxiv.org/abs/1307.1065"
+    ]
+   },
+   {
+    "id": "07:S15",
+    "tag": "S15",
+    "text": "\"Kawasaki's theorem\", Wikipedia – https://en.wikipedia.org/wiki/Kawasaki%27s_theorem (search-confirmed)",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Kawasaki%27s_theorem"
+    ]
+   },
+   {
+    "id": "07:S16",
+    "tag": "S16",
+    "text": "\"Yoshizawa–Randlett system\", Wikipedia – https://en.wikipedia.org/wiki/Yoshizawa%E2%80%93Randlett_system (search-confirmed)",
+    "urls": [
+     "https://en.wikipedia.org/wiki/Yoshizawa%E2%80%93Randlett_system"
+    ]
+   },
+   {
+    "id": "07:S17",
+    "tag": "S17",
+    "text": "Wikibooks, \"Origami/Techniques/Yoshizawa-Randlett system\" – https://en.wikibooks.org/wiki/Origami/Techniques/Yoshizawa-Randlett_system (search-confirmed)",
+    "urls": [
+     "https://en.wikibooks.org/wiki/Origami/Techniques/Yoshizawa-Randlett_system"
+    ]
+   },
+   {
+    "id": "07:S18",
+    "tag": "S18",
+    "text": "belcastro & Hull, \"Modelling the folding of paper into three dimensions using affine transformations\", Linear Algebra Appl. 348 (2002) 273–282, doi:10.1016/S0024-3795(01)00608-5 – https://scholarworks.uni.edu/facpub/3391 (search-confirmed)",
+    "urls": [
+     "https://scholarworks.uni.edu/facpub/3391"
+    ]
+   },
+   {
+    "id": "07:S19",
+    "tag": "S19",
+    "text": "T. Tachi, \"Simulation of Rigid Origami\" (4OSME) – https://www.tsg.ne.jp/TT/cg/SimulationOfRigidOrigami_tachi_4OSME.pdf (search-confirmed)",
+    "urls": [
+     "https://www.tsg.ne.jp/TT/cg/SimulationOfRigidOrigami_tachi_4OSME.pdf"
+    ]
+   },
+   {
+    "id": "07:S20",
+    "tag": "S20",
+    "text": "J. S. Ku, Flat-Folder README and LICENSE (MIT) – https://raw.githubusercontent.com/origamimagiro/flat-folder/main/README.md (opened)",
+    "urls": [
+     "https://raw.githubusercontent.com/origamimagiro/flat-folder/main/README.md"
+    ]
+   },
+   {
+    "id": "07:S21",
+    "tag": "S21",
+    "text": "ORIPA README and LICENSE (GPL-3.0) – https://raw.githubusercontent.com/oripa/oripa/master/README.md (opened)",
+    "urls": [
+     "https://raw.githubusercontent.com/oripa/oripa/master/README.md"
+    ]
+   },
+   {
+    "id": "07:S22",
+    "tag": "S22",
+    "text": "polygon-clipping 0.15.7 README – https://registry.npmjs.org/polygon-clipping (opened)",
+    "urls": [
+     "https://registry.npmjs.org/polygon-clipping"
+    ]
+   },
+   {
+    "id": "07:S23",
+    "tag": "S23",
+    "text": "martinez-polygon-clipping 0.9.1 README – https://registry.npmjs.org/martinez-polygon-clipping (opened)",
+    "urls": [
+     "https://registry.npmjs.org/martinez-polygon-clipping"
+    ]
+   },
+   {
+    "id": "07:S24",
+    "tag": "S24",
+    "text": "clipper2-js 1.2.4 package metadata – https://registry.npmjs.org/clipper2-js (opened)",
+    "urls": [
+     "https://registry.npmjs.org/clipper2-js"
+    ]
+   },
+   {
+    "id": "07:S25",
+    "tag": "S25",
+    "text": "robust-predicates 3.0.3 README (port of Shewchuk, https://www.cs.cmu.edu/~quake/robust.html) – https://registry.npmjs.org/robust-predicates (opened)",
+    "urls": [
+     "https://www.cs.cmu.edu/~quake/robust.html",
+     "https://registry.npmjs.org/robust-predicates"
+    ]
+   },
+   {
+    "id": "07:S26",
+    "tag": "S26",
+    "text": "This research: esbuild 0.24.0 --bundle --minify plus gzip -9 bundle measurements, and NumPy checks (rectangle closed forms, 2×10⁶-sample Monte Carlo, axiom reflections), 2026-11-09.",
+    "urls": []
+   },
+   {
+    "id": "07:S27",
+    "tag": "S27",
+    "text": "matgeom polygonSecondAreaMoments – https://octave.sourceforge.io/matgeom/function/polygonSecondAreaMoments.html ; Penn State ME481 notes – https://www.me.psu.edu/sommer/me481/notes_07_02.pdf (search-confirmed)",
+    "urls": [
+     "https://octave.sourceforge.io/matgeom/function/polygonSecondAreaMoments.html",
+     "https://www.me.psu.edu/sommer/me481/notes_07_02.pdf"
+    ]
+   },
+   {
+    "id": "07:S28",
+    "tag": "S28",
+    "text": "READMEs: https://raw.githubusercontent.com/charlestytler/PaperAirplaneSim/master/README.md , https://raw.githubusercontent.com/nissmar/Paper_Plane_VCL/master/README.md , https://raw.githubusercontent.com/LOrangex/suzanne-paper-plane-lab/main/README.md (opened); the \"none generates airframe from folds\" finding comes from a web-search summary.",
+    "urls": [
+     "https://raw.githubusercontent.com/charlestytler/PaperAirplaneSim/master/README.md",
+     "https://raw.githubusercontent.com/nissmar/Paper_Plane_VCL/master/README.md",
+     "https://raw.githubusercontent.com/LOrangex/suzanne-paper-plane-lab/main/README.md"
+    ]
+   }
+  ]
+ },
+ {
+  "doc": "08",
+  "file": "08-platform-leaderboard.md",
+  "title": "Platform, hosting, leaderboard backend and mobile WebGL",
+  "notes": [
+   "Cloudflare pages were read from github.com/cloudflare/cloudflare-docs (branch production, path src/content/…), which builds the canonical pages. Base for raw sources: https://raw.githubusercontent.com/cloudflare/cloudflare-docs/production/src/content/."
+  ],
+  "entries": [
+   {
+    "id": "08:S1",
+    "tag": "S1",
+    "text": "Cloudflare Pages overview, note \"Are you sure you want to use Pages?\": https://developers.cloudflare.com/pages/ (partial partials/pages/workers-for-new-projects.mdx)",
+    "urls": [
+     "https://developers.cloudflare.com/pages/"
+    ]
+   },
+   {
+    "id": "08:S2",
+    "tag": "S2",
+    "text": "Migrate from Pages to Workers + compatibility matrix: https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/ (docs/workers/static-assets/migration-guides/migrate-from-pages.mdx)",
+    "urls": [
+     "https://developers.cloudflare.com/workers/static-assets/migration-guides/migrate-from-pages/"
+    ]
+   },
+   {
+    "id": "08:S3",
+    "tag": "S3",
+    "text": "Workers static assets, Single Page Application: https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/ (and [S3-nav] partial partials/workers/navigation_requests.mdx)",
+    "urls": [
+     "https://developers.cloudflare.com/workers/static-assets/routing/single-page-application/"
+    ]
+   },
+   {
+    "id": "08:S4",
+    "tag": "S4",
+    "text": "Workers static assets, Headers: https://developers.cloudflare.com/workers/static-assets/headers/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/static-assets/headers/"
+    ]
+   },
+   {
+    "id": "08:S5",
+    "tag": "S5",
+    "text": "Workers framework guide React + Vite, and Vite plugin partials (partials/workers/vite-plugin/*.mdx): https://developers.cloudflare.com/workers/framework-guides/web-apps/react/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/framework-guides/web-apps/react/"
+    ]
+   },
+   {
+    "id": "08:S6",
+    "tag": "S6",
+    "text": "Cloudflare Vite plugin overview and Vite+ page: https://developers.cloudflare.com/workers/vite-plugin/ , https://developers.cloudflare.com/workers/vite-plugin/vite-plus/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/vite-plugin/",
+     "https://developers.cloudflare.com/workers/vite-plugin/vite-plus/"
+    ]
+   },
+   {
+    "id": "08:S7",
+    "tag": "S7",
+    "text": "Wrangler configuration: https://developers.cloudflare.com/workers/wrangler/configuration/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/wrangler/configuration/"
+    ]
+   },
+   {
+    "id": "08:S8",
+    "tag": "S8",
+    "text": "Workers limits: https://developers.cloudflare.com/workers/platform/limits/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/platform/limits/"
+    ]
+   },
+   {
+    "id": "08:S9",
+    "tag": "S9",
+    "text": "Workers pricing: https://developers.cloudflare.com/workers/platform/pricing/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/platform/pricing/"
+    ]
+   },
+   {
+    "id": "08:S10",
+    "tag": "S10",
+    "text": "Pages serving behaviour (SPA rendering): https://developers.cloudflare.com/pages/configuration/serving-pages/",
+    "urls": [
+     "https://developers.cloudflare.com/pages/configuration/serving-pages/"
+    ]
+   },
+   {
+    "id": "08:S11",
+    "tag": "S11",
+    "text": "Pages build configuration + presets (src/content/pages-framework-presets/index.yaml: React (Vite) → npm run build, dist): https://developers.cloudflare.com/pages/configuration/build-configuration/",
+    "urls": [
+     "https://developers.cloudflare.com/pages/configuration/build-configuration/"
+    ]
+   },
+   {
+    "id": "08:S12",
+    "tag": "S12",
+    "text": "Pages Functions overview: https://developers.cloudflare.com/pages/functions/",
+    "urls": [
+     "https://developers.cloudflare.com/pages/functions/"
+    ]
+   },
+   {
+    "id": "08:S13",
+    "tag": "S13",
+    "text": "Choose a data or storage product: https://developers.cloudflare.com/workers/platform/storage-options/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/platform/storage-options/"
+    ]
+   },
+   {
+    "id": "08:S14",
+    "tag": "S14",
+    "text": "D1 limits: https://developers.cloudflare.com/d1/platform/limits/",
+    "urls": [
+     "https://developers.cloudflare.com/d1/platform/limits/"
+    ]
+   },
+   {
+    "id": "08:S15",
+    "tag": "S15",
+    "text": "D1 pricing (partial partials/workers/d1-pricing.mdx): https://developers.cloudflare.com/d1/platform/pricing/",
+    "urls": [
+     "https://developers.cloudflare.com/d1/platform/pricing/"
+    ]
+   },
+   {
+    "id": "08:S16",
+    "tag": "S16",
+    "text": "Workers KV limits: https://developers.cloudflare.com/kv/platform/limits/",
+    "urls": [
+     "https://developers.cloudflare.com/kv/platform/limits/"
+    ]
+   },
+   {
+    "id": "08:S17",
+    "tag": "S17",
+    "text": "How KV works: https://developers.cloudflare.com/kv/concepts/how-kv-works/",
+    "urls": [
+     "https://developers.cloudflare.com/kv/concepts/how-kv-works/"
+    ]
+   },
+   {
+    "id": "08:S18",
+    "tag": "S18",
+    "text": "Durable Objects limits: https://developers.cloudflare.com/durable-objects/platform/limits/",
+    "urls": [
+     "https://developers.cloudflare.com/durable-objects/platform/limits/"
+    ]
+   },
+   {
+    "id": "08:S19",
+    "tag": "S19",
+    "text": "Durable Objects pricing + plans note: https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "urls": [
+     "https://developers.cloudflare.com/durable-objects/platform/pricing/"
+    ]
+   },
+   {
+    "id": "08:S20",
+    "tag": "S20",
+    "text": "Workers Rate Limiting binding: https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/runtime-apis/bindings/rate-limit/"
+    ]
+   },
+   {
+    "id": "08:S21",
+    "tag": "S21",
+    "text": "Turnstile server-side validation: https://developers.cloudflare.com/turnstile/get-started/server-side-validation/",
+    "urls": [
+     "https://developers.cloudflare.com/turnstile/get-started/server-side-validation/"
+    ]
+   },
+   {
+    "id": "08:S22",
+    "tag": "S22",
+    "text": "Workers secrets: https://developers.cloudflare.com/workers/configuration/secrets/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/configuration/secrets/"
+    ]
+   },
+   {
+    "id": "08:S23",
+    "tag": "S23",
+    "text": "R2 example aws-sdk-js-v3 (SDK v3 in Workers with nodejs_compat): https://developers.cloudflare.com/r2/examples/aws/aws-sdk-js-v3/",
+    "urls": [
+     "https://developers.cloudflare.com/r2/examples/aws/aws-sdk-js-v3/"
+    ]
+   },
+   {
+    "id": "08:S24",
+    "tag": "S24",
+    "text": "How Workers works (V8 isolates): https://developers.cloudflare.com/workers/reference/how-workers-works/",
+    "urls": [
+     "https://developers.cloudflare.com/workers/reference/how-workers-works/"
+    ]
+   },
+   {
+    "id": "08:S25",
+    "tag": "S25",
+    "text": "aws4fetch README: https://github.com/mhart/aws4fetch (raw: https://raw.githubusercontent.com/mhart/aws4fetch/master/README.md); version from https://registry.npmjs.org/aws4fetch/latest",
+    "urls": [
+     "https://github.com/mhart/aws4fetch",
+     "https://raw.githubusercontent.com/mhart/aws4fetch/master/README.md",
+     "https://registry.npmjs.org/aws4fetch/latest"
+    ]
+   },
+   {
+    "id": "08:S26",
+    "tag": "S26",
+    "text": "DynamoDB Developer Guide, Using Global Secondary Indexes (GameScores / GameTitleIndex): https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html (archived source: https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/GSI.md)",
+    "urls": [
+     "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html",
+     "https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/GSI.md"
+    ]
+   },
+   {
+    "id": "08:S27",
+    "tag": "S27",
+    "text": "DynamoDB Query (ScanIndexForward, 1 MB page, Count): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/Query.md",
+    "urls": [
+     "https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/Query.md"
+    ]
+   },
+   {
+    "id": "08:S28",
+    "tag": "S28",
+    "text": "DynamoDB partition key design (3,000 RCU / 1,000 WCU per partition): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/bp-partition-key-design.md",
+    "urls": [
+     "https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/bp-partition-key-design.md"
+    ]
+   },
+   {
+    "id": "08:S29",
+    "tag": "S29",
+    "text": "DynamoDB service quotas (400 KB item, key lengths, 20 GSIs): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/ServiceQuotas.md",
+    "urls": [
+     "https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/ServiceQuotas.md"
+    ]
+   },
+   {
+    "id": "08:S30",
+    "tag": "S30",
+    "text": "DynamoDB low-level API (X-Amz-Target, x-amz-json-1.0): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/Programming.LowLevelAPI.md",
+    "urls": [
+     "https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/Programming.LowLevelAPI.md"
+    ]
+   },
+   {
+    "id": "08:S31",
+    "tag": "S31",
+    "text": "ECMA-262 (implementation-approximated, Math.sqrt, Number::multiply, Math.imul, fdlibm recommendation): https://tc39.es/ecma262/ (source: https://raw.githubusercontent.com/tc39/ecma262/main/spec.html)",
+    "urls": [
+     "https://tc39.es/ecma262/",
+     "https://raw.githubusercontent.com/tc39/ecma262/main/spec.html"
+    ]
+   },
+   {
+    "id": "08:S32",
+    "tag": "S32",
+    "text": "Chromium third_party/fdlibm/README.chromium (V8 ieee754 fork; cross-OS consistency): https://chromium.googlesource.com/chromium/src/+/main/third_party/fdlibm/README.chromium (opened in verification via the GitHub mirror https://raw.githubusercontent.com/chromium/chromium/main/third_party/fdlibm/README.chromium)",
+    "urls": [
+     "https://chromium.googlesource.com/chromium/src/+/main/third_party/fdlibm/README.chromium",
+     "https://raw.githubusercontent.com/chromium/chromium/main/third_party/fdlibm/README.chromium"
+    ]
+   },
+   {
+    "id": "08:S33",
+    "tag": "S33",
+    "text": "V8 code review said to move asin/acos to fdlibm (search-confirmed by the first author only; not re-opened, host unreachable; nothing in this document depends on it): https://codereview.chromium.org/2122643002",
+    "urls": [
+     "https://codereview.chromium.org/2122643002"
+    ]
+   },
+   {
+    "id": "08:S34",
+    "tag": "S34",
+    "text": "Mozilla. Opened in verification: the test for bug 2037094 (libm pow 1 ulp off on Android ARM), https://raw.githubusercontent.com/mozilla-firefox/firefox/main/js/src/jit-test/tests/basic/fdlibm-for-pow.js (same file as https://searchfox.org/firefox-main/source/js/src/jit-test/tests/basic/fdlibm-for-pow.js). Search-confirmed by the first author only, not re-opened (bugzilla.mozilla.org unreachable): bug 531915 (tan differs Linux/Windows) https://bugzilla.mozilla.org/show_bug.cgi?id=531915 ; bug 1823880 (select fdlibm dynamically) https://bugzilla.mozilla.org/show_bug.cgi?id=1823880 ; bug 2037094 https://bugzilla.mozilla.org/show_bug.cgi?id=2037094",
+    "urls": [
+     "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/js/src/jit-test/tests/basic/fdlibm-for-pow.js",
+     "https://searchfox.org/firefox-main/source/js/src/jit-test/tests/basic/fdlibm-for-pow.js",
+     "https://bugzilla.mozilla.org/show_bug.cgi?id=531915",
+     "https://bugzilla.mozilla.org/show_bug.cgi?id=1823880",
+     "https://bugzilla.mozilla.org/show_bug.cgi?id=2037094"
+    ]
+   },
+   {
+    "id": "08:S35",
+    "tag": "S35",
+    "text": "Chromium \"Using Chromium with SwiftShader\": https://chromium.googlesource.com/chromium/src/+/main/docs/gpu/swiftshader.md (read via https://raw.githubusercontent.com/chromium/chromium/main/docs/gpu/swiftshader.md)",
+    "urls": [
+     "https://chromium.googlesource.com/chromium/src/+/main/docs/gpu/swiftshader.md",
+     "https://raw.githubusercontent.com/chromium/chromium/main/docs/gpu/swiftshader.md"
+    ]
+   },
+   {
+    "id": "08:S36",
+    "tag": "S36",
+    "text": "Playwright Browsers (headless shell vs new headless): https://playwright.dev/docs/browsers (source: https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/browsers.md)",
+    "urls": [
+     "https://playwright.dev/docs/browsers",
+     "https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/browsers.md"
+    ]
+   },
+   {
+    "id": "08:S37",
+    "tag": "S37",
+    "text": "three.js manual, Responsive Design (HD-DPI, max pixel count): https://threejs.org/manual/#en/responsive (source mrdoob/three.js/dev/manual/pages/responsive.html)",
+    "urls": [
+     "https://threejs.org/manual/#en/responsive"
+    ]
+   },
+   {
+    "id": "08:S38",
+    "tag": "S38",
+    "text": "three.js manual, How to dispose of objects (and \"Rendering on demand\"): https://threejs.org/manual/#en/how-to-dispose-of-objects (source manual/pages/how-to-dispose-of-objects.html, rendering-on-demand.html)",
+    "urls": [
+     "https://threejs.org/manual/#en/how-to-dispose-of-objects"
+    ]
+   },
+   {
+    "id": "08:S39",
+    "tag": "S39",
+    "text": "three.js manual, Shadows (fake shadows): https://threejs.org/manual/#en/shadows",
+    "urls": [
+     "https://threejs.org/manual/#en/shadows"
+    ]
+   },
+   {
+    "id": "08:S40",
+    "tag": "S40",
+    "text": "three.js manual, WebGL Compatibility Check: https://threejs.org/manual/#en/webgl-compatibility-check",
+    "urls": [
+     "https://threejs.org/manual/#en/webgl-compatibility-check"
+    ]
+   },
+   {
+    "id": "08:S41",
+    "tag": "S41",
+    "text": "three.js manual, WebGPURenderer: https://threejs.org/manual/#en/webgpurenderer",
+    "urls": [
+     "https://threejs.org/manual/#en/webgpurenderer"
+    ]
+   },
+   {
+    "id": "08:S42",
+    "tag": "S42",
+    "text": "three.js src/renderers/WebGLRenderer.js (dev, r187): https://raw.githubusercontent.com/mrdoob/three.js/dev/src/renderers/WebGLRenderer.js",
+    "urls": [
+     "https://raw.githubusercontent.com/mrdoob/three.js/dev/src/renderers/WebGLRenderer.js"
+    ]
+   },
+   {
+    "id": "08:S43",
+    "tag": "S43",
+    "text": "MDN, WebGL best practices: https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices (source mdn/content)",
+    "urls": [
+     "https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/WebGL_best_practices"
+    ]
+   },
+   {
+    "id": "08:S44",
+    "tag": "S44",
+    "text": "MDN, HTMLCanvasElement.getContext (powerPreference): https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext",
+    "urls": [
+     "https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/getContext"
+    ]
+   },
+   {
+    "id": "08:S45",
+    "tag": "S45",
+    "text": "MDN, webglcontextlost event: https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextlost_event",
+    "urls": [
+     "https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/webglcontextlost_event"
+    ]
+   },
+   {
+    "id": "08:S46",
+    "tag": "S46",
+    "text": "MDN, Making PWAs installable: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable",
+    "urls": [
+     "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable"
+    ]
+   },
+   {
+    "id": "08:S47",
+    "tag": "S47",
+    "text": "vite-plugin-pwa, Getting Started: https://vite-pwa-org.netlify.app/guide/ (source https://raw.githubusercontent.com/vite-pwa/docs/main/guide/index.md)",
+    "urls": [
+     "https://vite-pwa-org.netlify.app/guide/",
+     "https://raw.githubusercontent.com/vite-pwa/docs/main/guide/index.md"
+    ]
+   },
+   {
+    "id": "08:S48",
+    "tag": "S48",
+    "text": "vite-plugin-pwa, Deploy (Cache-Control): https://vite-pwa-org.netlify.app/deployment/ (source deployment/index.md)",
+    "urls": [
+     "https://vite-pwa-org.netlify.app/deployment/"
+    ]
+   },
+   {
+    "id": "08:S49",
+    "tag": "S49",
+    "text": "vite-plugin-pwa, Service worker precache (globPatterns): https://vite-pwa-org.netlify.app/guide/service-worker-precache (source guide/service-worker-precache.md)",
+    "urls": [
+     "https://vite-pwa-org.netlify.app/guide/service-worker-precache"
+    ]
+   },
+   {
+    "id": "08:S50",
+    "tag": "S50",
+    "text": "Workbox build types (maximumFileSizeToCacheInBytes default 2097152): https://raw.githubusercontent.com/GoogleChrome/workbox/v7/packages/workbox-build/src/types.ts",
+    "urls": [
+     "https://raw.githubusercontent.com/GoogleChrome/workbox/v7/packages/workbox-build/src/types.ts"
+    ]
+   },
+   {
+    "id": "08:S51",
+    "tag": "S51",
+    "text": "Vite build options (outDir, assetsDir, target, chunkSizeWarningLimit): https://vite.dev/config/build-options (source https://raw.githubusercontent.com/vitejs/vite/main/docs/config/build-options.md)",
+    "urls": [
+     "https://vite.dev/config/build-options",
+     "https://raw.githubusercontent.com/vitejs/vite/main/docs/config/build-options.md"
+    ]
+   },
+   {
+    "id": "08:S52",
+    "tag": "S52",
+    "text": "actions/setup-node README (v7): https://github.com/actions/setup-node",
+    "urls": [
+     "https://github.com/actions/setup-node"
+    ]
+   },
+   {
+    "id": "08:S53",
+    "tag": "S53",
+    "text": "actions/checkout README (v7): https://github.com/actions/checkout",
+    "urls": [
+     "https://github.com/actions/checkout"
+    ]
+   },
+   {
+    "id": "08:S54",
+    "tag": "S54",
+    "text": "Node.js release schedule: https://raw.githubusercontent.com/nodejs/Release/main/schedule.json",
+    "urls": [
+     "https://raw.githubusercontent.com/nodejs/Release/main/schedule.json"
+    ]
+   },
+   {
+    "id": "08:S55",
+    "tag": "S55",
+    "text": "npm registry metadata (versions, engines, peers): https://registry.npmjs.org/ (/<pkg>/latest, e.g. https://registry.npmjs.org/vite-plugin-pwa/2.0.0)",
+    "urls": [
+     "https://registry.npmjs.org/",
+     "https://registry.npmjs.org/vite-plugin-pwa/2.0.0"
+    ]
+   },
+   {
+    "id": "08:S56",
+    "tag": "S56",
+    "text": "three 0.187.0 npm tarball, measured locally (gzip -9): https://registry.npmjs.org/three/-/three-0.187.0.tgz",
+    "urls": [
+     "https://registry.npmjs.org/three/-/three-0.187.0.tgz"
+    ]
+   },
+   {
+    "id": "08:S57",
+    "tag": "S57",
+    "text": "V8 src/base/ieee754.cc on three branches (GitHub mirror of v8/v8). fdlibm-derived port: https://raw.githubusercontent.com/v8/v8/14.9-lkgr/src/base/ieee754.cc ; LLVM-libc delegation: https://raw.githubusercontent.com/v8/v8/15.0-lkgr/src/base/ieee754.cc and https://raw.githubusercontent.com/v8/v8/main/src/base/ieee754.cc",
+    "urls": [
+     "https://raw.githubusercontent.com/v8/v8/14.9-lkgr/src/base/ieee754.cc",
+     "https://raw.githubusercontent.com/v8/v8/15.0-lkgr/src/base/ieee754.cc",
+     "https://raw.githubusercontent.com/v8/v8/main/src/base/ieee754.cc"
+    ]
+   },
+   {
+    "id": "08:S58",
+    "tag": "S58",
+    "text": "SpiderMonkey js/src/builtin/Math.cpp (GitHub mirror of Firefox): https://raw.githubusercontent.com/mozilla-firefox/firefox/main/js/src/builtin/Math.cpp",
+    "urls": [
+     "https://raw.githubusercontent.com/mozilla-firefox/firefox/main/js/src/builtin/Math.cpp"
+    ]
+   },
+   {
+    "id": "08:S59",
+    "tag": "S59",
+    "text": "WebKit JavaScriptCore runtime/MathCommon.h, MathCommon.cpp, MathObject.cpp: https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathCommon.h ; https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathCommon.cpp ; https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathObject.cpp",
+    "urls": [
+     "https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathCommon.h",
+     "https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathCommon.cpp",
+     "https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathObject.cpp"
+    ]
+   },
+   {
+    "id": "08:S60",
+    "tag": "S60",
+    "text": "DynamoDB Developer Guide, transactions (archived snapshot; TransactWriteItems up to 100 actions, 4 MB): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/transaction-apis.md",
+    "urls": [
+     "https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/transaction-apis.md"
+    ]
+   },
+   {
+    "id": "08:S61",
+    "tag": "S61",
+    "text": "Workers KV, Write key-value pairs (expirationTtl minimum 60): https://developers.cloudflare.com/kv/api/write-key-value-pairs/ (source docs/kv/api/write-key-value-pairs.mdx)",
+    "urls": [
+     "https://developers.cloudflare.com/kv/api/write-key-value-pairs/"
+    ]
+   }
+  ]
+ }
+]
