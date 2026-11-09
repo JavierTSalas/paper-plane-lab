@@ -276,9 +276,15 @@ export interface Panel {
   side: -1 | 0 | 1;
   /** A point on the panel plane, body frame. */
   origin: Vec3;
-  /** Unit normal, body frame, pointing to the panel's "upper/outer" side: up for wings and centre, outboard for fuselage walls and winglets. */
+  /**
+   * Unit normal, body frame: the image of body +y (up in the flat, un-hinged layout) under this panel's
+   * hinge rotations. Wings and the centre panel: up. A vertical right fuselage wall: inboard (-z).
+   */
   normal: Vec3;
-  /** Unit vector along which stacked layers are offset for rendering (image of the table's toward-viewer axis). */
+  /**
+   * Unit vector along which stacked layers are offset for rendering: the image of the table's
+   * toward-viewer axis. Equals `normal` for a valley keel or none, `-normal` for a mountain keel.
+   */
   stackDir: Vec3;
   pieceIds: number[];
 }
@@ -326,7 +332,7 @@ export interface AeroElement {
   le: Vec3;
   /** Unit vector from the leading edge toward the trailing edge, in the element plane. */
   chordDir: Vec3;
-  /** Unit normal ("upper" side for wings, outboard for vertical surfaces), body frame. */
+  /** Unit normal of the element plane, body frame (same sense as its panel normal, rotated for flap elements). */
   normal: Vec3;
   /** True for the bent trailing-edge strip (elevator / aileron / rudder). */
   flap: boolean;
