@@ -1,0 +1,166 @@
+/* Paper swatches, preview and picker. */
+
+.ppl-swatch {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+button.ppl-swatch {
+  width: var(--tap);
+  height: var(--tap);
+  cursor: pointer;
+}
+
+.ppl-swatch__dot {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 1.5px rgb(47 46 43 / 0.18),
+    0 1px 2px rgb(60 50 30 / 0.12);
+  transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-1) var(--ease);
+}
+
+.ppl-swatch--sm .ppl-swatch__dot {
+  width: 18px;
+  height: 18px;
+}
+
+button.ppl-swatch:hover .ppl-swatch__dot {
+  transform: scale(1.08);
+}
+
+.ppl-swatch.is-selected .ppl-swatch__dot {
+  box-shadow:
+    inset 0 0 0 1.5px rgb(47 46 43 / 0.18),
+    0 0 0 3px var(--card),
+    0 0 0 5px var(--ink);
+}
+
+.ppl-swatch--sm.is-selected .ppl-swatch__dot {
+  box-shadow: inset 0 0 0 1.5px rgb(47 46 43 / 0.18);
+}
+
+.ppl-paper-preview {
+  display: block;
+  overflow: visible;
+}
+
+/* ------------------------------------------------------------ picker */
+
+.ppl-picker {
+  display: grid;
+  gap: var(--s-5);
+}
+
+@media (min-width: 640px) {
+  .ppl-picker {
+    grid-template-columns: 200px minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.ppl-picker__preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-5) var(--s-4) var(--s-4);
+  border-radius: var(--r-card);
+  background: var(--paper-2);
+}
+
+.ppl-picker__preview .ppl-paper-preview {
+  height: 170px;
+  width: auto;
+}
+
+.ppl-picker__faces {
+  display: flex;
+  gap: var(--s-4);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ppl-picker__faces > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ppl-picker__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+.ppl-picker__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+.ppl-picker__label {
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.ppl-picker__value {
+  font-weight: 600;
+  color: var(--ink);
+  margin-left: 4px;
+}
+
+.ppl-picker__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 2px;
+  margin-inline: -6px;
+}
+
+/* ------------------------------------------------------------ select */
+
+.ppl-select {
+  position: relative;
+}
+
+.ppl-select select {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 0 44px 0 var(--s-3);
+  appearance: none;
+  border: var(--outline);
+  border-radius: var(--r-control);
+  background: var(--card);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.ppl-select select:hover {
+  border-color: rgb(47 46 43 / 0.3);
+}
+
+.ppl-select__chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--ink-2);
+}
