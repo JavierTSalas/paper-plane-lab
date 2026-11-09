@@ -1,0 +1,122 @@
+/*
+ * Paper Plane Lab design tokens (docs/ARCHITECTURE.md §9.1).
+ * The first block is the spec table verbatim; everything after it is derived from it.
+ */
+:root {
+  /* §9.1 palette */
+  --paper: #f7f1e5;
+  --paper-2: #efe6d4;
+  --card: #fffaf0;
+  --ink: #2f2e2b;
+  --ink-2: #6b665c;
+  --line: #dccfb8;
+  --accent: #d9694c;
+  --sage: #7fa58a;
+  --sky: #7fb2d9;
+  --mustard: #e3b04b;
+  --plum: #8a6fa8;
+  --rose: #e39aa0;
+
+  /* Derived ink steps. Contrast measured on --card / --paper (WCAG 2): */
+  --ink-3: #8c8576; /* 3.4:1, decorative and disabled only, never body text */
+  --accent-strong: #b9532f; /* 4.65:1 under --card text: primary button face */
+  --accent-lip: #934025; /* pressed edge of the primary button */
+  --accent-ink: #a8472c; /* 5.2:1: accent-coloured text and links */
+  --accent-wash: #f6dcd0; /* selected backgrounds */
+  --sage-wash: #e3ecdf;
+  --sky-wash: #dfeaf3;
+  --mustard-wash: #f7e7c2;
+  --plum-wash: #e8e0f0;
+  --rose-wash: #f7e1e2;
+  --focus: #2f6fa3; /* 5:1 on --paper, visible on --accent too */
+
+  /* Status (reserved meaning; always shipped with an icon or a word) */
+  --good: #3f7a52; /* 4.9:1 */
+  --good-fill: #7fa58a;
+  --warn: #8a6512; /* 5.1:1 */
+  --warn-fill: #e3b04b;
+  --bad: #b23a3a; /* 5.7:1 */
+  --bad-fill: #d9694c;
+
+  /*
+   * Chart series. The §9.1 series tokens are pastel (chroma < 0.1, contrast < 3:1 on --card) and fail
+   * the categorical checks, so charts use deeper steps of the same hues in a validated order
+   * (dataviz validate_palette.js, light, surface --card: lightness, chroma, CVD worst adjacent 11.1, normal 16.6, contrast >= 3:1).
+   */
+  --viz-1: #c4583c; /* terracotta */
+  --viz-2: #3a86c4; /* sky */
+  --viz-3: #3f8f5e; /* sage */
+  --viz-4: #7b56a8; /* plum */
+  --viz-5: #b8860b; /* mustard */
+  --viz-6: #c85a74; /* rose */
+  --viz-muted: #b9ae99;
+  --viz-grid: #ece2cf;
+  --viz-axis: #cdbfa5;
+
+  /* Type (§9.1) */
+  --font-ui: ui-rounded, 'SF Pro Rounded', 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --fs-xs: 13px;
+  --fs-sm: 15px;
+  --fs-md: 17px;
+  --fs-lg: 22px;
+  --fs-xl: 28px;
+  --lh-tight: 1.2;
+  --lh-body: 1.45;
+
+  /* 8 px rhythm */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 64px;
+
+  /* Shape (§9.1) */
+  --r-card: 16px;
+  --r-control: 12px;
+  --r-pill: 999px;
+  --stroke: 1.5px;
+  --outline-color: rgb(47 46 43 / 0.14);
+  --outline: var(--stroke) solid var(--outline-color);
+  --shadow-sm: 0 2px 6px rgb(60 50 30 / 0.08);
+  --shadow: 0 6px 20px rgb(60 50 30 / 0.1);
+  --shadow-lg: 0 18px 44px rgb(60 50 30 / 0.18);
+
+  /* Motion (§9.1) */
+  --dur-1: 180ms;
+  --dur-2: 220ms;
+  --dur-3: 260ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Hit targets and chrome */
+  --tap: 44px;
+  --topbar-h: 56px;
+  --tabbar-h: 64px;
+  --rail-w: 96px;
+  --content-max: 1120px;
+  --gutter: 16px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* Layering */
+  --z-chrome: 20;
+  --z-popover: 40;
+  --z-toast: 60;
+}
+
+@media (min-width: 600px) {
+  :root {
+    --gutter: 24px;
+  }
+}
+
+@media (min-width: 900px) {
+  :root {
+    --gutter: 32px;
+  }
+}
