@@ -343,7 +343,7 @@ export interface AeroElement {
   bendRad: number;
   /** Fraction of the normal force this element keeps when shielded by a twin surface (closed keel halves): 0.5 - 1. */
   exposure: number;
-  /** Number of wetted faces for skin friction: 1 or 2. */
+  /** Wetted faces for skin friction, 1 to 2. Fractional while a closed keel opens (one face each when pressed together). */
   wettedFaces: number;
 }
 
@@ -369,6 +369,8 @@ export interface LiftingSurface {
   cd90: number;
   /** Centre-of-pressure base position as a fraction of chord at small incidence. */
   k0: number;
+  /** Plain-flap efficiency eta_f applied to the bends of this surface's elements (research doc 01 section 8). */
+  flapEfficiency: number;
 }
 
 export interface Airframe {
@@ -649,9 +651,16 @@ export interface TrimAnalysis {
   /** (x_cg - x_np) / MAC as a percentage. Positive = CG ahead of the neutral point = stable. */
   staticMarginPct: number;
   pitchStable: boolean;
-  /** Roll moment per radian of sideslip (about +x). Stabilising dihedral effect when `rollStable` is true. */
+  /**
+   * Roll-moment coefficient (about body +x, reference span) per radian of sideslip.
+   * NEGATIVE is the stabilising dihedral effect: wind from the right lifts the right wing. `rollStable` = clBeta < 0.
+   */
   clBeta: number;
-  /** Yaw moment per radian of sideslip (about +y). Weathercock stable when `yawStable` is true. */
+  /**
+   * Yaw-moment coefficient (about body +y, which points UP, reference span) per radian of sideslip.
+   * NEGATIVE is weathercock stable in this frame (a positive rotation about +y yaws the nose left, away from
+   * a wind from the right), the opposite sign of the textbook z-down convention. `yawStable` = cnBeta < 0.
+   */
   cnBeta: number;
   rollStable: boolean;
   yawStable: boolean;
