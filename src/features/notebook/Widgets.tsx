@@ -118,9 +118,21 @@ function SourceList(): ReactElement {
       <p className="ppl-small ppl-muted">
         {total} entries from {SOURCE_GROUPS.length} research notes. Tags like <span className="ppl-nb-ref is-static">01·S15</span> are how topics cite them.
       </p>
+      <nav aria-label="Research notes" className="ppl-nb-sources__jump">
+        <ul role="list">
+          {SOURCE_GROUPS.map((g) => (
+            <li key={g.doc}>
+              <a href={notebookLink('sources', `srcgrp-${g.doc}`)}>
+                <span className="ppl-nb-sources__num">{g.doc}</span>
+                {g.title.split(/[:,]/)[0]}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
       {SOURCE_GROUPS.map((g) => (
-        <section key={g.doc} className="ppl-nb-sources__group" aria-labelledby={`srcgrp-${g.doc}`}>
-          <h3 id={`srcgrp-${g.doc}`} className="ppl-h3">
+        <section key={g.doc} id={`srcgrp-${g.doc}`} className="ppl-nb-sources__group" aria-labelledby={`srcgrp-h-${g.doc}`}>
+          <h3 id={`srcgrp-h-${g.doc}`} className="ppl-h3">
             <span className="ppl-nb-sources__num">{g.doc}</span> {g.title}
           </h3>
           {g.notes.map((n, i) => (

@@ -39,7 +39,7 @@ function BlockView({ block }: { block: Block }): ReactElement {
             <div className="ppl-nb-formula__lines">
               {block.lines.map((l) => (
                 <div key={l} className="ppl-nb-formula__line">
-                  {l}
+                  <RichText text={l} />
                 </div>
               ))}
             </div>

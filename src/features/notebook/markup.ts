@@ -2,7 +2,8 @@
 
 export type QuantityKind = 'length' | 'speed' | 'mass' | 'area' | 'wingLoading';
 
-export const TOKEN = /\*\*(.+?)\*\*|\[\[([^\]]+)\]\]|\{\{([^}]+)\}\}/g;
+/** Groups: 1 bold, 2 link, 3 brace token, 4-5 subscript (`C_L` is C with subscript L). */
+export const TOKEN = /\*\*(.+?)\*\*|\[\[([^\]]+)\]\]|\{\{([^}]+)\}\}|\b([A-Za-z])_([A-Za-z0-9]+)/g;
 
 const KINDS: readonly QuantityKind[] = ['length', 'speed', 'mass', 'area', 'wingLoading'];
 
@@ -23,7 +24,8 @@ export function tokensOf(text: string): { kind: 'bold' | 'link' | 'brace'; body:
 
 /** Plain words of a markup string, for counting. */
 export function plainText(text: string): string {
-  return text.replace(TOKEN, (_all, bold: string | undefined, link: string | undefined, brace: string | undefined) => {
+  return text.replace(TOKEN, (_all, bold: string | undefined, link: string | undefined, brace: string | undefined, base: string | undefined, sub: string | undefined) => {
+    if (base !== undefined) return `${base}${sub ?? ''}`;
     if (bold !== undefined) return bold;
     if (link !== undefined) return link.split('|')[1] ?? link;
     if (brace !== undefined && brace.startsWith('info:')) return '';

@@ -8,7 +8,7 @@ import type { DiagramId } from '../diagrams';
  * - `[[topic]]`, `[[topic|label]]`, `[[topic~anchor|label]]`: link to another topic
  * - `{{length:88.31}}`, `{{length:88.31|1}}`, also `speed`, `mass`, `area`, `wingLoading`: an SI value shown in the user's units (`|digits` optional)
  * - `{{info:Question?|Answer in one or two sentences.}}`: an InfoDot
- * - `_x_` sub and `^2` style is not parsed; write formulas as plain text with Unicode.
+ * - `C_L`: a letter, an underscore and letters or digits become a subscript. Write powers in Unicode (², ³).
  */
 export type Inline = string;
 
@@ -21,7 +21,7 @@ export type Block =
   | { kind: 'list'; items: Inline[] }
   | {
       kind: 'formula';
-      /** Each line is set on its own row in the formula font. Plain Unicode, no markup. */
+      /** Each line is set on its own row in the formula font. Plain Unicode; subscripts as in Inline. */
       lines: string[];
       /** "where ..." line under the formula. */
       where?: Inline;

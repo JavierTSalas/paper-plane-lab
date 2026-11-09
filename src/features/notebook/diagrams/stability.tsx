@@ -13,8 +13,8 @@ function CgNpRow({ y, cg, np, stable }: { y: number; cg: number; np: number; sta
     <g>
       <path d={`M${tail[0]},${tail[1]} L${nose[0]},${nose[1]}`} stroke={C.ink} strokeWidth={3.5} strokeLinecap="round" />
       <path d={`M${nose[0]},${nose[1]} L${tail[0]},${tail[1]} L${tail[0] + 4},${tail[1] + 14} Z`} fill={C.mustardWash} stroke={C.ink} strokeWidth={1.6} strokeLinejoin="round" />
-      <Arrow x1={npx} y1={npy - 4} x2={npx} y2={npy - 50} color={C.sage} width={2.4} />
-      <T x={npx + 6} y={npy - 40}>
+      <Arrow x1={npx} y1={npy - 4} x2={npx} y2={npy - 40} color={C.sage} width={2.4} />
+      <T x={npx - 6} y={npy - 30} textAnchor="end">
         extra lift
       </T>
       <NpMark x={npx} y={npy} />
@@ -26,7 +26,7 @@ function CgNpRow({ y, cg, np, stable }: { y: number; cg: number; np: number; sta
         NP
       </T>
       {stable ? <ArcArrow cx={cgx} cy={cgy} r={30} from={-60} to={-10} color={C.ink} /> : <ArcArrow cx={cgx} cy={cgy} r={30} from={-120} to={-170} color={C.accent} />}
-      <T x={14} y={y - 46} bold>
+      <T x={14} y={y - 58} bold>
         {stable ? 'Stable: nose comes back down' : 'Unstable: nose keeps rising'}
       </T>
       <T x={346} y={y + 2} textAnchor="end" muted>
@@ -39,10 +39,10 @@ function CgNpRow({ y, cg, np, stable }: { y: number; cg: number; np: number; sta
 /** stability-and-trim: CG ahead of / behind the neutral point. */
 export function CgNp(): ReactElement {
   return (
-    <Figure width={360} height={236} label="Two side views after a nose-up bump. Top: the centre of gravity is ahead of the neutral point, so the extra lift at the neutral point pitches the nose back down. Bottom: the centre of gravity is behind it, so the extra lift pitches the nose further up.">
-      <CgNpRow y={78} cg={214} np={176} stable />
-      <line x1={10} x2={350} y1={122} y2={122} stroke={C.line} strokeWidth={1} />
-      <CgNpRow y={196} cg={160} np={200} stable={false} />
+    <Figure width={360} height={248} label="Two side views after a nose-up bump. Top: the centre of gravity is ahead of the neutral point, so the extra lift at the neutral point pitches the nose back down. Bottom: the centre of gravity is behind it, so the extra lift pitches the nose further up.">
+      <CgNpRow y={88} cg={214} np={176} stable />
+      <line x1={10} x2={350} y1={132} y2={132} stroke={C.line} strokeWidth={1} />
+      <CgNpRow y={212} cg={160} np={200} stable={false} />
     </Figure>
   );
 }
@@ -50,7 +50,7 @@ export function CgNp(): ReactElement {
 /** stability-and-trim: trailing-edge up-bend makes a nose-up moment. */
 export function Elevator(): ReactElement {
   const y = 86;
-  const bendX = 268;
+  const bendX = 250;
   const bendLen = 46;
   const b = rot(bendX + bendLen, y, bendX, y, -14);
   return (
@@ -62,11 +62,11 @@ export function Elevator(): ReactElement {
       <T x={60} y={y + 22} muted>
         nose
       </T>
-      <T x={b[0] + 4} y={b[1] - 6} textAnchor="end" muted>
+      <T x={b[0] + 6} y={b[1] - 10} textAnchor="end" muted>
         up-bend
       </T>
-      <Arrow x1={bendX + 24} y1={y - 26} x2={bendX + 22} y2={y + 30} color={C.plum} width={2.4} />
-      <T x={bendX + 30} y={y + 32}>
+      <Arrow x1={bendX + 28} y1={y - 12} x2={bendX + 28} y2={y + 34} color={C.plum} width={2.4} />
+      <T x={bendX + 20} y={y + 44} textAnchor="end">
         tail pushed down
       </T>
       <CgMark x={140} y={y} />
@@ -109,15 +109,15 @@ export function Dihedral(): ReactElement {
       <path d={`M${cx},${cy} L${keel[0]},${keel[1]}`} stroke={C.ink} strokeWidth={4} strokeLinecap="round" />
       <Arrow x1={mR[0]} y1={mR[1]} x2={mR[0] + nR[0] * 70} y2={mR[1] + nR[1] * 70} color={C.sage} width={2.6} />
       <Arrow x1={mL[0]} y1={mL[1]} x2={mL[0] + nL[0] * 40} y2={mL[1] + nL[1] * 40} color={C.sage} width={2} />
-      <T x={mR[0] + nR[0] * 70 + 6} y={mR[1] + nR[1] * 70 - 4}>
+      <T x={352} y={mR[1] + nR[1] * 70 - 10} textAnchor="end">
         low wing lifts more
       </T>
       <Arrow x1={346} y1={190} x2={262} y2={190} color={C.sky} width={2} />
       <T x={346} y={178} textAnchor="end" muted>
         sideslip air
       </T>
-      <ArcArrow cx={cx} cy={cy} r={58} from={-118} to={-150} color={C.accent} />
-      <T x={92} y={40} textAnchor="middle" bold>
+      <ArcArrow cx={cx} cy={cy} r={44} from={-60} to={-120} color={C.accent} />
+      <T x={cx} y={cy - 56} textAnchor="middle" bold>
         rolls back level
       </T>
     </Figure>
@@ -137,10 +137,10 @@ export function Phugoid(): ReactElement {
       <line x1={10} x2={350} y1={146} y2={146} stroke={C.ink3} strokeWidth={1.4} />
       <path d={pathOf([[20, 52], [340, 116]])} stroke={C.ink3} strokeWidth={1.2} strokeDasharray="5 5" fill="none" />
       <path d={pathOf(pts)} fill="none" stroke={C.accent} strokeWidth={2.6} strokeLinecap="round" strokeLinejoin="round" />
-      <T x={30} y={36}>
-        climbs
+      <T x={74} y={20}>
+        climbs, slows
       </T>
-      <T x={78} y={104}>
+      <T x={110} y={114} textAnchor="middle">
         speeds up
       </T>
       <T x={340} y={136} textAnchor="end" muted>

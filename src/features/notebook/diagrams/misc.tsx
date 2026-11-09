@@ -28,7 +28,7 @@ export function ArenaDiagram(): ReactElement {
         first touch
       </T>
       <path d="M316,147 l20,-3 l-18,-1 z" fill={C.card} stroke={C.ink} strokeWidth={1.4} strokeLinejoin="round" />
-      <T x={352} y={floor - 14} textAnchor="end" muted>
+      <T x={354} y={floor + 22} textAnchor="end" muted>
         rest: not counted
       </T>
       <Arrow x1={lineX} y1={floor + 32} x2={touch} y2={floor + 32} color={C.ink} width={1.8} />

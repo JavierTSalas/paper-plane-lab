@@ -59,59 +59,50 @@ export function SimPipeline(): ReactElement {
 
 /** lift-and-drag: a flat plate at angle of attack, normal force split into lift and drag. */
 export function AngleOfAttack(): ReactElement {
-  const cx = 190;
-  const cy = 118;
+  const cx = 206;
+  const cy = 128;
   const a = 14;
-  const half = 82;
+  const half = 92;
   const rad = (a * Math.PI) / 180;
   // Leading edge left and high, trailing edge right and low: the plate's normal tilts back, downstream.
-  const le2 = rot(cx - half, cy, cx, cy, a);
-  const te2 = rot(cx + half, cy, cx, cy, a);
-  const n = 84;
+  const le = rot(cx - half, cy, cx, cy, a);
+  const te = rot(cx + half, cy, cx, cy, a);
+  const n = 92;
   const nEnd: [number, number] = [cx + n * Math.sin(rad), cy - n * Math.cos(rad)];
   const lift: [number, number] = [cx, cy - n * Math.cos(rad)];
   const drag: [number, number] = [cx + n * Math.sin(rad), cy];
-  const flowYs = [46, 76, 160, 186];
-  const arcR = 48;
+  const arcR = 58;
+  const mid = rad / 2;
   return (
-    <Figure width={360} height={210} label="A flat plate tilted nose-up into a horizontal airflow. The force on it acts at right angles to the plate, tilted back; its vertical part is lift and its horizontal part is drag.">
-      {flowYs.map((y) => (
-        <Arrow key={y} x1={8} y1={y} x2={70} y2={y} color={C.sky} width={1.6} head={6} />
+    <Figure width={360} height={176} label="A flat plate tilted nose-up into a horizontal airflow. The force on it acts at right angles to the plate, tilted back; its vertical part is lift and its horizontal part is drag.">
+      {[64, 92, 120].map((y) => (
+        <Arrow key={y} x1={8} y1={y} x2={64} y2={y} color={C.sky} width={1.6} head={6} />
       ))}
-      <T x={8} y={118} muted>
+      <T x={8} y={146} muted>
         airflow
       </T>
-      {/* reference line along the flow through the leading edge */}
-      <line x1={le2[0]} y1={le2[1]} x2={le2[0] + arcR + 40} y2={le2[1]} stroke={C.ink3} strokeWidth={1.2} strokeDasharray="4 4" />
-      <path
-        d={`M${le2[0] + arcR},${le2[1]} A${arcR},${arcR} 0 0 1 ${le2[0] + arcR * Math.cos(rad)},${le2[1] + arcR * Math.sin(rad)}`}
-        fill="none"
-        stroke={C.ink2}
-        strokeWidth={1.5}
-      />
-      <T x={le2[0] + arcR + 6} y={le2[1] + 14} bold>
+      <line x1={le[0]} y1={le[1]} x2={le[0] + arcR + 26} y2={le[1]} stroke={C.ink3} strokeWidth={1.2} strokeDasharray="4 4" />
+      <path d={`M${le[0] + arcR},${le[1]} A${arcR},${arcR} 0 0 1 ${le[0] + arcR * Math.cos(rad)},${le[1] + arcR * Math.sin(rad)}`} fill="none" stroke={C.ink2} strokeWidth={1.6} />
+      <T x={le[0] + (arcR + 10) * Math.cos(mid)} y={le[1] + (arcR + 10) * Math.sin(mid) + 5} bold>
         α
       </T>
-      {/* separated flow curl at the sharp leading edge */}
-      <path d={`M${le2[0]},${le2[1]} C${le2[0] + 10},${le2[1] - 18} ${le2[0] + 40},${le2[1] - 16} ${le2[0] + 52},${le2[1] - 2}`} stroke={C.sky} strokeWidth={1.4} fill="none" strokeDasharray="3 3" />
-      {/* the plate */}
-      <line x1={le2[0]} y1={le2[1]} x2={te2[0]} y2={te2[1]} stroke={C.ink} strokeWidth={4} strokeLinecap="round" />
-      <T x={le2[0] - 4} y={le2[1] - 10} textAnchor="end" muted>
+      <path d={`M${le[0]},${le[1]} C${le[0] + 10},${le[1] - 20} ${le[0] + 44},${le[1] - 18} ${le[0] + 60},${le[1] - 4}`} stroke={C.sky} strokeWidth={1.4} fill="none" strokeDasharray="3 3" />
+      <line x1={le[0]} y1={le[1]} x2={te[0]} y2={te[1]} stroke={C.ink} strokeWidth={4} strokeLinecap="round" />
+      <T x={le[0] - 2} y={le[1] + 20} textAnchor="middle" muted>
         sharp edge
       </T>
-      {/* components */}
       <line x1={lift[0]} y1={lift[1]} x2={nEnd[0]} y2={nEnd[1]} stroke={C.ink3} strokeWidth={1.2} strokeDasharray="3 3" />
       <line x1={drag[0]} y1={drag[1]} x2={nEnd[0]} y2={nEnd[1]} stroke={C.ink3} strokeWidth={1.2} strokeDasharray="3 3" />
-      <Arrow x1={cx} y1={cy} x2={lift[0]} y2={lift[1]} color={C.sage} width={2} />
-      <Arrow x1={cx} y1={cy} x2={drag[0] + 6} y2={drag[1]} color={C.plum} width={2} head={7} />
-      <Arrow x1={cx} y1={cy} x2={nEnd[0]} y2={nEnd[1]} color={C.accent} width={2.6} />
-      <T x={nEnd[0] + 8} y={nEnd[1] + 6} bold>
+      <Arrow x1={cx} y1={cy} x2={lift[0]} y2={lift[1]} color={C.sage} width={2.2} />
+      <Arrow x1={cx} y1={cy} x2={drag[0] + 4} y2={drag[1]} color={C.plum} width={2.2} head={7} />
+      <Arrow x1={cx} y1={cy} x2={nEnd[0]} y2={nEnd[1]} color={C.accent} width={2.8} />
+      <T x={nEnd[0] + 8} y={nEnd[1] + 4} bold>
         force on plate
       </T>
-      <T x={lift[0] - 8} y={lift[1] + 12} textAnchor="end">
+      <T x={lift[0] - 8} y={lift[1] + 12} textAnchor="end" bold>
         lift
       </T>
-      <T x={drag[0] + 14} y={drag[1] + 4}>
+      <T x={drag[0] + 8} y={drag[1] - 6} bold>
         drag
       </T>
     </Figure>
@@ -131,39 +122,41 @@ function SidePlane({ x, y, deg, scale = 1 }: { x: number; y: number; deg: number
 export function GlideForces(): ReactElement {
   const g = 12;
   const rad = (g * Math.PI) / 180;
-  const cx = 170;
-  const cy = 92;
-  const W = 92;
+  const cx = 200;
+  const cy = 100;
+  const W = 86;
   const L = W * Math.cos(rad);
   const D = W * Math.sin(rad);
   const v: [number, number] = [Math.cos(rad), Math.sin(rad)];
   const up: [number, number] = [v[1], -v[0]];
-  const pathStart: [number, number] = [cx - 160 * v[0], cy - 160 * v[1]];
-  const pathEnd: [number, number] = [cx + 175 * v[0], cy + 175 * v[1]];
+  const start: [number, number] = [cx - 180 * v[0], cy - 180 * v[1]];
+  const end: [number, number] = [cx + 150 * v[0], cy + 150 * v[1]];
+  const arcR = 64;
+  const dragEnd: [number, number] = [cx - (D + 44) * v[0], cy - (D + 44) * v[1]];
   return (
     <Figure width={360} height={210} label="A plane gliding down a shallow slope. Lift points at right angles to the path, drag points backward along it, and weight points straight down. The three balance.">
-      <line x1={pathStart[0]} y1={pathStart[1]} x2={pathEnd[0]} y2={pathEnd[1]} stroke={C.ink3} strokeWidth={1.4} strokeDasharray="6 5" />
-      <line x1={250} y1={cy + 80 * v[1] + 0} x2={340} y2={cy + 80 * v[1]} stroke={C.ink3} strokeWidth={1.2} />
-      <path d={`M${290},${cy + 80 * v[1]} A40,40 0 0 1 ${250 + 40 * v[0]},${cy + 80 * v[1] + 40 * v[1]}`} fill="none" stroke={C.ink2} strokeWidth={1.4} />
-      <T x={296} y={cy + 80 * v[1] + 16} bold>
+      <line x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]} stroke={C.ink3} strokeWidth={1.4} strokeDasharray="6 5" />
+      <line x1={start[0]} y1={start[1]} x2={start[0] + arcR + 30} y2={start[1]} stroke={C.ink3} strokeWidth={1.2} />
+      <path d={`M${start[0] + arcR},${start[1]} A${arcR},${arcR} 0 0 1 ${start[0] + arcR * v[0]},${start[1] + arcR * v[1]}`} fill="none" stroke={C.ink2} strokeWidth={1.6} />
+      <T x={start[0] + (arcR + 8) * Math.cos(rad / 2)} y={start[1] + (arcR + 8) * Math.sin(rad / 2) + 5} bold>
         γ
       </T>
-      <SidePlane x={cx} y={cy} deg={g} />
+      <T x={end[0]} y={end[1] - 10} textAnchor="end" muted>
+        flight path
+      </T>
+      <SidePlane x={cx} y={cy} deg={g} scale={0.8} />
       <Arrow x1={cx} y1={cy} x2={cx + L * up[0]} y2={cy + L * up[1]} color={C.sage} width={2.4} />
-      <Arrow x1={cx} y1={cy} x2={cx - (D + 10) * v[0]} y2={cy - (D + 10) * v[1]} color={C.plum} width={2.4} head={7} />
+      <Arrow x1={cx - 36 * v[0]} y1={cy - 36 * v[1] - 1} x2={dragEnd[0]} y2={dragEnd[1] - 1} color={C.plum} width={2.4} head={7} />
       <Arrow x1={cx} y1={cy} x2={cx} y2={cy + W} color={C.ink} width={2.4} />
       <CgMark x={cx} y={cy} r={5} />
-      <T x={cx + L * up[0] + 8} y={cy + L * up[1] + 4} bold>
+      <T x={cx + L * up[0] + 8} y={cy + L * up[1] + 6} bold>
         lift
       </T>
-      <T x={cx - (D + 10) * v[0] - 8} y={cy - (D + 10) * v[1] - 6} textAnchor="end" bold>
+      <T x={dragEnd[0] - 2} y={dragEnd[1] - 10} textAnchor="middle" bold>
         drag
       </T>
       <T x={cx + 8} y={cy + W - 2} bold>
         weight
-      </T>
-      <T x={pathEnd[0] - 4} y={pathEnd[1] - 8} textAnchor="end" muted>
-        flight path
       </T>
     </Figure>
   );
@@ -199,8 +192,8 @@ function dartCL(aDeg: number): number {
 export function LiftCurve(): ReactElement {
   const X0 = 46;
   const X1 = 340;
-  const Y0 = 186;
-  const Y1 = 18;
+  const Y0 = 196;
+  const Y1 = 30;
   const aMax = 60;
   const cMax = 1.6;
   const px = (a: number): number => X0 + ((X1 - X0) * a) / aMax;
@@ -213,7 +206,7 @@ export function LiftCurve(): ReactElement {
   const gStall = 13;
   const dStall = 38;
   return (
-    <Figure width={360} height={214} label="Sketch: lift coefficient against angle of attack. The glider-like wing rises steeply to about 0.75 and stalls near 13 degrees. The dart rises slowly but keeps rising to about 1.36 near 38 degrees.">
+    <Figure width={360} height={226} label="Sketch: lift coefficient against angle of attack. The glider-like wing rises steeply to about 0.75 and stalls near 13 degrees. The dart rises slowly but keeps rising to about 1.36 near 38 degrees.">
       {[0.4, 0.8, 1.2, 1.6].map((c) => (
         <g key={c}>
           <line x1={X0} x2={X1} y1={py(c)} y2={py(c)} stroke="var(--viz-grid)" strokeWidth={1} />
@@ -231,20 +224,23 @@ export function LiftCurve(): ReactElement {
       <T x={X1} y={Y0 + 30} textAnchor="end" muted>
         angle of attack
       </T>
-      <T x={X0 - 6} y={Y1 - 4} textAnchor="end" muted>
-        C_L
+      <T x={X0 - 6} y={14} textAnchor="end" muted>
+        C
+        <tspan baselineShift="sub" fontSize="9">
+          L
+        </tspan>
       </T>
       <path d={pathOf(sample(gliderCL))} fill="none" stroke={C.sky} strokeWidth={2.4} strokeLinejoin="round" />
       <path d={pathOf(sample(dartCL))} fill="none" stroke={C.accent} strokeWidth={2.4} strokeLinejoin="round" strokeDasharray="7 4" />
       <circle cx={px(gStall)} cy={py(gliderCL(gStall))} r={4} fill={C.sky} />
       <circle cx={px(dStall)} cy={py(dartCL(dStall))} r={4} fill={C.accent} />
-      <T x={px(gStall) + 6} y={py(gliderCL(gStall)) - 8}>
-        glider stalls ≈ 13°
+      <T x={px(gStall) - 4} y={py(gliderCL(gStall)) - 10} textAnchor="middle">
+        glider ≈ 13°
       </T>
       <T x={px(dStall)} y={py(dartCL(dStall)) - 10} textAnchor="middle">
         dart ≈ 38°
       </T>
-      <T x={px(52)} y={py(plateCL(52)) - 10} textAnchor="middle" muted>
+      <T x={px(52)} y={py(plateCL(52)) + 20} textAnchor="middle" muted>
         flat-plate drop
       </T>
     </Figure>

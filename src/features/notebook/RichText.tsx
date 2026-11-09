@@ -69,6 +69,13 @@ export function RichText({ text }: { text: string }): ReactElement {
     if (m[1] !== undefined) parts.push(<strong key={key++}>{m[1]}</strong>);
     else if (m[2] !== undefined) parts.push(renderLink(m[2], key++));
     else if (m[3] !== undefined) parts.push(renderBrace(m[3], key++, units));
+    else if (m[4] !== undefined)
+      parts.push(
+        <Fragment key={key++}>
+          {m[4]}
+          <sub>{m[5]}</sub>
+        </Fragment>,
+      );
     last = at + m[0].length;
   }
   if (last < text.length) parts.push(text.slice(last));

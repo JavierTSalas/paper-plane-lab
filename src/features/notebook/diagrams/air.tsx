@@ -29,7 +29,7 @@ export function ReynoldsScale(): ReactElement {
         );
       })}
       <rect x={px(glide[0])} y={22 + 34 + 3} width={px(glide[1]) - px(glide[0])} height={12} rx={6} fill={C.accent} />
-      <T x={px(glide[1]) + 6} y={22 + 34 + 13} muted>
+      <T x={(px(glide[0]) + px(glide[1])) / 2} y={22 + 34 + 31} textAnchor="middle" muted>
         glide
       </T>
       <line x1={X0} x2={X1} y1={132} y2={132} stroke={C.ink} strokeWidth={1.6} />
@@ -66,7 +66,7 @@ export function WindProfile(): ReactElement {
         <path key={i} d={`M${12 + i * 16},${ground} l-3,-7 M${12 + i * 16},${ground} l3,-8`} stroke={C.sage} strokeWidth={1.4} strokeLinecap="round" />
       ))}
       <line x1={x0} x2={x0} y1={ground} y2={top - 6} stroke={C.ink} strokeWidth={1.6} />
-      {[0, 2, 4, 6, 8, 10].map((z) => (
+      {[2, 4, 6, 8, 10].map((z) => (
         <T key={z} x={x0 - 8} y={ground - z * pxPerM + 4} textAnchor="end" muted className="ppl-nb-svg__num">
           {z} m
         </T>
@@ -84,7 +84,7 @@ export function WindProfile(): ReactElement {
       <T x={x0 + scale * u(2) + 8} y={ground - 2 * pxPerM + 4} bold>
         0.72 × U₁₀
       </T>
-      <g transform={`translate(${x0 + 30},${ground - 1.4 * pxPerM}) scale(0.5)`}>
+      <g transform={`translate(${x0 + 200},${ground - 1.5 * pxPerM}) scale(0.5)`}>
         <path d="M30,0 L-30,-6 L-28,2 Z M30,0 L-28,2 L-24,12 Z" fill={C.card} stroke={C.ink} strokeWidth={2.4} strokeLinejoin="round" />
       </g>
     </Figure>
@@ -115,13 +115,18 @@ export function SlopeLift(): ReactElement {
       <path d={hill} fill={C.sageWash} stroke={C.sage} strokeWidth={2} strokeLinejoin="round" />
       {flows.map((y, i) => {
         const rise = (ground - 82) * (1 - i * 0.28);
-        return <path key={y} d={`M150,${y} C200,${y} 228,${y - rise * 0.55} 300,${y - rise * 0.72} L346,${y - rise * 0.74}`} fill="none" stroke={C.sky} strokeWidth={1.8} strokeLinecap="round" />;
+        const endY = y - rise * 0.74;
+        return (
+          <g key={y}>
+            <path d={`M150,${y} C200,${y} 228,${y - rise * 0.55} 300,${y - rise * 0.72} L340,${endY}`} fill="none" stroke={C.sky} strokeWidth={1.8} strokeLinecap="round" />
+            <Arrow x1={336} y1={endY} x2={352} y2={endY} color={C.sky} width={1.8} head={6} />
+          </g>
+        );
       })}
-      <Arrow x1={300} y1={flows[2] - 66} x2={346} y2={flows[2] - 68} color={C.sky} width={1.8} head={6} />
       <T x={152} y={flows[0] - 8} muted>
         wind
       </T>
-      <T x={262} y={20} textAnchor="middle" bold>
+      <T x={300} y={40} textAnchor="middle" bold>
         slope lift
       </T>
     </Figure>
