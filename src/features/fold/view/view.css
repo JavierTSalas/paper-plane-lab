@@ -1,0 +1,211 @@
+/* Paper rendering (src/features/fold/view). */
+.ppl-scene {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.ppl-scene__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  display: block;
+}
+.ppl-face__base {
+  stroke: rgb(47 46 43 / 0.34);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.ppl-face__print {
+  pointer-events: none;
+}
+.ppl-face__crease {
+  stroke: rgb(47 46 43 / 0.2);
+  stroke-width: 0.9;
+  stroke-linecap: round;
+}
+.ppl-scene__shadow {
+  fill: rgb(60 50 30);
+  opacity: 0.2;
+}
+.ppl-scene__ghost {
+  opacity: 0.42;
+  pointer-events: none;
+}
+.ppl-scene__fold {
+  fill: none;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.ppl-scene__fold--valley {
+  stroke: var(--viz-2);
+}
+.ppl-scene__fold--mountain {
+  stroke: var(--viz-1);
+}
+.ppl-marker__ring {
+  fill: var(--card);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+.ppl-marker__fill {
+  fill: var(--ink);
+}
+.ppl-marker--np .ppl-marker__ring {
+  stroke: var(--viz-2);
+}
+.ppl-marker--np .ppl-marker__fill {
+  fill: var(--viz-2);
+}
+.ppl-marker__label {
+  font: 600 11px/1 var(--font-ui);
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+
+/* FoldPlayer */
+.ppl-player {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  min-width: 0;
+}
+.ppl-player__stage,
+.ppl-desk {
+  background:
+    radial-gradient(120% 90% at 50% 40%, var(--card) 0%, var(--paper-2) 100%);
+  border-radius: var(--r-card);
+  box-shadow: inset 0 0 0 1.5px rgb(47 46 43 / 0.06);
+}
+.ppl-player__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 3.6em;
+}
+.ppl-player__count {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+.ppl-player__phase {
+  color: var(--ink-2);
+}
+.ppl-player__label {
+  margin: 0;
+  font-size: var(--fs-md);
+  line-height: var(--lh-tight);
+  color: var(--ink);
+}
+.ppl-player__controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.ppl-player__buttons {
+  display: flex;
+  justify-content: center;
+  gap: var(--s-2);
+}
+.ppl-player__scrub {
+  min-width: 0;
+}
+@media (min-width: 720px) {
+  .ppl-player__controls {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--s-4);
+  }
+  .ppl-player__scrub {
+    flex: 1;
+  }
+}
+
+/* Thumbnails */
+.ppl-thumb {
+  display: block;
+  overflow: visible;
+}
+.ppl-thumb__shadow {
+  fill: rgb(60 50 30);
+  opacity: 0.12;
+}
+.ppl-thumb__face {
+  stroke: rgb(47 46 43 / 0.38);
+  stroke-width: 0.9;
+  stroke-linejoin: round;
+}
+
+/* PlaneView */
+.ppl-planeview--orbit .ppl-scene__svg {
+  cursor: grab;
+}
+.ppl-planeview--orbit .ppl-scene__svg:active {
+  cursor: grabbing;
+}
+.ppl-scene__svg:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: var(--r-control);
+}
+
+/* Crease pattern. Line style always differs as well as colour. */
+.ppl-cp {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+}
+.ppl-cp__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.ppl-cp__shadow {
+  fill: rgb(60 50 30 / 0.12);
+}
+.ppl-cp__edge {
+  fill: none;
+  stroke: rgb(47 46 43 / 0.4);
+  stroke-width: 1.5;
+}
+.ppl-crease {
+  fill: none;
+  stroke-linecap: round;
+}
+.ppl-crease--valley {
+  stroke: var(--viz-2);
+  stroke-width: 1.75;
+  stroke-dasharray: 6 4;
+}
+.ppl-crease--mountain {
+  stroke: var(--viz-1);
+  stroke-width: 1.75;
+  stroke-dasharray: 8 3 1.5 3;
+}
+.ppl-crease--aux {
+  stroke: var(--ink-3);
+  stroke-width: 0.9;
+}
+.ppl-cp__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-4);
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+.ppl-cp__key {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
