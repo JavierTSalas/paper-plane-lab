@@ -134,6 +134,8 @@ export function LineChart({
   const ext = useMemo(() => extent(series, xDomain, yDomain), [series, xDomain, yDomain]);
   const fx = formatX ?? ((v: number) => tickLabel(v, ext.x.step));
   const fy = formatY ?? ((v: number) => tickLabel(v, ext.y.step));
+  // Readouts are finer than the axis: one more decimal than the tick step.
+  const fyValue = formatY ?? ((v: number) => tickLabel(v, ext.y.step / 10));
   const plotW = Math.max(40, width - PAD.left - PAD.right);
   const plotH = Math.max(40, height - PAD.top - PAD.bottom);
   const sx = linearScale([ext.x.min, ext.x.max], [PAD.left, PAD.left + plotW]);
@@ -181,7 +183,9 @@ export function LineChart({
       ? []
       : series.map((s, i) => ({ s, slot: slotOf(s, i), v: valueAt(s.points, activeX) })).filter((r) => r.v !== null);
   const cursorPx = activeX === null ? 0 : sx(activeX);
-  const tipLeft = Math.min(Math.max(cursorPx, 70), width - 70);
+  // The tooltip sits beside the cursor, on whichever side has more room.
+  const tipOnRight = cursorPx < PAD.left + plotW / 2;
+  const tipStyle = tipOnRight ? { left: cursorPx + 12 } : { right: width - cursorPx + 12 };
 
   const titleId = `${uid}-t`;
   const descId = `${uid}-d`;
@@ -297,7 +301,7 @@ export function LineChart({
           )}
         </svg>
         {hoverX !== null && readout.length > 0 && (
-          <div className="ppl-chart__tip" style={{ left: tipLeft }} role="status">
+          <div className="ppl-chart__tip" style={{ ...tipStyle, top: PAD.top }} role="status">
             <div className="ppl-chart__tip-x">
               {xLabel ? `${xLabel} ` : ''}
               {fx(hoverX)}
@@ -306,7 +310,7 @@ export function LineChart({
               <div key={s.id} className="ppl-chart__tip-row">
                 <span className={cx('ppl-chart__key', `ppl-viz-bg-${slot}`)} aria-hidden="true" />
                 <span className="ppl-chart__tip-label">{s.label}</span>
-                <span className="ppl-num">{fy(v!)}</span>
+                <span className="ppl-num">{fyValue(v!)}</span>
               </div>
             ))}
           </div>

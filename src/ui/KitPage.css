@@ -37,6 +37,7 @@
 
 .ppl-kit__grid2 {
   display: grid;
+  align-items: start;
   gap: var(--s-4);
 }
 

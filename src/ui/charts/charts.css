@@ -129,8 +129,6 @@
 
 .ppl-chart__tip {
   position: absolute;
-  top: 0;
-  transform: translate(-50%, -100%) translateY(-8px);
   min-width: 128px;
   padding: var(--s-2) var(--s-3);
   border-radius: 10px;
