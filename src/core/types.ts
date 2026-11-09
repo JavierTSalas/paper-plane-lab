@@ -13,9 +13,10 @@
  *                The FRONT face of the paper faces the viewer (+z) before any fold.
  *  Table frame   2D. Where the flat-folded model lies. Starts identical to the sheet frame.
  *                The nose of every plane points toward +y. The centreline is x = paper.width / 2.
- *  Body frame    3D, right-handed. +x toward the nose, +y up, +z toward the right wing (starboard).
- *                Origin: on the centreline (keel line) at the rearmost point of the model (tail), so
- *                every body x is >= 0 and the nose is at x = length.
+ *  Body frame    3D, right-handed. +x toward the nose along the wing root line, +y up, +z toward the
+ *                right wing (starboard). Origin: in the plane of symmetry, x = 0 at the rearmost point of
+ *                the model (tail) and y = 0 at the lowest point of the keel line, so every body x is >= 0
+ *                and the nose is at x = length.
  *  World frame   3D, right-handed, identical axes to three.js. +x downrange, +y up, +z right of the thrower.
  *                Ground is y = 0. Gravity is (0, -g, 0).
  *

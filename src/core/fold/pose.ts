@@ -159,6 +159,15 @@ export function poseModel(
     winglet: wingletChain[wingletChain.length - 1]?.origin ?? [0, 0, 0],
   };
 
+  // Level the model: pitch it about the lateral axis so the wing root line is horizontal. When the wing
+  // fold is not parallel to the centre crease (the classic dart), the wings, not the keel, define "level":
+  // body +x then points along the wing root and a zero-dihedral wing has the normal [0, 1, 0].
+  const rootAxis = wing ? wingChain[wingChain.length - 1]!.axis : null;
+  const pitch = rootAxis ? Math.atan2(rootAxis[1], rootAxis[0]) : 0;
+  const cosP = Math.cos(pitch);
+  const sinP = Math.sin(pitch);
+  const level = (p: Vec3): Vec3 => [p[0] * cosP + p[1] * sinP, p[1] * cosP - p[0] * sinP, p[2]];
+
   const placed = parts.map((part) => {
     const mid = centroid(part.sheet.map((v) => applyIso(part.piece.iso, v)));
     const half = mid[0] < cx ? -1 : 1;
@@ -177,7 +186,7 @@ export function poseModel(
     const mirror = role === 'center' ? 1 : side;
     const verts = part.sheet.map((v): Vec3 => {
       const t = applyIso(part.piece.iso, v);
-      const p = swing(chains[role], [t[1], 0, lateral * (t[0] - cx)]);
+      const p = level(swing(chains[role], [t[1], 0, lateral * (t[0] - cx)]));
       return [p[0], p[1], mirror * p[2]];
     });
     return { part, role, side, verts };
@@ -189,8 +198,11 @@ export function poseModel(
   let high = -Infinity;
   let left = Infinity;
   let right = -Infinity;
-  for (const { verts } of placed) {
+  // y = 0 is the lowest point of the keel line (or the centre panel when there is no keel).
+  let keelLow = Infinity;
+  for (const { verts, role } of placed) {
     for (const [x, y, z] of verts) {
+      if (role === 'fuselage' || role === 'center') keelLow = Math.min(keelLow, y);
       tail = Math.min(tail, x);
       nose = Math.max(nose, x);
       low = Math.min(low, y);
@@ -200,20 +212,24 @@ export function poseModel(
     }
   }
 
+  const drop = Number.isFinite(keelLow) ? keelLow : 0;
+  low -= drop;
+  high -= drop;
+
   const panels: Panel[] = [];
   const panelOf = (role: PanelRole, side: -1 | 0 | 1): Panel => {
     const known = panels.find((p) => p.role === role && p.side === side);
     if (known) return known;
     const chain = chains[role];
-    const up = sub3(swing(chain, [0, 1, 0]), swing(chain, [0, 0, 0]));
+    const up = level(sub3(swing(chain, [0, 1, 0]), swing(chain, [0, 0, 0])));
     const mirror = side === 0 ? 1 : side;
     const normal: Vec3 = [up[0], up[1], mirror * up[2]];
-    const hinge = hingePoint[role];
+    const hinge = level(hingePoint[role]);
     const panel: Panel = {
       index: panels.length,
       role,
       side,
-      origin: [hinge[0] - tail, hinge[1], mirror * hinge[2]],
+      origin: [hinge[0] - tail, hinge[1] - drop, mirror * hinge[2]],
       normal,
       stackDir: scale3(normal, s),
       pieceIds: [],
@@ -234,7 +250,7 @@ export function poseModel(
     return {
       id,
       panel: panel.index,
-      verts: verts.map(([x, y, z]): Vec3 => [x - tail, y, z]),
+      verts: verts.map(([x, y, z]): Vec3 => [x - tail, y - drop, z]),
       sheet: part.sheet,
       frontNormal: part.piece.flipped ? scale3(panel.stackDir, -1) : panel.stackDir,
       layer: part.piece.layer,

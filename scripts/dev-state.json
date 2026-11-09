@@ -1,0 +1,18 @@
+{
+  "state": {
+    "profile": {
+      "name": "Tester",
+      "onboarded": true
+    },
+    "planes": {},
+    "currentPlaneId": null,
+    "flights": [],
+    "settings": {
+      "units": "metric",
+      "reducedMotion": false,
+      "showTrails": true
+    },
+    "assignmentsDone": []
+  },
+  "version": 1
+}

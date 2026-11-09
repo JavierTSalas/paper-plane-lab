@@ -102,7 +102,7 @@ The plane is built from the final flat state (which must be mirror-symmetric abo
    - keel: rotate about the centreline by `angles.keel` so the wall rises (+Y). `pi/2` = walls vertical and touching.
    - wing: rotate about the (already rotated) wing line back toward horizontal by `angles.wing`.
    - winglet: rotate about the (already rotated) winglet line by `angles.winglet` (positive = up).
-5. Shift so the tail is at x = 0 and the keel line is at y = 0, z = 0.
+5. Level the model: pitch it about the lateral axis so the wing root (hinge) line is parallel to +x. On planes whose wing fold is not parallel to the centre crease (the classic dart) the wings define "level", not the keel. Then shift so the tail is at x = 0, the lowest point of the keel line is at y = 0, and the plane of symmetry is z = 0. Issues from `poseModel` carry `step = SHAPE_STEP` (-1).
 
 `finalHingeAngles(shape)`: `keel = (90 - keelSpreadDeg / 2) deg` (0 when keel is none), `wing = keel - dihedralDeg` in radians (for keel none: `wing = -dihedral`, i.e. the wing line is a dihedral break rotating up), `winglet = wingletDeg`.
 The same function with intermediate angles drives the "open the wings" animation.

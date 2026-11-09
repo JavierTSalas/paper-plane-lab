@@ -9,7 +9,11 @@ const [, , base = 'http://localhost:5173', route = '/', out = '/tmp/shot', waitA
 const waitMs = Number(waitArg) || 1200;
 const clicks = [];
 for (let i = 0; i < rest.length; i++) if (rest[i] === '--click' && rest[i + 1]) clicks.push(rest[++i]);
-const seed = rest.includes('--fresh') ? null : process.env.PPL_STATE ?? null;
+const fs = require('node:fs');
+const path = require('node:path');
+const devState = path.join(__dirname, 'dev-state.json');
+// Default: an onboarded dev state, so screens are reachable. --fresh = first-visit state. PPL_STATE overrides.
+const seed = rest.includes('--fresh') ? null : process.env.PPL_STATE ?? (fs.existsSync(devState) ? fs.readFileSync(devState, 'utf8') : null);
 
 const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 let failed = false;
