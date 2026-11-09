@@ -31,7 +31,7 @@ function cliffProfile(height: number, out: number): number {
  * stands out on the rounded shoulder (edgeX < 0), because the ground under the thrower is y = 0 by convention.
  */
 export function cliffTopHeight(terrain: Extract<Terrain, { kind: 'cliff' }>): number {
-  return -cliffProfile(terrain.height, -terrain.edgeX);
+  return 0 - cliffProfile(terrain.height, -terrain.edgeX);
 }
 
 /** Ground height (world y) under the point (x, z) in an environment, metres. */
