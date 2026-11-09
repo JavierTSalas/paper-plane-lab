@@ -31,14 +31,27 @@ const kernel = (d: number, tol: number): number => {
   return Math.exp(-0.5 * t * t);
 };
 
-/** Weighted Jaccard (Ruzicka) similarity: sum of min / sum of max. Two empty grids are identical. */
+/**
+ * Weighted Jaccard (Ruzicka) similarity, sum of min / sum of max, of the two grids rescaled to unit
+ * sum (top-view mass distributions). Stored grids are max-normalised per the contract, but comparing
+ * them directly lets one small thick patch (an extra nose layer raising the peak from 2 to 3 layers)
+ * rescale every other cell by 2/3 and cost about 0.27 of grid score. On unit-sum grids the same patch
+ * costs roughly its share of the paper mass. Two empty grids are identical; one empty grid scores 0.
+ */
 export function gridSimilarity(a: readonly number[], b: readonly number[]): number {
   const n = Math.max(a.length, b.length);
+  let sumA = 0;
+  let sumB = 0;
+  for (let k = 0; k < a.length; k++) sumA += a[k];
+  for (let k = 0; k < b.length; k++) sumB += b[k];
+  if (!(sumA > 0) || !(sumB > 0)) return sumA > 0 || sumB > 0 ? 0 : 1;
+  const ia = 1 / sumA;
+  const ib = 1 / sumB;
   let sMin = 0;
   let sMax = 0;
   for (let k = 0; k < n; k++) {
-    const x = k < a.length ? a[k] : 0;
-    const y = k < b.length ? b[k] : 0;
+    const x = k < a.length ? a[k] * ia : 0;
+    const y = k < b.length ? b[k] * ib : 0;
     if (x < y) {
       sMin += x;
       sMax += y;
@@ -47,7 +60,7 @@ export function gridSimilarity(a: readonly number[], b: readonly number[]): numb
       sMax += x;
     }
   }
-  return sMax > 0 ? sMin / sMax : 1;
+  return sMin / sMax;
 }
 
 /** Product of the per-feature kernels, 0..1. */
@@ -96,16 +109,16 @@ export type MatchLabel = 'identical' | 'near-identical' | 'similar' | 'related' 
 /**
  * UI wording thresholds (design choice, tuned on the test fixtures):
  *  >= 0.995 identical       same fold, at most rounding or a different sheet size
- *  >= 0.95  near-identical  same plane with a small change (an extra nose layer, a trim tweak)
- *  >= 0.85  similar         same family, visibly different proportions
- *  >= 0.65  related         shares the general layout (both darts, both gliders)
- *  below    different
+ *  >= 0.93  near-identical  same plane with a small change (fixture: one extra nose layer scores 0.937)
+ *  >= 0.80  similar         same family, visibly different proportions
+ *  >= 0.60  related         shares the general layout (both darts, both gliders)
+ *  below    different       (fixture: delta dart vs wide glider scores 0.11)
  */
 export const MATCH_THRESHOLDS = {
   identical: 0.995,
-  nearIdentical: 0.95,
-  similar: 0.85,
-  related: 0.65,
+  nearIdentical: 0.93,
+  similar: 0.8,
+  related: 0.6,
 } as const;
 
 export function describeMatch(score: number): MatchLabel {
