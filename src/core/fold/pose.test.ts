@@ -675,6 +675,17 @@ describe('defaultShape', () => {
     }
   });
 
+  it('measures a lopsided model on its wider side', () => {
+    // The right half folded over onto the left: nothing is left to the right of the centreline.
+    const { final } = foldFlat(A4, [valley({ a: [CX, H], b: [CX, 0] })]);
+    const shape = defaultShape(final);
+    expect(shape.wingLine?.a[0]).toBeCloseTo(CX + 0.12 * CX, 12);
+    const { model, issues } = poseModel(final, shape);
+    expect(issues.map((i) => i.code)).toEqual(['not-symmetric']);
+    expect(model.panels.map((p) => `${p.role}${p.side}`)).toEqual(['fuselage-1', 'wing-1']);
+    expectSound(model, final);
+  });
+
   it('works on other sheets', () => {
     for (const flat of [createSheet(LETTER), foldFlat(LETTER, dartSteps(LETTER)).final, foldFlat(LETTER, lockSteps(LETTER)).final]) {
       const model = pose(flat, defaultShape(flat));

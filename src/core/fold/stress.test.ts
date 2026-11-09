@@ -100,7 +100,9 @@ describe('random symmetric fold sequences', () => {
       tally.maxPieces = Math.max(tally.maxPieces, state.pieces.length);
 
       // Whatever came out can be opened into some 3D shape without losing paper.
-      const { model } = poseModel(state, defaultShape(state));
+      const { model, issues } = poseModel(state, defaultShape(state));
+      expect(issues.filter((issue) => issue.code === 'shape-line-invalid'), `seed ${seed}: the default shape fits`).toEqual([]);
+      expect(model.panels.some((panel) => panel.role === 'wing'), `seed ${seed}: the default shape has wings`).toBe(true);
       expect(model.pieces.every((piece) => finite(piece.verts)), `seed ${seed}: posed model is finite`).toBe(true);
       const posedArea = model.pieces.reduce((sum, piece) => sum + triangleFanArea(piece.verts), 0);
       expect(posedArea, `seed ${seed}: posed area`).toBeCloseTo(paper.width * paper.height, 10);

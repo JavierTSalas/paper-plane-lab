@@ -260,11 +260,13 @@ export function poseModel(
  * parallel to the centreline, 8 degrees of dihedral and no winglets.
  * The fuselage is 12 % of the sheet's half-width deep (about half an inch on A4 or Letter), and never
  * more than half of what the folded model has to offer, so the wing line always cuts the model.
+ * A model with no width to either side of the centreline gets no keel and no wing line.
  */
 export function defaultShape(flat: FlatState): ShapeSpec {
   const cx = flat.paper.width / 2;
   const { min, max } = tableBounds(flat);
-  const reach = max[0] - cx;
+  // poseModel mirrors the left half onto the right, so a lopsided model is measured on its wider side.
+  const reach = Math.max(max[0] - cx, cx - min[0]);
   const depth = Math.min(0.12 * cx, 0.5 * reach);
   const flatWing = depth <= MIN_FEATURE;
   return {
