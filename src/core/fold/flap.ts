@@ -1,7 +1,8 @@
 import {
-  applyIso, boundsOf, containsPoint, EPS, lineDistance, MIN_FEATURE, overlaps, sharedEdges, unionFind,
+  applyIso, boundsOf, boxesMeet, COLLINEAR_TOL, containsPoint, EPS, lineDistance, MIN_FEATURE, overlaps, sharedEdges,
+  unionFind,
 } from './geom';
-import type { Bounds, Line } from './geom';
+import type { Line } from './geom';
 import type { Iso2, Vec2 } from '../types';
 
 /** The portion of one piece that lies on the moving side of the fold line. */
@@ -18,9 +19,6 @@ export interface FlapChoice {
   /** Other layers lay in the way of the picked flap and were taken along. */
   blocked: boolean;
 }
-
-const boxesTouch = (p: Bounds, q: Bounds): boolean =>
-  p.min[0] <= q.max[0] + EPS && q.min[0] <= p.max[0] + EPS && p.min[1] <= q.max[1] + EPS && q.min[1] <= p.max[1] + EPS;
 
 function hasEdgeOnLine(table: readonly Vec2[], line: Line): boolean {
   for (let i = 0, j = table.length - 1; i < table.length; j = i++) {
@@ -40,7 +38,7 @@ function components(parts: readonly FlapPart[], line: Line, movingSign: 1 | -1):
   const sets = unionFind(parts.length);
   for (let i = 0; i < parts.length; i++) {
     for (let j = i + 1; j < parts.length; j++) {
-      if (!boxesTouch(boxes[i], boxes[j]) || sets.find(i) === sets.find(j)) continue;
+      if (!boxesMeet(boxes[i], boxes[j], COLLINEAR_TOL) || sets.find(i) === sets.find(j)) continue;
       const joined = sharedEdges(parts[i].sheet, parts[j].sheet).some(([a, b]) => {
         const mid = applyIso(parts[i].iso, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]);
         return movingSign * lineDistance(line, mid) > EPS;
@@ -82,19 +80,25 @@ export function selectFlap(
   if (seed < 0) return null;
 
   const group = components(parts, line, movingSign);
-  const inFlap = group.map((g) => g === group[seed]);
+  const reach = tables.map((table) => boundsOf([table]));
+  const inFlap = parts.map(() => false);
+  const unchecked: number[] = [];
+  let outside = parts.length;
+  const take = (wanted: number): void => {
+    group.forEach((g, i) => {
+      if (g !== wanted || inFlap[i]) return;
+      inFlap[i] = true;
+      unchecked.push(i);
+      outside--;
+    });
+  };
+  take(group[seed]);
   let blocked = false;
-  for (let grew = true; grew; ) {
-    grew = false;
+  for (let f = unchecked.pop(); f !== undefined && outside > 0; f = unchecked.pop()) {
     for (let q = 0; q < parts.length; q++) {
-      if (inFlap[q]) continue;
-      const inTheWay = parts.some((_, f) => inFlap[f] && outer(q, f) && overlaps(tables[q], tables[f]));
-      if (!inTheWay) continue;
-      group.forEach((g, i) => {
-        if (g === group[q]) inFlap[i] = true;
-      });
+      if (inFlap[q] || !outer(q, f) || !boxesMeet(reach[q], reach[f], 0) || !overlaps(tables[q], tables[f])) continue;
+      take(group[q]);
       blocked = true;
-      grew = true;
     }
   }
   return { members: inFlap.flatMap((yes, i) => (yes ? [i] : [])), blocked };

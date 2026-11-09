@@ -1,8 +1,8 @@
 import { addCrease } from './creases';
 import { selectFlap } from './flap';
 import {
-  applyIso, boundsOf, collinearOverlap, composeIso, EPS, ISO_IDENTITY, isPoint, lineDistance, MIN_FEATURE,
-  mirrorIso, reflectionIso, splitByLine, toLine,
+  applyIso, boundsOf, boxesMeet, COLLINEAR_TOL, collinearOverlap, composeIso, EPS, ISO_IDENTITY, isPoint, lineDistance,
+  MIN_FEATURE, mirrorIso, reflectionIso, splitByLine, toLine,
 } from './geom';
 import type { Bounds, Line, Segment, Split } from './geom';
 import type {
@@ -12,6 +12,11 @@ import type {
 
 /** How far the default flap pick sits from the fold line, on the moving side, metres. */
 const PICK_NUDGE = 1e-4;
+/**
+ * A fold that would leave more pieces than this is refused (research doc 07, section 9.5: all-layers
+ * folds double the count). Nine halvings of a sheet reach it; no real sheet folds further.
+ */
+export const MAX_PIECES = 512;
 
 export interface StepOutcome {
   state: FlatState;
@@ -88,10 +93,14 @@ function hingeCreases(
   step: number,
 ): Crease[] {
   let out = creases;
+  let boxes: Bounds[] | null = null;
   for (const mover of movers) {
     const edge = edgeOnLine(mover, line);
     if (!edge) continue;
-    for (const stayer of stayers) {
+    boxes ??= stayers.map((p) => boundsOf([p.sheet]));
+    const reach = boundsOf([edge]);
+    stayers.forEach((stayer, k) => {
+      if (!boxesMeet(boxes![k], reach, COLLINEAR_TOL)) return;
       for (let i = 0, j = stayer.sheet.length - 1; i < stayer.sheet.length; j = i++) {
         const shared = collinearOverlap(edge[0], edge[1], stayer.sheet[j], stayer.sheet[i]);
         if (!shared) continue;
@@ -99,7 +108,7 @@ function hingeCreases(
         const assignment = wasFlat ? assignmentFor(valley, stayer.flipped) : 'aux';
         out = addCrease(out, { a: shared[0], b: shared[1], assignment, step }, 'override');
       }
-    }
+    });
   }
   return out;
 }
@@ -142,6 +151,12 @@ function applyFold(state: FlatState, step: FoldStepFold, index: number): StepOut
   }
   if (cuts.every((c, i) => folds[i] && stayingPart(c) === null)) {
     return skipped(state, step, index, 'nothing-moves', 'The whole model lies on the moving side, so nothing would stay put.');
+  }
+
+  const newPieces = cuts.filter((c, i) => folds[i] && c.cut !== null).length;
+  if (state.pieces.length + newPieces > MAX_PIECES) {
+    // The contract has no code of its own for this; nothing can move because the stack is too thick.
+    return skipped(state, step, index, 'nothing-moves', 'That would make more layers than paper can be folded into. Unfold something first.');
   }
 
   let nextId = nextPieceId(state.pieces);
@@ -252,6 +267,7 @@ function applyFlip(state: FlatState, step: FoldStep, index: number): StepOutcome
  *    uncut `before` state plus the new reference creases, so the ids of the cut-off halves in `split`
  *    exist only inside that frame.
  *  - A skipped step has `after === before`, `split === before.pieces`, no moving pieces and no axis.
+ *  - A fold that would leave more than MAX_PIECES pieces is skipped and reported as `nothing-moves`.
  */
 export function applyStep(state: FlatState, step: FoldStep, index: number): StepOutcome {
   switch (step?.kind) {

@@ -289,6 +289,10 @@ export function boundsOf(polys: Iterable<readonly Vec2[]>): Bounds {
   return { min: [x0, y0], max: [x1, y1] };
 }
 
+/** True when two boxes overlap or come within `slack` of each other. */
+export const boxesMeet = (p: Bounds, q: Bounds, slack: number): boolean =>
+  p.min[0] <= q.max[0] + slack && q.min[0] <= p.max[0] + slack && p.min[1] <= q.max[1] + slack && q.min[1] <= p.max[1] + slack;
+
 /** Disjoint-set forest over the indices 0..n-1. */
 export function unionFind(n: number): { find(i: number): number; union(i: number, j: number): void } {
   const parent = Array.from({ length: n }, (_, i) => i);

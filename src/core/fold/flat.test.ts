@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { A4, both, busySteps, dartSteps, LETTER, lockSteps, mountain, paperOf, valley } from './fixtures';
-import { applyStep, createSheet, foldFlat, foldPointToPoint, isSymmetric, piecePolygon, tableBounds } from './index';
+import { applyStep, createSheet, foldFlat, foldPointToPoint, isSymmetric, MAX_PIECES, piecePolygon, tableBounds } from './index';
 import { expectValidState, polygonArea } from './invariants';
 import type { FlatPiece, FlatState, FoldStep, PaperSpec, Vec2 } from '../types';
 
@@ -596,6 +596,48 @@ describe('invalid steps', () => {
   });
 });
 
+describe('layer limit', () => {
+  /** Fold the sheet in half `count` times, alternating direction. */
+  function halvings(count: number): FoldStep[] {
+    const steps: FoldStep[] = [];
+    let w = W;
+    let h = H;
+    for (let i = 0; i < count; i++) {
+      if (i % 2 === 0) {
+        h /= 2;
+        steps.push(valley({ a: [0, h], b: [W, h] }));
+      } else {
+        w /= 2;
+        steps.push(valley({ a: [w, H], b: [w, 0] }));
+      }
+    }
+    return steps;
+  }
+
+  it('folds a sheet in half nine times and refuses the tenth', () => {
+    const nine = foldFlat(A4, halvings(9));
+    expect(nine.issues).toEqual([]);
+    expect(nine.final.pieces).toHaveLength(MAX_PIECES);
+    expectValidState(nine.final, 'nine halvings');
+
+    const ten = foldFlat(A4, halvings(10));
+    expect(ten.issues).toHaveLength(1);
+    expect(ten.issues[0]).toMatchObject({ step: 9, severity: 'error', code: 'nothing-moves' });
+    expect(ten.issues[0].message).toMatch(/layers/);
+    expect(ten.final.pieces).toEqual(nine.final.pieces);
+    expect(ten.frames[9].after).toBe(ten.frames[9].before);
+  });
+
+  it('still takes folds that add no pieces, and creases', () => {
+    const { final } = foldFlat(A4, halvings(9));
+    const flip = applyStep(final, { kind: 'flip' }, 9);
+    expect(flip.issues).toEqual([]);
+    const crease = applyStep(final, { kind: 'crease', line: { a: [0, 0.004], b: [W, 0.005] } }, 9);
+    expect(crease.issues).toEqual([]);
+    expect(crease.state.pieces).toBe(final.pieces);
+  });
+});
+
 describe('performance', () => {
   it('folds twelve steps on A4 in well under 5 ms', () => {
     const steps = busySteps(A4);
@@ -607,5 +649,27 @@ describe('performance', () => {
     const each = (performance.now() - start) / runs;
     expect(foldFlat(A4, steps).issues.filter((i) => i.severity === 'error')).toEqual([]);
     expect(each).toBeLessThan(5);
+  });
+
+  it('stays interactive at the layer limit', () => {
+    // 256 layers cut into 512: about 3 ms. The bound is loose to stay quiet on a busy machine;
+    // without the limit the next two halvings take 12 ms and 200 ms.
+    const steps: FoldStep[] = [];
+    for (let i = 0, w = W, h = H; i < 8; i++) {
+      if (i % 2 === 0) steps.push(valley({ a: [0, (h /= 2)], b: [W, h] }));
+      else steps.push(valley({ a: [(w /= 2), H], b: [w, 0] }));
+    }
+    const thick = foldFlat(A4, steps).final;
+    expect(thick.pieces).toHaveLength(256);
+    for (const layers of ['all', 'flap'] as const) {
+      const last: FoldStep = { kind: 'fold', line: { a: [0, H / 32], b: [W, H / 32] }, moving: 'left', dir: 'valley', layers };
+      for (let i = 0; i < 5; i++) applyStep(thick, last, 8);
+      const runs = 20;
+      const start = performance.now();
+      for (let i = 0; i < runs; i++) applyStep(thick, last, 8);
+      const each = (performance.now() - start) / runs;
+      expect(applyStep(thick, last, 8).state.pieces).toHaveLength(MAX_PIECES);
+      expect(each).toBeLessThan(20);
+    }
   });
 });
