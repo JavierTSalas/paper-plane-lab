@@ -70,7 +70,7 @@ export function FoldPlayer({
         paper: tl.design.paper,
         yaw: s.yaw,
         pitch: s.pitch,
-        fit: fitAt(tl, i, u, reduced),
+        fit: fitAt(tl, i, u, reduced, s),
         creases: s.creases,
         highlight: s.highlight,
         overlayZ: 0,
@@ -121,9 +121,10 @@ export function FoldPlayer({
   useEffect(() => {
     if (!playing) return;
     let raf = 0;
-    let lastT = performance.now();
+    let lastT = -1;
     const tick = (now: number): void => {
-      const dt = Math.min(0.1, (now - lastT) / 1000);
+      // rAF timestamps can precede the moment the effect ran; never step backward.
+      const dt = lastT < 0 ? 0 : Math.max(0, Math.min(0.1, (now - lastT) / 1000));
       lastT = now;
       const i = segIndex(pos.current, count);
       const seg = tl.segments[i]!;

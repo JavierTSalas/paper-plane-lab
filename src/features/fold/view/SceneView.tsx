@@ -106,7 +106,8 @@ export function SceneView({ ref, aspect, pad = 12, printScale = 1500, label, cla
       overlayRef.current?.setAttribute('transform', matrixAttr(tableMatrix(cam, z)));
       const line = lineRef.current;
       if (line) {
-        const b = input.highlight ? facesBounds(input.faces) : null;
+        const still = input.faces.filter((f) => f.level === 0 || f.level === undefined);
+        const b = input.highlight ? facesBounds(still.length ? still : input.faces) : null;
         const seg = input.highlight && b ? lineInBox(input.highlight.line, b.min, b.max, 0.006) : null;
         if (input.highlight && seg) {
           const basis = cameraBasis(cam.yaw, cam.pitch);

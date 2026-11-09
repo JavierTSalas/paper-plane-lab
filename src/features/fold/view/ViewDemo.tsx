@@ -129,13 +129,13 @@ export default function ViewDemo(): ReactElement {
                 { x: model.length * 0.5, kind: 'np' },
               ]}
             />
-            <p className="ppl-vdemo__note">
+            <div className="ppl-vdemo__note">
               {formatLength(model.length, units)} long, {formatLength(model.span, units)} span
               <InfoDot label="What are CG and NP?" title="Balance and neutral point">
                 CG is where the plane balances. NP is the point the lift pivots about; the CG must sit ahead of it for a steady glide. The demo
                 places both at fixed fractions of the length.
               </InfoDot>
-            </p>
+            </div>
           </Card>
         </Block>
 
@@ -161,9 +161,9 @@ export default function ViewDemo(): ReactElement {
                 cursor && <circle cx={cursor[0]} cy={cursor[1]} r={9 / pxPerMetre} className="ppl-vdemo__cursor" vectorEffect="non-scaling-stroke" />
               }
             </PaperCanvas>
-            <p className="ppl-vdemo__note ppl-num">
+            <div className="ppl-vdemo__note ppl-num">
               {cursor ? `x ${formatLength(cursor[0], units)} · y ${formatLength(cursor[1], units)}` : 'Move the pointer over the paper.'}
-            </p>
+            </div>
           </Card>
         </Block>
 
@@ -172,9 +172,9 @@ export default function ViewDemo(): ReactElement {
             <div className="ppl-vdemo__thumbs">
               {designs.map((d) => (
                 <div key={d.id} className="ppl-vdemo__thumbrow">
-                  <PlaneThumb design={d} view="top" size={96} />
-                  <PlaneThumb design={d} view="three-quarter" size={120} />
-                  <PlaneThumb design={d} view="side" size={120} />
+                  <PlaneThumb design={d} view="top" size={72} />
+                  <PlaneThumb design={d} view="three-quarter" size={100} />
+                  <PlaneThumb design={d} view="side" size={100} />
                 </div>
               ))}
             </div>

@@ -174,11 +174,26 @@ function segmentFit(tl: Timeline, i: number): ScreenBounds {
   return b ?? { min: [0, 0], max: [1, 1] };
 }
 
-/** Framing at a position: blends from the previous segment's framing early in a shaping step. */
-export function fitAt(tl: Timeline, i: number, u: number, reduced: boolean): ScreenBounds {
-  const cur = tl.fits[i]!;
+/**
+ * Framing at a position: blends from the previous segment's framing early in a shaping step. While the
+ * camera orbits, the target is the live scene itself, so the finished plane ends up filling the view.
+ */
+export function fitAt(tl: Timeline, i: number, u: number, reduced: boolean, scene?: TimelineScene): ScreenBounds {
+  const seg = tl.segments[i]!;
+  const live = seg.kind === 'shape' && seg.orbit && scene ? screenBounds(scene.faces.flatMap((f) => f.verts), scene.yaw, scene.pitch) : null;
+  const cur = live ?? tl.fits[i]!;
   if (i === 0 || reduced) return cur;
   const prev = tl.fits[i - 1]!;
+  if (live) {
+    // Different cameras: keep the live centre and ease only the size, never cropping the live scene.
+    const k = motionAt(u, false);
+    const half = (b: ScreenBounds, axis: 0 | 1): number => (b.max[axis] - b.min[axis]) / 2;
+    const hx = Math.max(half(live, 0), half(prev, 0) + (half(live, 0) - half(prev, 0)) * k);
+    const hy = Math.max(half(live, 1), half(prev, 1) + (half(live, 1) - half(prev, 1)) * k);
+    const mx = (live.min[0] + live.max[0]) / 2;
+    const my = (live.min[1] + live.max[1]) / 2;
+    return { min: [mx - hx, my - hy], max: [mx + hx, my + hy] };
+  }
   const k = easeInOutSine(Math.min(1, u / 0.45));
   if (k >= 1) return cur;
   return {

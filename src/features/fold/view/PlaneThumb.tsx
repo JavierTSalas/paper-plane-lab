@@ -68,7 +68,7 @@ function thumbFaces(design: PlaneDesign, view: ThumbView, size: number): { faces
     const w = size;
     const h = view === 'top' ? size : Math.round(size * 0.75);
     const cam = fitPoints(faces.flatMap((f) => f.verts), v.yaw, v.pitch, { width: w, height: h, pad: Math.max(4, size * 0.06) });
-    return { faces: cam ? composeScene(faces, cam, { shadows: view !== 'side', groundZ: -0.1 * model.length }) : [], w, h };
+    return { faces: cam ? composeScene(faces, cam, { shadows: view === 'three-quarter', groundZ: -0.1 * model.length }) : [], w, h };
   });
 }
 

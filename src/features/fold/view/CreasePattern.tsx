@@ -65,8 +65,15 @@ export function CreasePattern({ design, includeShape = true, legend = true, size
   const { width: W, height: H } = design.paper;
   const creases = useMemo(() => {
     const all = [...flat.creases, ...(includeShape ? shapeCreases(flat, design.shape) : [])];
-    return all.sort((a, b) => ORDER[a.assignment] - ORDER[b.assignment]);
-  }, [flat, includeShape, design.shape]);
+    // A "crease" lying along the sheet's own edge is a fold that happens to land on an edge: nothing to draw.
+    const eps = 1e-6;
+    const onEdge = (c: Crease): boolean =>
+      (Math.abs(c.a[0]) < eps && Math.abs(c.b[0]) < eps) ||
+      (Math.abs(c.a[0] - W) < eps && Math.abs(c.b[0] - W) < eps) ||
+      (Math.abs(c.a[1]) < eps && Math.abs(c.b[1]) < eps) ||
+      (Math.abs(c.a[1] - H) < eps && Math.abs(c.b[1] - H) < eps);
+    return all.filter((c) => !onEdge(c)).sort((a, b) => ORDER[a.assignment] - ORDER[b.assignment]);
+  }, [flat, includeShape, design.shape, W, H]);
   const mm = 1000;
   const pt = (p: Vec2): string => `${(p[0] * mm).toFixed(2)} ${((H - p[1]) * mm).toFixed(2)}`;
   const front = paperFaceFill(design.paper, 'front', prefix);
