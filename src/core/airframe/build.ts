@@ -12,7 +12,7 @@ import type { PointMass } from './massProps';
 import { panelMaxLayers, panelPoint, projectPanel, sliceStrips } from './strips';
 import type { PanelShape } from './strips';
 import {
-  blendCoefficients, deltanessFromSweep, plateAddedMass, surfaceCoefficients,
+  blendCoefficients, deltanessFromSweep, plateAddedMass, slenderCpFraction, surfaceCoefficients,
 } from './surfaces';
 import type { SurfaceCoefficients } from './surfaces';
 
@@ -106,6 +106,7 @@ const surfaceOf = (
   stallWidth: c.stallWidth,
   cd90: c.cd90,
   k0: c.k0,
+  vortexCp: c.vortexCp,
   flapEfficiency: c.flapEfficiency,
 });
 
@@ -318,7 +319,18 @@ export function buildAirframe(model: PosedModel, trim: TrimSpec, stock: PaperSto
       fronts.map((d) => d.width * Math.abs(d.el.normal[1])),
     );
     const sweep = Math.atan(Math.max(0, -slope));
-    wingCoefs = surfaceCoefficients(refAspect, deltanessFromSweep(sweep));
+    const deltaCp = slenderCpFraction(
+      fronts.map((d) => {
+        const flat = Math.abs(d.el.normal[1]);
+        return {
+          leX: d.el.le[0],
+          chord: d.el.chord,
+          outer: Math.abs(d.el.le[2]) + 0.5 * d.width * Math.abs(d.spanAxis[2]),
+          area: d.el.area * flat,
+        };
+      }),
+    );
+    wingCoefs = surfaceCoefficients(refAspect, deltanessFromSweep(sweep), deltaCp);
     for (const d of wingDrafts) d.el.surface = surfaces.length;
     surfaces.push(surfaceOf('wing', refArea, refSpan, refAspect, wingCoefs));
     let developedSpan = 0;

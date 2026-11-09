@@ -258,6 +258,22 @@ export function foldedModel(spec: FoldedFixtureSpec): PosedModel {
   };
 }
 
+/**
+ * A rectangular wing with a short keel fin under part of its chord. `finFrom` / `finTo` are the x range of the
+ * fin (from the tail). An aerodynamic test object, not a foldable plane.
+ */
+export function finnedPlateModel(span: number, chord: number, finDepth: number, finFrom: number, finTo: number): PosedModel {
+  const h = span / 2;
+  return foldedModel({
+    paper: paperOf(span, chord),
+    layers: [
+      { outline: [[finDepth, 0], [h + finDepth, 0], [h + finDepth, chord], [finDepth, chord]] },
+      { outline: [[0, finFrom], [finDepth, finFrom], [finDepth, finTo], [0, finTo]] },
+    ],
+    keelDepth: finDepth,
+  });
+}
+
 /** Two rectangular wing halves meeting on the centreline with dihedral, no fuselage. */
 export function dihedralPlateModel(span: number, chord: number, dihedralDeg: number): PosedModel {
   const h = span / 2;
@@ -329,6 +345,12 @@ export function dartFixture(options: DartFixtureOptions = {}): PosedModel {
   });
 }
 
+/**
+ * Trim the fixture dart glides with: a small up-bend of the last tenth of the chord. Flat plates need reflex
+ * as soon as the centre of gravity is ahead of the neutral point.
+ */
+export const DART_TRIM: TrimSpec = { ...NEUTRAL_TRIM, elevatorDeg: 4, elevatorChordFrac: 0.1 };
+
 /* ------------------------------------------------------------------ */
 /* Fixture glider                                                     */
 /* ------------------------------------------------------------------ */
@@ -369,3 +391,6 @@ export function gliderFixture(options: GliderFixtureOptions = {}): PosedModel {
     wingletDeg: options.wingletDeg ?? 0,
   });
 }
+
+/** The fixture glider needs no bend: its centre of pressure travels aft with incidence and meets the centre of gravity. */
+export const GLIDER_TRIM: TrimSpec = NEUTRAL_TRIM;

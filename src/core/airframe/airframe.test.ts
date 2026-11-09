@@ -9,7 +9,9 @@ import type { Airframe, Mat3, PosedModel, Vec3 } from '../types';
 import { buildAirframe } from './build';
 import { STANDARD_GRAVITY } from './constants';
 import { laminaMassProps } from './massProps';
-import { deltaSlope, helmboldSlope, plateAddedMass, plateAddedMassCoefficient, surfaceCoefficients } from './surfaces';
+import {
+  deltaSlope, helmboldSlope, plateAddedMass, plateAddedMassCoefficient, slenderCpFraction, surfaceCoefficients,
+} from './surfaces';
 
 const RHO_PAPER = PAPER_STOCK.gsm / 1000;
 
@@ -259,6 +261,7 @@ describe('lifting surfaces', () => {
       expect(s.stallWidth / DEG).toBeCloseTo(width, 9);
       expect(s.cd90).toBeCloseTo(Math.max(1.17, 1.11 + 0.018 * ar), 9);
       expect(s.k0).toBe(0.25);
+      expect(s.vortexCp).toBe(0.5);
       expect(s.flapEfficiency).toBe(0.8);
       expect(af.elements.every((e) => e.surface === 0)).toBe(true);
     }
@@ -273,7 +276,35 @@ describe('lifting surfaces', () => {
     expect(s.kv).toBeCloseTo(Math.PI, 12);
     expect(s.alphaStall / DEG).toBeCloseTo(35, 9);
     expect(s.stallWidth / DEG).toBeCloseTo(20, 9);
-    expect(s.k0).toBe(0.5);
+    // Pure delta: the slender-wing match gives the document's 0.5 (strip quadrature: 0.4 % low).
+    expect(s.k0).toBeCloseTo(0.5, 2);
+    expect(s.vortexCp).toBeCloseTo(0.5, 2);
+  });
+
+  it('strip centre of pressure reproduces the slender-wing aerodynamic centre of the planform', () => {
+    const strips = (leX: (t: number) => number, chord: (t: number) => number, n = 400) =>
+      Array.from({ length: n }, (_, i) => {
+        const t = (i + 0.5) / n;
+        return { leX: leX(t), chord: chord(t), outer: (i + 1) / n, area: chord(t) / n };
+      });
+    // Pure delta, root chord 1, tail at x = 0: centroid of d(s²)/dx is 2/3 behind the apex, so k = 0.5.
+    expect(slenderCpFraction(strips((t) => 1 - t, (t) => 1 - t))).toBeCloseTo(0.5, 3);
+    // Cropped delta (tip chord 0.2): the load of slender-wing theory sits further forward on every strip.
+    // By hand: mean LE = mean chord = (1 - 0.2^3) / 2.4 / 0.6; centroid of d(s²) = 1 - 0.8 * 2/3.
+    const meanChord = (1 - 0.2 ** 3) / 2.4 / 0.6;
+    expect(slenderCpFraction(strips((t) => 1 - 0.8 * t, (t) => 1 - 0.8 * t))).toBeCloseTo(
+      (meanChord - (1 - 1.6 / 3)) / meanChord,
+      3,
+    );
+    // Tip chord 0.4: slender-wing theory would go ahead of the quarter chord; held there.
+    expect(slenderCpFraction(strips((t) => 1 - 0.6 * t, (t) => 1 - 0.6 * t))).toBe(0.25);
+    // Straight leading edge: all span growth at the leading edge, clamped to the quarter chord.
+    expect(slenderCpFraction(strips(() => 1, () => 1))).toBe(0.25);
+    // The fixture dart has cropped tips.
+    const dart = buildAirframe(dartFixture(), NEUTRAL_TRIM).surfaces[0];
+    expect(dart.k0).toBeGreaterThan(0.3);
+    expect(dart.k0).toBeLessThan(0.36);
+    expect(dart.vortexCp).toBe(dart.k0);
   });
 
   it('formulas reproduce the tables of doc 01 section 3', () => {

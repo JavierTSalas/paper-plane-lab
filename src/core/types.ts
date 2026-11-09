@@ -369,6 +369,8 @@ export interface LiftingSurface {
   cd90: number;
   /** Centre-of-pressure base position as a fraction of chord at small incidence. */
   k0: number;
+  /** Chord fraction where the vortex-lift part of the normal force acts (0.5 on straight wings and pure deltas). */
+  vortexCp: number;
   /** Plain-flap efficiency eta_f applied to the bends of this surface's elements (research doc 01 section 8). */
   flapEfficiency: number;
 }
@@ -664,6 +666,12 @@ export interface TrimAnalysis {
   cnBeta: number;
   rollStable: boolean;
   yawStable: boolean;
+  /**
+   * Directional stiffness in flight, "Cn-beta dynamic": -cnBeta cos(alpha) - (I_yaw / I_roll) clBeta sin(alpha).
+   * POSITIVE is stable. Slender planes with a long keel are often not weathercock stable (cnBeta > 0) and hold
+   * their heading through the dihedral effect instead; this number shows it.
+   */
+  cnBetaDynamic: number;
   /** Best lift-to-drag ratio in the sweep and where it occurs. */
   bestLd: number;
   bestLdAlphaDeg: number;

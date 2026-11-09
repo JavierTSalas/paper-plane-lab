@@ -30,8 +30,11 @@ const CD90_MIN = 1.17;
 const CD90_BASE = 1.11;
 const CD90_SLOPE = 0.018;
 /** Centre of pressure at small incidence, fraction of chord (doc 01 section 6). */
-const K0_RECT = 0.25;
-const K0_DELTA = 0.5;
+export const K0_RECT = 0.25;
+/** Value for a pure delta: puts the aerodynamic centre at 2/3 of the root chord, the slender-wing result (doc 01 section 6). */
+export const K0_DELTA = 0.5;
+/** Vortex lift acts at mid-chord on straight wings: side-edge vortices (doc 01 section 6, calibration). */
+const VORTEX_CP_RECT = 0.5;
 /** Viscous plain-flap efficiency eta_f (doc 01 section 8, calibration). */
 export const FLAP_EFFICIENCY = 0.8;
 
@@ -58,11 +61,20 @@ export interface SurfaceCoefficients {
   stallWidth: number;
   cd90: number;
   k0: number;
+  vortexCp: number;
   flapEfficiency: number;
 }
 
-/** The constants of doc 01 section 10.1, blended between the straight and the delta set by `deltaness`. */
-export function surfaceCoefficients(aspectRatio: number, deltaness: number): SurfaceCoefficients {
+/**
+ * The constants of doc 01 section 10.1, blended between the straight and the delta set by `deltaness`.
+ *
+ * `deltaCp` is the strip centre-of-pressure fraction of the delta set. Doc 01 section 6 derives 0.5 for a
+ * pure delta from one requirement: uniformly loaded strips must put the aerodynamic centre where slender-wing
+ * theory puts it. The caller passes the value that meets the same requirement for the actual planform
+ * (`slenderCpFraction`); it is 0.5 for a pure delta and smaller when the tips are cropped. On a delta the
+ * vortex lift is taken to act at the same fraction (conical flow), on a straight wing at mid-chord.
+ */
+export function surfaceCoefficients(aspectRatio: number, deltaness: number, deltaCp: number = K0_DELTA): SurfaceCoefficients {
   const ar = Math.max(aspectRatio, AR_FLOOR);
   const d = clamp(deltaness, 0, 1);
   const lowAr = (KV_RECT_AR_END - ar) / 2;
@@ -73,9 +85,47 @@ export function surfaceCoefficients(aspectRatio: number, deltaness: number): Sur
     alphaStall: Math.min(STALL_MAX, STALL_BASE + STALL_GAIN * Math.exp(1 - ar)),
     stallWidth: lerp(STALL_WIDTH_BASE + STALL_WIDTH_GAIN * clamp(lowAr, 0, STALL_WIDTH_CLAMP), STALL_WIDTH_DELTA, d),
     cd90: Math.max(CD90_MIN, CD90_BASE + CD90_SLOPE * Math.max(ar, 1 / ar)),
-    k0: lerp(K0_RECT, K0_DELTA, d),
+    k0: lerp(K0_RECT, deltaCp, d),
+    vortexCp: lerp(VORTEX_CP_RECT, deltaCp, d),
     flapEfficiency: FLAP_EFFICIENCY,
   };
+}
+
+/**
+ * Strip centre-of-pressure fraction that makes uniformly loaded strips reproduce the slender-wing aerodynamic
+ * centre of a planform. Slender-wing theory (R. T. Jones) loads a wing in proportion to d(s²)/dx, s(x) being
+ * the local semi-span going aft, so its aerodynamic centre is the centroid of the growth of s².
+ * Each strip is given by its leading-edge x, its chord, the distance of its outer edge from the centreline
+ * and its projected area. Result clamped to [0.25, 0.5]: quarter chord (thin airfoil) to the pure-delta value.
+ */
+export function slenderCpFraction(
+  strips: readonly { leX: number; chord: number; outer: number; area: number }[],
+): number {
+  let area = 0;
+  let leSum = 0;
+  let chordSum = 0;
+  for (const s of strips) {
+    area += s.area;
+    leSum += s.area * s.leX;
+    chordSum += s.area * s.chord;
+  }
+  if (!(area > 0) || !(chordSum > 0)) return K0_DELTA;
+  // March aft from the nose; the span grows where a strip begins.
+  const order = [...strips].sort((a, b) => b.leX - a.leX);
+  let reach = 0;
+  let growth = 0;
+  let moment = 0;
+  for (const s of order) {
+    if (s.outer <= reach) continue;
+    const step = s.outer * s.outer - reach * reach;
+    growth += step;
+    moment += step * s.leX;
+    reach = s.outer;
+  }
+  if (!(growth > 0)) return K0_DELTA;
+  const centre = moment / growth;
+  // Sum of area (leX - k chord) = centre * area  =>  k = (mean leX - centre) / mean chord.
+  return clamp((leSum / area - centre) / (chordSum / area), K0_RECT, K0_DELTA);
 }
 
 /** Linear blend of two coefficient sets: t = 0 gives `a`, t = 1 gives `b`. */
@@ -88,6 +138,7 @@ export function blendCoefficients(a: SurfaceCoefficients, b: SurfaceCoefficients
     stallWidth: lerp(a.stallWidth, b.stallWidth, t),
     cd90: lerp(a.cd90, b.cd90, t),
     k0: lerp(a.k0, b.k0, t),
+    vortexCp: lerp(a.vortexCp, b.vortexCp, t),
     flapEfficiency: lerp(a.flapEfficiency, b.flapEfficiency, t),
   };
 }
