@@ -110,6 +110,10 @@
   padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom));
   padding-left: var(--safe-left);
   padding-right: var(--safe-right);
+}
+
+/* Focus lands here after navigation for screen readers; no ring around the whole page. */
+.ppl-shell__main:focus {
   outline: none;
 }
 

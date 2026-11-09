@@ -5,8 +5,39 @@
   gap: var(--s-2);
 }
 
+.ppl-stepper-wrap {
+  container-type: inline-size;
+}
+
 .ppl-stepper--controls {
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'back center next';
+}
+
+.ppl-stepper__back {
+  grid-area: back;
+  justify-self: start;
+}
+
+.ppl-stepper__next {
+  grid-area: next;
+  justify-self: end;
+}
+
+.ppl-stepper--controls .ppl-stepper__center {
+  grid-area: center;
+}
+
+/* Narrow containers: dots on their own row, Back and Next underneath. */
+@container (max-width: 440px) {
+  .ppl-stepper--controls {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'center center'
+      'back next';
+    row-gap: var(--s-1);
+  }
 }
 
 .ppl-stepper__center {

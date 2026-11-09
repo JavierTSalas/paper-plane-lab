@@ -42,56 +42,59 @@ export function Stepper({
   const name = (i: number): string => stepLabels?.[i] ?? `Step ${i + 1}`;
 
   return (
-    <nav className={cx('ppl-stepper', controls && 'ppl-stepper--controls', className)} aria-label={label}>
-      {controls && (
-        <Button variant="ghost" size="sm" icon="back" disabled={index === 0 || !onIndexChange} onClick={() => go(index - 1)}>
-          Back
-        </Button>
-      )}
-      <div className="ppl-stepper__center">
-        <ol className="ppl-stepper__dots" role="list">
-          {Array.from({ length: count }, (_, i) => {
-            const state = i < index ? 'done' : i === index ? 'current' : 'todo';
-            const dot = <span className={cx('ppl-stepper__dot', `is-${state}`)} />;
-            return (
-              <li key={i}>
-                {onIndexChange ? (
-                  <button
-                    type="button"
-                    className="ppl-stepper__hit"
-                    aria-label={name(i)}
-                    aria-current={i === index ? 'step' : undefined}
-                    title={name(i)}
-                    disabled={i > maxReachable}
-                    onClick={() => go(i)}
-                  >
-                    {dot}
-                  </button>
-                ) : (
-                  <span className="ppl-stepper__hit" aria-current={i === index ? 'step' : undefined}>
-                    {dot}
-                    <span className="ppl-sr-only">{name(i)}</span>
-                  </span>
-                )}
-              </li>
-            );
-          })}
-        </ol>
-        <p className="ppl-stepper__count ppl-num" aria-live="polite">
-          Step {Math.min(index + 1, count)} of {count}
-        </p>
-      </div>
-      {controls && (
-        <Button
-          variant={last ? 'primary' : 'secondary'}
-          size="sm"
-          iconRight={last ? 'check' : 'next'}
-          disabled={last ? !onFinish : !onIndexChange || index + 1 > maxReachable}
-          onClick={() => (last ? onFinish?.() : go(index + 1))}
-        >
-          {last ? finishLabel : 'Next'}
-        </Button>
-      )}
-    </nav>
+    <div className={cx('ppl-stepper-wrap', className)}>
+      <nav className={cx('ppl-stepper', controls && 'ppl-stepper--controls')} aria-label={label}>
+        {controls && (
+          <Button className="ppl-stepper__back" variant="ghost" size="sm" icon="back" disabled={index === 0 || !onIndexChange} onClick={() => go(index - 1)}>
+            Back
+          </Button>
+        )}
+        <div className="ppl-stepper__center">
+          <ol className="ppl-stepper__dots" role="list">
+            {Array.from({ length: count }, (_, i) => {
+              const state = i < index ? 'done' : i === index ? 'current' : 'todo';
+              const dot = <span className={cx('ppl-stepper__dot', `is-${state}`)} />;
+              return (
+                <li key={i}>
+                  {onIndexChange ? (
+                    <button
+                      type="button"
+                      className="ppl-stepper__hit"
+                      aria-label={name(i)}
+                      aria-current={i === index ? 'step' : undefined}
+                      title={name(i)}
+                      disabled={i > maxReachable}
+                      onClick={() => go(i)}
+                    >
+                      {dot}
+                    </button>
+                  ) : (
+                    <span className="ppl-stepper__hit" aria-current={i === index ? 'step' : undefined}>
+                      {dot}
+                      <span className="ppl-sr-only">{name(i)}</span>
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+          <p className="ppl-stepper__count ppl-num" aria-live="polite">
+            Step {Math.min(index + 1, count)} of {count}
+          </p>
+        </div>
+        {controls && (
+          <Button
+            className="ppl-stepper__next"
+            variant={last ? 'primary' : 'secondary'}
+            size="sm"
+            iconRight={last ? 'check' : 'next'}
+            disabled={last ? !onFinish : !onIndexChange || index + 1 > maxReachable}
+            onClick={() => (last ? onFinish?.() : go(index + 1))}
+          >
+            {last ? finishLabel : 'Next'}
+          </Button>
+        )}
+      </nav>
+    </div>
   );
 }

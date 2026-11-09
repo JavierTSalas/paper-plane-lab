@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useRef, type ReactElement } from 'react';
-import { Redirect, Route, Router, Switch, useLocation } from 'wouter';
+import { Redirect, Route, Router, Switch, matchRoute, useLocation, useRouter } from 'wouter';
 import { useHashLocation } from 'wouter/use-hash-location';
 import { setReducedMotionOverride } from '../ui/motion';
 import { Spinner } from '../ui/Spinner';
@@ -16,54 +16,53 @@ function RouteFallback(): ReactElement {
   );
 }
 
-/** Title, scroll and focus housekeeping on navigation (not on the first load). */
-function useRouteChange(route: AppRoute, location: string): void {
-  const first = useRef(true);
+/** Scroll to top and move focus to the page when the location changes (not on the first load). */
+function useNavigationFocus(location: string): void {
+  const previous = useRef(location);
   useEffect(() => {
-    document.title = route.bare ? 'Paper Plane Lab' : `${route.title} · Paper Plane Lab`;
-    if (first.current) {
-      first.current = false;
-      return;
-    }
+    if (previous.current === location) return;
+    previous.current = location;
     window.scrollTo(0, 0);
     document.getElementById('ppl-main')?.focus({ preventScroll: true });
-  }, [route, location]);
+  }, [location]);
 }
 
 function RoutePage({ route }: { route: AppRoute }): ReactElement {
-  const [location] = useLocation();
-  useRouteChange(route, location);
   const Page = route.page;
-  const page = (
+  return (
     <Suspense fallback={<RouteFallback />}>
       <Page />
     </Suspense>
   );
-  return route.bare ? page : <AppShell route={route}>{page}</AppShell>;
 }
 
 function Routes(): ReactElement {
   const onboarded = useLab((s) => s.profile.onboarded);
-  const [location] = useLocation();
   const reducedMotion = useLab((s) => s.settings.reducedMotion);
+  const [location] = useLocation();
+  const { parser } = useRouter();
+  const route = ROUTES.find((r) => matchRoute(parser, r.path, location)[0]);
+  useNavigationFocus(location);
 
   useEffect(() => setReducedMotionOverride(reducedMotion), [reducedMotion]);
+  useEffect(() => {
+    if (route) document.title = route.bare ? 'Paper Plane Lab' : `${route.title} · Paper Plane Lab`;
+  }, [route]);
 
-  const publicPath = ROUTES.some((r) => r.public && location.startsWith(r.path.split('/:')[0]!));
-  if (!onboarded && !publicPath) return <Redirect to={WELCOME_PATH} replace />;
+  if (!route) return <Redirect to={onboarded ? HOME_PATH : WELCOME_PATH} replace />;
+  if (!onboarded && !route.public) return <Redirect to={WELCOME_PATH} replace />;
 
-  return (
+  const pages = (
     <Switch>
       {ROUTES.map((r) => (
         <Route key={r.path} path={r.path}>
           <RoutePage route={r} />
         </Route>
       ))}
-      <Route>
-        <Redirect to={onboarded ? HOME_PATH : WELCOME_PATH} replace />
-      </Route>
     </Switch>
   );
+  // One persistent shell around every chromed route, so the nav and open sheets survive navigation.
+  return route.bare ? pages : <AppShell route={route}>{pages}</AppShell>;
 }
 
 export function App(): ReactElement {

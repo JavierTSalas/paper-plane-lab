@@ -32,10 +32,12 @@ export interface PaperPatternDefsProps {
    * 1000 when drawn in millimetres, or px-per-metre for a screen-scaled preview.
    */
   unitsPerMetre: number;
+  /** Floor for line width and dot radius in user units, so small previews still show the print. Default 0. */
+  minLine?: number;
 }
 
 /** <defs> with every printed pattern in a dark and a light ink, sized in real paper millimetres. */
-export function PaperPatternDefs({ idPrefix, unitsPerMetre }: PaperPatternDefsProps): ReactElement {
+export function PaperPatternDefs({ idPrefix, unitsPerMetre, minLine = 0 }: PaperPatternDefsProps): ReactElement {
   const mm = unitsPerMetre / 1000;
   const inks: readonly PatternInk[] = ['dark', 'light'];
   return (
@@ -43,7 +45,8 @@ export function PaperPatternDefs({ idPrefix, unitsPerMetre }: PaperPatternDefsPr
       {inks.map((ink) => {
         const stroke = ink === 'dark' ? 'rgb(47 46 43 / 0.2)' : 'rgb(253 252 248 / 0.3)';
         const strong = ink === 'dark' ? 'rgb(47 46 43 / 0.13)' : 'rgb(253 252 248 / 0.18)';
-        const w = 0.3 * mm;
+        const w = Math.max(0.3 * mm, minLine);
+        const dot = Math.max(0.45 * mm, minLine);
         return (
           <g key={ink}>
             <pattern id={patternId(idPrefix, 'grid', ink)} patternUnits="userSpaceOnUse" width={5 * mm} height={5 * mm}>
@@ -53,7 +56,7 @@ export function PaperPatternDefs({ idPrefix, unitsPerMetre }: PaperPatternDefsPr
               <path d={`M0 ${7.5 * mm}H${8 * mm}`} fill="none" stroke={stroke} strokeWidth={w} />
             </pattern>
             <pattern id={patternId(idPrefix, 'dots', ink)} patternUnits="userSpaceOnUse" width={5 * mm} height={5 * mm}>
-              <circle cx={2.5 * mm} cy={2.5 * mm} r={0.45 * mm} fill={stroke} />
+              <circle cx={2.5 * mm} cy={2.5 * mm} r={dot} fill={stroke} />
             </pattern>
             <pattern id={patternId(idPrefix, 'stripes', ink)} patternUnits="userSpaceOnUse" width={12 * mm} height={12 * mm} patternTransform="rotate(45)">
               <rect width={5 * mm} height={12 * mm} fill={strong} />
@@ -183,7 +186,8 @@ export function PaperPreview({ paper, size = 160, className }: PaperPreviewProps
       role="img"
       aria-label={`${sizeName} sheet, ${paper.width > paper.height ? 'landscape' : 'portrait'}, front ${getPaperColor(paper.front).name}${paper.pattern ? ` with ${paper.pattern}` : ''}, back ${getPaperColor(paper.back).name}`}
     >
-      <PaperPatternDefs idPrefix={prefix} unitsPerMetre={pxPerM} />
+      {/* Print drawn at 1.5x real size so it reads at thumbnail scale. */}
+      <PaperPatternDefs idPrefix={prefix} unitsPerMetre={pxPerM * 1.5} minLine={0.8} />
       <path d={sheet} transform="translate(2 4)" fill="rgb(60 50 30 / 0.12)" />
       <path d={sheet} fill={front.base} />
       {front.overlay && <path d={sheet} fill={front.overlay} />}
