@@ -56,7 +56,7 @@ export function overlapArea(p: readonly Vec2[], q: readonly Vec2[]): number {
 }
 
 /** The stretch two sheet segments share when they lie on one line. */
-function sharedStretch(a: Vec2, b: Vec2, c: Vec2, d: Vec2): [Vec2, Vec2] | null {
+export function sharedStretch(a: Vec2, b: Vec2, c: Vec2, d: Vec2): [Vec2, Vec2] | null {
   const len = Math.hypot(b[0] - a[0], b[1] - a[1]);
   const ux = (b[0] - a[0]) / len;
   const uy = (b[1] - a[1]) / len;

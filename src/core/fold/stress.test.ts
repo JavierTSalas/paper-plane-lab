@@ -6,7 +6,7 @@ import {
   applyStep, createSheet, defaultShape, foldPointToPoint, frameAt, mirrorStep, poseModel, snapPoints, tableBounds,
 } from './index';
 import { expectValidState, polygonArea } from './invariants';
-import type { FlatState, FoldLine, FoldStep, PaperSpec, Vec2, Vec3 } from '../types';
+import type { FlatState, FoldLine, FoldStep, PaperSpec, Vec3 } from '../types';
 
 const PAPERS: PaperSpec[] = [A4, LETTER, paperOf(0.15, 0.15, 'square'), paperOf(0.297, 0.21, 'a4-landscape')];
 const SEQUENCES = 180;
