@@ -367,7 +367,26 @@ export function buildAirframe(model: PosedModel, trim: TrimSpec, stock: PaperSto
     area /= wallPanels.length;
     weight /= wallPanels.length;
     const aspect = area > 0 ? (2 * height * height) / area : 0;
-    const own = surfaceCoefficients(aspect, 0);
+    // Planform of a wall, measured down from the wing root line. The wing is the wall's reflection plane, so
+    // the root line plays the part the centreline plays for the wing: a wall that deepens toward the tail (the
+    // keel of every dart) is half of a slender delta and is loaded where its depth grows, well aft, while a
+    // wall of constant depth keeps the straight-wing constants. Same rule as for the wing and the winglets;
+    // with straight-wing constants on a triangular keel its side force sat ahead of the centre of gravity and
+    // the classic dart had no weathercock stability at all (found in the flight simulation).
+    const wallFronts: { leX: number; chord: number; outer: number; area: number; depth: number; width: number }[] = [];
+    for (const panel of wallPanels) {
+      const shape = shapes[panel.index];
+      const rootV =
+        panelPoint(shape.frame, 0, shape.vMax)[1] >= panelPoint(shape.frame, 0, shape.vMin)[1] ? shape.vMax : shape.vMin;
+      for (const d of byPanel[panel.index]) {
+        if (!d.front) continue;
+        const depth = Math.abs(d.leV - rootV);
+        wallFronts.push({ leX: d.el.le[0], chord: d.el.chord, outer: depth + 0.5 * d.width, area: d.el.area, depth, width: d.width });
+      }
+    }
+    const wallSlope = fitSlope(wallFronts.map((f) => f.depth), wallFronts.map((f) => f.leX), wallFronts.map((f) => f.width));
+    const wallSweep = Math.atan(Math.max(0, -wallSlope));
+    const own = surfaceCoefficients(aspect, deltanessFromSweep(wallSweep), slenderCpFraction(wallFronts));
     const coefs = wingCoefs ? blendCoefficients(wingCoefs, own, weight) : own;
     const wallDrafts = wallPanels.flatMap((p) => byPanel[p.index]);
     for (const d of wallDrafts) d.el.surface = surfaces.length;

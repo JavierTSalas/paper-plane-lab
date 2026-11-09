@@ -154,13 +154,20 @@ function compile(airframe: Airframe): Compiled {
 
 const cache = new WeakMap<Airframe, Compiled>();
 
+// The integrator asks for the same airframe forty thousand times per flight: remember the last one.
+let lastAirframe: Airframe | null = null;
+let lastCompiled: Compiled | null = null;
+
 /** Compiled form of an airframe, built on first use. Airframes are immutable once built. */
 function compiled(airframe: Airframe): Compiled {
+  if (airframe === lastAirframe && lastCompiled !== null) return lastCompiled;
   let c = cache.get(airframe);
   if (!c) {
     c = compile(airframe);
     cache.set(airframe, c);
   }
+  lastAirframe = airframe;
+  lastCompiled = c;
   return c;
 }
 
