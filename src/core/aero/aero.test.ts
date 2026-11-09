@@ -7,7 +7,7 @@ import {
 } from '../testing/fixtures';
 import type { Airframe, Vec3 } from '../types';
 import { flapCmDelta, flapTau } from './flap';
-import { aeroLoads, aeroLoadsDetailed, createAeroLoads } from './loads';
+import { aeroLoads, aeroLoadsDetailed, bendTerms, createAeroLoads } from './loads';
 
 const AIR = TEST_AIR;
 const NU = AIR.mu / AIR.rho;
@@ -42,8 +42,8 @@ describe('thin-airfoil flap functions', () => {
     for (const [e, tau, cm] of table) {
       expect(flapTau(e)).toBeCloseTo(tau, 3);
       expect(flapCmDelta(e)).toBeCloseTo(cm, 3);
-      // dCl/d(delta) = 2 pi tau, as tabulated.
-      expect(2 * Math.PI * flapTau(e)).toBeCloseTo([1.77, 2.49, 3.02, 3.46, 4.15][table.findIndex((r) => r[0] === e)], 2);
+      // dCl/d(delta) = 2 pi tau, as tabulated (the table rounds tau first).
+      expect(2 * Math.PI * flapTau(e)).toBeCloseTo([1.77, 2.49, 3.02, 3.46, 4.15][table.findIndex((r) => r[0] === e)], 1);
     }
     expect(flapTau(0)).toBeCloseTo(0, 12);
     expect(flapTau(1)).toBeCloseTo(1, 12);
@@ -173,10 +173,12 @@ describe('element incidence in three dimensions', () => {
   it('dihedral: lift scales with cos² of the dihedral angle', () => {
     const speed = 5;
     const a = 3 * DEG;
-    const flat = buildAirframe(dihedralPlateModel(0.3, 0.1, 0), NEUTRAL_TRIM);
+    // Aspect ratio 6: the projected aspect ratio stays above 3, so there is no vortex term to confuse the ratio.
+    const flat = buildAirframe(dihedralPlateModel(0.6, 0.1, 0), NEUTRAL_TRIM);
     const base = loadsAt(flat, windVelocity(speed, a)).force[1] / flat.surfaces[0].kp;
     for (const deg of [10, 25, 40]) {
-      const vee = buildAirframe(dihedralPlateModel(0.3, 0.1, deg), NEUTRAL_TRIM);
+      const vee = buildAirframe(dihedralPlateModel(0.6, 0.1, deg), NEUTRAL_TRIM);
+      expect(vee.surfaces[0].kv).toBe(0);
       const out = loadsAt(vee, windVelocity(speed, a));
       // Same true area; the lift slope follows the projected aspect ratio, so compare per unit Kp.
       const ratio = out.force[1] / vee.surfaces[0].kp / base;
@@ -210,14 +212,21 @@ describe('rate damping emerges from omega x r', () => {
     // CG at mid-chord: the 3/4-chord point sinks at 0.25 c q, which is an incidence of 0.25 c q / V.
     const lift = 0.5 * AIR.rho * speed * speed * b * c * af.surfaces[0].kp * ((0.25 * c * q) / speed);
     expect(up.force[1] / lift).toBeCloseTo(1, 3);
-    // That lift acts at the quarter chord, ahead of the CG: by itself a nose-up moment. Damping needs the CG
-    // ahead of the 3/4-chord point by more than that, as on every real plane; check it on the fixtures.
+    // Quasi-steady thin-airfoil theory: lift due to rotation about mid-chord has no moment about mid-chord.
+    // (Applied at the quarter chord it would drive the rotation with lift * c / 4.)
+    const still = loadsAt(af, windVelocity(speed, 0));
+    expect(Math.abs(up.moment[2] - still.moment[2])).toBeLessThan(0.01 * lift * 0.25 * c);
+    // Turning about a point ahead of mid-chord is damped: move the CG forward with a clip.
+    const nosey = buildAirframe(flatPlateModel(b, c), trimOf({ clip: { mass: 0.002, x: c } }));
+    const base = loadsAt(nosey, windVelocity(speed, 0));
+    expect(loadsAt(nosey, windVelocity(speed, 0), [0, 0, q]).moment[2] - base.moment[2]).toBeLessThan(0);
+    expect(loadsAt(nosey, windVelocity(speed, 0), [0, 0, -q]).moment[2] - base.moment[2]).toBeGreaterThan(0);
     for (const [model, trim] of [[dartFixture(), DART_TRIM], [gliderFixture(), NEUTRAL_TRIM]] as const) {
       const plane = buildAirframe(model, trim);
       const v = windVelocity(speed, 6 * DEG);
-      const still = loadsAt(plane, v);
-      expect(loadsAt(plane, v, [0, 0, q]).moment[2] - still.moment[2]).toBeLessThan(0);
-      expect(loadsAt(plane, v, [0, 0, -q]).moment[2] - still.moment[2]).toBeGreaterThan(0);
+      const steady = loadsAt(plane, v);
+      expect(loadsAt(plane, v, [0, 0, q]).moment[2] - steady.moment[2]).toBeLessThan(0);
+      expect(loadsAt(plane, v, [0, 0, -q]).moment[2] - steady.moment[2]).toBeGreaterThan(0);
     }
   });
 
@@ -248,26 +257,56 @@ describe('trailing-edge bends', () => {
 
   it('up elevator pushes the tail down and the nose up; effectiveness follows eta_f tau(E)', () => {
     const clean = buildAirframe(model, NEUTRAL_TRIM);
-    const kp = clean.surfaces[0].kp;
-    const eta = clean.surfaces[0].flapEfficiency;
+    const surface = clean.surfaces[0];
+    const kp = surface.kp;
+    const eta = surface.flapEfficiency;
     const chord = clean.ref.mac;
     const delta = 2 * DEG;
     for (const e of [0.05, 0.1, 0.15, 0.2, 0.3]) {
-      const af = buildAirframe(model, trimOf({ elevatorDeg: 2, elevatorChordFrac: e }));
-      const out = loadsAt(af, windVelocity(speed, 0));
-      const cl = out.force[1] / qS(af, speed);
-      expect(cl).toBeLessThan(0); // trailing edge up: download
-      // d(alpha_eff)/d(delta) = eta_f tau(E); the table value of tau follows within 10 % (here: 0.1 %).
-      const tau = -cl / kp / delta / eta;
-      expect(tau / flapTau(e)).toBeCloseTo(1, 3);
-      // Moment about the quarter chord: -Cm_delta delta eta_f Kp / (2 pi), nose up.
-      const aboutQuarter = out.moment[2] - 0.25 * chord * out.force[1];
-      const cm = aboutQuarter / (qS(af, speed) * chord);
-      expect(cm).toBeGreaterThan(0);
-      expect(cm / ((-flapCmDelta(e) * delta * eta * kp) / (2 * Math.PI))).toBeCloseTo(1, 1);
-      // About the CG the pitching moment is nose up as well.
-      expect(out.moment[2]).toBeGreaterThan(0);
+      const built = buildAirframe(model, trimOf({ elevatorDeg: 2, elevatorChordFrac: e }));
+      // Thin-airfoil limit (slenderness switched off): exactly the document's flap.
+      const thin: Airframe = { ...built, surfaces: built.surfaces.map((s) => ({ ...s, flapSlenderness: 0 })) };
+      for (const af of [thin, built]) {
+        const out = loadsAt(af, windVelocity(speed, 0));
+        const cl = out.force[1] / qS(af, speed);
+        expect(cl).toBeLessThan(0); // trailing edge up: download
+        const tau = -cl / kp / delta / eta; // d(alpha_eff)/d(delta) / eta_f
+        // Moment about the quarter chord, nose up.
+        const cm = (out.moment[2] - 0.25 * chord * out.force[1]) / (qS(af, speed) * chord);
+        expect(cm).toBeGreaterThan(0);
+        const documented = (-flapCmDelta(e) * delta * eta * kp) / (2 * Math.PI);
+        if (af === thin) {
+          expect(tau / flapTau(e)).toBeCloseTo(1, 3);
+          // 1 % or so off: the strip's centre of pressure sits a hair behind the quarter chord at this incidence.
+          expect(cm / documented).toBeCloseTo(1, 1);
+        } else {
+          // At aspect ratio 6 the slender-wing share is 1 / 37: still within 10 % of the tau table.
+          expect(surface.flapSlenderness).toBeCloseTo(1 / 37, 12);
+          expect(tau / flapTau(e)).toBeGreaterThan(1);
+          expect(tau / flapTau(e)).toBeLessThan(1.1);
+          expect(cm / documented).toBeGreaterThan(1);
+          expect(cm / documented).toBeLessThan(1.25);
+          const terms = bendTerms(e, delta, surface);
+          expect(-cl / kp).toBeCloseTo(terms.shift, 5);
+        }
+      }
     }
+  });
+
+  it('bend model has the thin-airfoil and the slender-wing limits', () => {
+    const base = { kp: 2, k0: 0.25, flapEfficiency: 0.8 };
+    const delta = 0.1;
+    const thin = bendTerms(0.2, delta, { ...base, flapSlenderness: 0 });
+    expect(thin.shift).toBeCloseTo(0.8 * flapTau(0.2) * delta, 15);
+    expect(thin.moment).toBeCloseTo((-flapCmDelta(0.2) * delta * 0.8 * 2) / (2 * Math.PI), 15);
+    // Slender: the whole bend angle counts and its load sits at the hinge line, 1 - E - k0 behind the CP.
+    const slender = bendTerms(0.2, delta, { ...base, flapSlenderness: 1 });
+    expect(slender.shift).toBeCloseTo(0.8 * delta, 15);
+    expect(slender.moment).toBeCloseTo(2 * 0.8 * delta * (0.8 - 0.25), 15);
+    const mid = bendTerms(0.2, delta, { ...base, flapSlenderness: 0.5 });
+    expect(mid.shift).toBeGreaterThan(thin.shift);
+    expect(mid.shift).toBeLessThan(slender.shift);
+    expect(bendTerms(0, delta, { ...base, flapSlenderness: 0.5 })).toEqual({ shift: 0, moment: 0 });
   });
 
   it('aileron rolls to the right, rudder yaws the nose to the right', () => {
@@ -289,9 +328,10 @@ describe('trailing-edge bends', () => {
     expect(Math.abs(reversed.force[1])).toBeLessThan(1e-12);
     expect(Math.abs(reversed.moment[2])).toBeLessThan(1e-12);
     // Fully separated: the bend moment is gone; only the shifted incidence remains in the plate curve.
+    // Wind on the underside is a negative incidence in the element's terms; an up-bend reduces its size.
     const a = 60 * DEG;
-    const shift = clean.surfaces[0].flapEfficiency * flapTau(0.2) * 5 * DEG;
-    const eff = a + shift;
+    const shift = bendTerms(0.2, 5 * DEG, clean.surfaces[0]).shift;
+    const eff = a - shift;
     const expected = (clean.surfaces[0].cd90 * Math.sin(eff)) / (0.56 + 0.44 * Math.sin(eff));
     expect(loadsAt(bent, windVelocity(speed, a)).force[1] / qS(bent, speed)).toBeCloseTo(expected, 9);
   });
