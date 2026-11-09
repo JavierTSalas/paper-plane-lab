@@ -346,10 +346,10 @@ export function dartFixture(options: DartFixtureOptions = {}): PosedModel {
 }
 
 /**
- * Trim the fixture dart glides with: a small up-bend of the last tenth of the chord. Flat plates need reflex
- * as soon as the centre of gravity is ahead of the neutral point.
+ * Trim the fixture dart glides with: a slight up-bend of the last tenth of the chord. A flat plate needs
+ * reflex as soon as its centre of gravity is ahead of the neutral point (here by about 5 % of the MAC).
  */
-export const DART_TRIM: TrimSpec = { ...NEUTRAL_TRIM, elevatorDeg: 4, elevatorChordFrac: 0.1 };
+export const DART_TRIM: TrimSpec = { ...NEUTRAL_TRIM, elevatorDeg: 1, elevatorChordFrac: 0.1 };
 
 /* ------------------------------------------------------------------ */
 /* Fixture glider                                                     */
