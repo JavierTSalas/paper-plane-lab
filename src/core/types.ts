@@ -431,50 +431,95 @@ export interface Air {
   mu: number;
 }
 
+/** A thermal updraft column (Allen scaling with the zero-net-flux game shape, research doc 03 section 5.2). */
 export interface ThermalSpec {
-  /** Centre on the ground plane (x, z), metres. */
+  /** Centre on the ground plane (x, z) at t = 0, metres. The column leans and drifts with the mean wind U(z). */
   x: number;
   z: number;
-  /** Core radius, metres. */
-  radius: number;
-  /** Peak updraft, m/s. */
-  strength: number;
+  /** Convective velocity scale w*, m/s (about 1 - 1.5 on a sunny day). */
+  wStar: number;
+  /** Depth of the convective layer z_i, metres (about 1000). */
+  mixedLayerHeight: number;
 }
 
+/** Turbulence given directly instead of from surface-layer similarity: room air. */
+export interface TurbulenceSpec {
+  /** Standard deviations [along the mean wind, across it, vertical], m/s. */
+  sigma: Vec3;
+  /** Correlation length of the gusts on every axis, metres (Ornstein-Uhlenbeck, research doc 03 section 3.5). */
+  length: number;
+}
+
+/** The air's motion in one place. `createWindField` in core/wind turns it into a field. */
 export interface WindSpec {
-  /** Mean wind speed at `refHeight`, m/s. */
+  /**
+   * Mean wind speed, m/s. Outdoors (`roughness` > 0): the speed 10 m above the ground, U10.
+   * Indoors (`roughness` = 0): the uniform room draft.
+   */
   speed: number;
-  /** Direction the wind blows TOWARD, degrees, measured from +x toward +z. 0 = tailwind, 180 = headwind, 90 = from the left. */
-  towardDeg: number;
-  /** Height where `speed` applies, metres. */
-  refHeight: number;
-  /** Aerodynamic roughness length, metres. 0 disables the height profile (uniform wind). */
+  /**
+   * Direction the wind blows TOWARD, degrees, measured from +x toward +z. 0 = tailwind, 180 = headwind,
+   * 90 = from the left. null = a horizontal direction drawn from the flight's seed (room drafts).
+   */
+  towardDeg: number | null;
+  /** Aerodynamic roughness length z0, metres. 0 = no height profile (indoors). */
   roughness: number;
-  /** Turbulence intensity sigma / mean speed, plus a floor in m/s for still-air drafts. */
-  turbulenceIntensity: number;
-  turbulenceFloor: number;
-  /** Turbulence length scale, metres. */
-  turbulenceLength: number;
-  /** Discrete gusts: 0 = none, 1 = strong. */
+  /** Explicit turbulence, or null to derive it from `speed` and `roughness` (similarity theory, outdoors). */
+  turbulence: TurbulenceSpec | null;
+  /** Discrete gust events: 0 = none, 1 = strong and frequent. */
   gustiness: number;
   thermals: ThermalSpec[];
-  /** Ridge lift: updraft = speed * factor inside a band starting at x = start (m) of the given depth. */
-  ridge: { start: number; depth: number; factor: number } | null;
 }
 
-/** Deterministic wind field. Same seed, same field. Returns air velocity in the world frame, m/s. */
+/**
+ * Deterministic wind field. Same spec, seed and environment, same field. Air velocity in the world frame, m/s.
+ *
+ * `sample` is STATEFUL: the turbulence is a random process that advances along the path the samples trace.
+ * Call it once per integrator step with a non-decreasing `t` and the plane's position. The result depends on
+ * the seed and on the exact sequence of calls (positions and times); the same sequence gives the same
+ * numbers. A repeated `t` does not advance the turbulence. `mean` is stateless and may be called freely.
+ */
 export interface WindField {
-  sample(pos: Vec3, t: number): Vec3;
+  /** Total air velocity (mean flow + gust events + turbulence). Written into `out` when given. */
+  sample(pos: Vec3, t: number, out?: [number, number, number]): Vec3;
+  /** The smooth part only (profile, terrain flow, thermals, gust events): a pure function of position and time. */
+  mean(pos: Vec3, t: number, out?: [number, number, number]): Vec3;
 }
 
 export interface RoomBounds {
-  /** World-frame box the plane may fly in. Hitting a wall or the ceiling ends the flight. */
+  /** World-frame box the plane may fly in; the floor is y = 0. Hitting a wall or the ceiling ends the flight. */
   xMin: number;
   xMax: number;
   zMin: number;
   zMax: number;
   ceiling: number;
 }
+
+/**
+ * Ground shape, uniform along z. The thrower stands at x = 0 where the ground is at y = 0.
+ * `groundHeight` in core/env evaluates it; the wind field flows over it.
+ */
+export type Terrain =
+  | { kind: 'flat' }
+  | {
+      /** An endless row of smooth cosine ridges (research doc 03 section 5.3 a). */
+      kind: 'hill';
+      /** Crest-to-valley height, metres. */
+      height: number;
+      /** Horizontal distance from a crest to the next valley floor, metres. */
+      halfWidth: number;
+      /** World x of the crest nearest the thrower. */
+      crestX: number;
+    }
+  | {
+      /**
+       * A flat cliff top at y = 0 for x <= edgeX, a rounded face (quarter circle of radius `height`) and the
+       * sea at y = -height from x = edgeX + height on (research doc 03 section 5.3 b).
+       */
+      kind: 'cliff';
+      height: number;
+      edgeX: number;
+    };
 
 /** Physical description of a place. Visual themes live in the UI layer and key off `id`. */
 export interface Environment {
@@ -484,15 +529,17 @@ export interface Environment {
   indoor: boolean;
   /** null = open air. */
   bounds: RoomBounds | null;
+  terrain: Terrain;
   tempC: number;
   pressurePa: number;
+  /** Relative humidity, 0 - 1. */
   humidity: number;
   wind: WindSpec;
   /** Whether the player may change wind speed / direction / gustiness here. */
   adjustableWind: boolean;
   /** Maximum mean wind the UI allows, m/s. */
   maxWind: number;
-  /** Release point of the throw, world frame. */
+  /** Release point of the throw (the plane's centre of gravity at release), world frame. */
   launch: Vec3;
 }
 
