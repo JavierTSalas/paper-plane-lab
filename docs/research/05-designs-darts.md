@@ -27,7 +27,7 @@ Scope: Classic Dart, Bulldog Dart (and Fold'N Fly "The Stable"), Harrier, Ken Bl
 - **FLIP** turns the model left–right (`x → W−x`, z-order reversed). Every model is L/R symmetric when it is flipped, so all later formulas are unchanged.
 - **FOLD notation:** `FOLD A→B | moving side ∋ X | VALLEY/MOUNTAIN | ALL/TOP`. X is a point that lies in the moving region before the fold. A landmark is given for each fold. "Point P onto Q" means the line is the perpendicular bisector of PQ. "Edge E onto line L" means the angle bisector.
 - **3-D frame after the centre fold:** use the right half (`x ≥ W/2`). Let `u = x − W/2` be the height above the keel. The **wing hinge** is given by two sheet points on the right half; mirror them for the left wing. The **root axis** is the hinge direction, nose to tail. The longitudinal CG is measured along it. Rotation about the hinge does not change that coordinate, so it is independent of dihedral.
-- **Face rule (derived):** with a MOUNTAIN centre fold, the front face is the outside of the keel and the **underside** of the wings. The back face becomes the wing top. With a VALLEY centre fold it is the reverse: the front face (which carries the flaps) is inside the keel and on **top** of the wings.
+- **Face rule (derived):** with a MOUNTAIN centre fold, the front face is the outside of the keel and the **underside** of the wings. The back face becomes the wing top. With a VALLEY centre fold it is the reverse: the front face (which carries the flaps) is inside the keel and on **top** of the wings. After a FLIP the viewer faces the back of the sheet, so swap "front" and "back" in this rule (Bulldog).
 
 ---
 
@@ -40,7 +40,7 @@ Scope: Classic Dart, Bulldog Dart (and Fold'N Fly "The Stable"), Harrier, Ken Bl
 | Origin | Traditional; no known designer or date (unverified - model knowledge). Fold'N Fly calls it "one of the most iconic paper airplane designs" [S1] |
 | Sources cross-checked | Fold'N Fly Basic Dart [S1][S2]; Smithsonian NASM "Dart" printout [S9]; Maine State Museum [S10]; Pima Air & Space Museum handout from Blackburn & Lammers [S8]; Museums Victoria [S12]; Amazing Paper Airplanes (UBC copy) [S11]; Paper Plane Depot [S14]; paperairplanes.co.uk [S13] |
 | Known for | Speed and decent distance; 5 folds [S1] |
-| Fold'N Fly measured (10-year-old thrower, 75 gsm) | **12.5 m (40.8 ft) average distance, 1.4 s average time aloft** [S1][S3]. Derived mean horizontal speed: 8.9 m/s *(derived)* |
+| Fold'N Fly measured (10-year-old thrower, 75 gsm) | **12.5 m (40.8 ft) average distance, 1.4 s average time aloft** [S1][S3] (search extract only; 12.5 m is 41.0 ft, so one of the two figures is rounded). Derived mean horizontal speed: 8.9 m/s *(derived)* |
 
 ### 1.2 Flat-fold sequence
 
@@ -176,7 +176,7 @@ Derived quantities:
 - Letter, g=12.7: `y_f=146.05`, `y_l=38.10`, `p=25.40`, lock spans 38.1–63.5 mm.
 - A4, g=12.7: `y_f=154.85`, `y_l=49.85`, `p=37.15`.
 
-**Stable consistency check.** The Stable text says the corners meet "about an inch above the downward-facing point" [S4], i.e. `p ≈ 25.4 mm`. Then `g = H − W − 2p`, which is **12.7 mm on Letter**. That is exactly the Art of Manliness Harrier gap, so the two share the same flat fold *(derived)*. On A4, `g = 36.2 mm` (`y_f=166.6`, `y_l=61.6`).
+**Stable consistency check.** The Stable text says the corners meet "about an inch above the downward-facing point" [S4], i.e. `p ≈ 25.4 mm`. Then `g = H − W − 2p`, which is **12.7 mm on Letter**. That is exactly the Art of Manliness Harrier gap, so under this reading the two share the same flat fold *(derived)*. On A4, `g = 36.2 mm` (`y_f=166.6`, `y_l=61.6`).
 
 One search extract described a Stable step as "fold the top point down to form a square" [S3]. No `g` satisfies both "square" and "tip protrudes about 1 in". **Flagged.**
 
@@ -259,7 +259,7 @@ The diagram positions of lines 1–4 were not visible. They are assumed to be Cl
 | Fold sequence | **Not published** in any source reachable here. A 20-minute fold implies many precise folds, probably beyond the simple-fold primitive set (inference). **NOT representable**: do not ship a fake "record plane" preset |
 | Newer record (unverified by me) | Sibling doc 04 reports a newer GWR record of **98.43 m**, 28 Dec 2025, Shanghai, design "Research", citing GWR and AFPBB [S29]. It also gives the 2022 plane's name as "Mach 5" with a launch near 40° [S29]. If those sources confirm it, the "current" record is no longer the 2022 plane |
 
-**Recommendation.** Show both as distance-benchmark lines in GWR-rules mode: 88.31 m (verified here) and 98.43 m (verify first). Do not show them as foldable presets.
+**Recommendation.** Show both as distance-benchmark lines in GWR-rules mode: 88.31 m (confirmed by search extracts of [S23][S24][S25] only; the pages were not opened) and 98.43 m (verify first). Do not show them as foldable presets.
 
 ---
 
@@ -321,10 +321,10 @@ Scale by √(gsm/75) for other paper. If the simulator's glide speeds fall far o
 1. No source page or diagram could be opened (WebFetch was blocked, and the search budget ran out mid-task). The next session should open [S1][S3][S8][S9][S16] and confirm the wing-fold lines against the pictures.
 2. Classic Dart wing rule: bisector (here) or parallel 25 mm keel (doc 04). These give a 1.5× span difference. Choose before tuning.
 3. Flaps inside or outside the keel: sources differ [S9][S30]. This affects rendering only.
-4. Bulldog nose-fold depth: "bottom of the folded flaps" was read as the seam point `(W/2, H−W/√2)`. The nose could also be tucked under [S15]. Bulldog wing-hinge offset `u_b`: 0.146447W or W/4 (§2.3). The choice changes the span by a factor of 1.41 and the wing area by 1.87.
+4. Bulldog nose-fold depth: "bottom of the folded flaps" was read as the seam point `(W/2, H−W/√2)`. The nose could also be tucked under [S15]. Bulldog wing-hinge offset `u_b`: 0.146447W or W/4 (§2.3). The choice changes the span by a factor of 1.41 and the wing area by 1.87 (Letter) or 1.76 (A4).
 5. Harrier wing rule, and the Stable "square" wording.
 6. Blackburn lines 1–9 (positions) and winglet height.
-7. All dihedral, elevator and throw magnitudes are model knowledge. They should be tuned against the Fold'N Fly averages (Dart 12.5 m / 1.4 s; Stable 5.5 m / 2.5 s; 10-year-old thrower, 75 gsm) [S1][S3].
+7. All dihedral, elevator and throw magnitudes are model knowledge. They should be tuned against the Fold'N Fly averages (Dart 12.5 m / 1.4 s; Stable 5.5 m / 2.5 s; 10-year-old thrower, 75 gsm) [S1][S3], but only after those figures have been read on the pages themselves.
 8. Record planes cannot be represented. Hammer, Stealth, Spear, Hunting Flight and Zip Dart steps are outstanding.
 
 ## Sources
@@ -355,9 +355,45 @@ Scale by √(gsm/75) for other paper. If the simulator's glide speeds fall far o
 24. [S24] Flying Magazine, "Boeing Engineers Set New Distance Record With Paper Airplane". https://flyingmag.com/boeing-engineers-set-new-distance-record-with-paper-airplane
 25. [S25] General Aviation News (21 Mar 2023), "Paper airplane sets world record". https://generalaviationnews.com/2023/03/21/paper-airplane-sets-world-record
 26. [S26] Hachette Book Group, *The World Record Paper Airplane Book* (Blackburn & Lammers). https://www.hbglibrary.com/titles/ken-blackburn/the-world-record-paper-airplane-book/9780761143833/
-27. [S27] Fold'N Fly, "The Best Paper Airplane" (average flight under 2 s). https://www.foldnfly.com/lounge/best-paper-airplane.php
-28. [S28] Dream Flight Charities, "Paper Airplane Folding Instructions" (PDF). https://dreamflightcharities.org/wp-content/uploads/2025/07/Paper-Airplane-Folding-Instructions.pdf
+27. [S27] Fold'N Fly, "The Best Paper Airplane" (average flight under 2 s). https://www.foldnfly.com/lounge/best-paper-airplane.php (background only; no claim in the text rests on it)
+28. [S28] Dream Flight Charities, "Paper Airplane Folding Instructions" (PDF). https://dreamflightcharities.org/wp-content/uploads/2025/07/Paper-Airplane-Folding-Instructions.pdf (background only; no claim in the text rests on it)
 29. [S29] Sibling doc `docs/research/04-paper-and-competition-rules.md` §6, which cites AFPBB https://www.afpbb.com/articles/-/3618713 and CNN https://amp.cnn.com/cnn/2023/04/14/world/paper-airplane-boeing-engineers-world-record-scn. I did not open these.
 30. [S30] wikiHow "Make a Simple Paper Airplane" (Kiwix mirror; folds kept inside). https://kiwix.lema.org/wikihow_en_maxi_2023-03/Make-a-Simple-Paper-Airplane
 31. [S31] Studocu, "Instructions for Making Paper Airplanes: Bulldog Dart & Hammer". https://www.studocu.com/en-us/document/harford-community-college/technical-writing/instructions-to-make-a-paper-airplane-k-carter/32807488
 32. [S32] Business Insider India (2023), Jensen quote on A4 at 100 gsm. https://businessinsider.in/tech/news/boeing-engineers-designed-a-paper-airplane-that-flew-almost-the-entire-length-of-a-football-field-smashing-the-world-record/amp_articleshow/99521282.cms
+
+## Verification notes
+
+Fact-check pass of 2026-11-09, done after the text above was written.
+
+**What could not be done.** WebFetch failed for `www.foldnfly.com`, `www.artofmanliness.com` and `www.guinnessworldrecords.com` (hosts outside the session's allowed network), and WebSearch returned "budget used up" on the first query. So nothing here was re-read on a source page. Statements tagged "model knowledge of the [Sx] wording" are my recollection of that page, not a re-read.
+
+**What was done.** I wrote a new convex-facet split-and-reflect script (independent of the author's) and traced every sequence on Letter and A4. Results: area conserved (60 322.46 and 62 370.00 mm²); left/right area and first moment equal before the centre fold; a 20 000-point inside/outside test matched each stated outline with 0 mismatches; layer counts as stated (4, 8, 7 per half). The Classic CG was also re-derived by hand from the moved-triangle moments.
+
+| # | Claim checked | Result | Change made |
+|---|---|---|---|
+| 1 | Constants `k`, `t`, `θw` and their trig values | Confirmed to 7 digits | None |
+| 2 | Classic lines 2–5, outline, `H/W ≥ k` validity, 4 layers per half | Confirmed | None |
+| 3 | Classic hinge, span `0.509796W`, length, wing area, AR, keel depth | Confirmed by script and by hand | None. The bisector rule itself is unverified against a diagram; my recollection of Fold'N Fly step 5 ("matching the top edges up with the bottom edge of the body") agrees with it |
+| 4 | Classic CG: 152.41 / 159.81 mm along the keel, 155.9 / 163.4 mm along the root axis, 6.5 / 7.1 mm below the root | Confirmed | Test vector 152.40 → 152.41 mm; closed form `H/2 + 0.0761845·W²/H` added |
+| 5 | Centre-fold default MOUNTAIN for Classic, Bulldog, Blackburn | Unsupported. The only cited source that gives a direction says inside [S30], and the Bulldog source says "in on itself" [S16] | Default changed to VALLEY for those three; VALLEY face rule added to §0. Harrier and Stable stay MOUNTAIN, as their sources say. Rendering only |
+| 6 | Bulldog nose line, nose width `0.292893W`, 8 layers per half | Geometry confirmed. The stated endpoints `(0,y_n)`, `(W,y_n)` lie off the paper | Line clipped to `(W/2 ∓ 0.146447W, y_n)` |
+| 7 | Bulldog wing hinge at `W/4` | Unsupported for this sequence: its only quote comes from a different variant [S15] | Hinge made a parameter `u_b`. Default `0.146447W` (top of snub nose), `W/4` kept as the alternative. The new default rests on my recollection of the [S16] wording, not on a re-read, so it is no better verified than `W/4`; it was preferred because §2.2 follows that source. Dimensions, constants, preset row and trim row given for both. Throw default 10 → 8 m/s |
+| 8 | Bulldog CG 84.22 / 92.81 mm and the `W/4` dimension column | Confirmed | None |
+| 9 | Harrier `y_f`, `y_l`, `p`, outline, TOP-group lock | Confirmed. The lock moves `2p²` of paper (2 layers), its apex lands at `y = H − W`, at most 7 layers per half | Cross-reference to the identical flat fold in doc 06 added |
+| 10 | Harrier / Stable dimension table | Confirmed except one cell: Stable Letter CG below root is 1.545 mm | 1.6 → 1.5. Stable hinge start moved from `(W/2+12.7, y_f)`, which is off the paper, to `(W/2+12.7, y_f−12.7)` |
+| 11 | "The Stable is the same flat fold as the Harrier" | Unsupported inference | Softened in the summary; alternative flat-nose reading computed in §3.2; alternative Harrier wing-edge reading added in §3.3 |
+| 12 | Blackburn winglet line endpoints and span `2·t_wl` | Confirmed. The stated s-range was wrong | "aft 20–25 %, s = 244–295 mm" → aft 28 %, s = 212.8–295.1 mm (Letter); aft 34 % (A4). Validity limit and height taper added |
+| 13 | Trim-speed table (12 values) | Confirmed | Symbol `W/S` → `mg/S` (W is the sheet width everywhere else); mass and weight stated; Bulldog rows split |
+| 14 | Record values | Not verifiable online. Conversions checked: 289 ft 9 in = 88.316 m; 252 ft 7 in = 76.987 m, which is not 77.134 m | Both prior-record figures and the 88.318 m possibility now stated in §5 |
+| 15 | "Mass, CG and inertia unchanged to within one paper thickness" | Too tight for 8- and 16-layer stacks | Reworded in summary item 8 |
+| 16 | Doc 04 cross-check | Confirmed: its 25 mm parallel-keel variant gives span 160.0 / 165.9 mm and wing area 22 412 / 19 728 mm² (A4 / Letter) from the same flat fold | None |
+
+**Still uncertain.**
+
+- Every step text, landmark and diagram. Four choices change the flight model and need a look at the source pictures: the Classic wing rule (bisector here, 25 mm parallel in doc 04), the Bulldog offset `u_b`, the Harrier wing edge (leading edge or outer edge), and the whole Stable flat fold.
+- Fold'N Fly averages (12.5 m / 1.4 s, 5.5 m / 2.5 s, 10.2 m, 9.1 m) come from search extracts only. The pair "12.5 m (40.8 ft)" is loose: 12.5 m is 41.0 ft. Do not tune the simulator to these until [S1] and [S3] have been opened.
+- Blackburn lines 1–9, winglet height and angle.
+- Record values: 88.31 or 88.318 m, the prior-record figure, the 98.43 m record, and the "Mach 5" name.
+- All dihedral, elevator and throw magnitudes remain model knowledge.
+- To close these, allow `www.foldnfly.com`, `www.artofmanliness.com`, `www.instructables.com`, `pimaair.org`, `howthingsfly.si.edu` and `www.guinnessworldrecords.com` in the session's network settings.

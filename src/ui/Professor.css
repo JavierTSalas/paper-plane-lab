@@ -1,0 +1,179 @@
+.ppl-prof {
+  display: block;
+  overflow: visible;
+  flex: none;
+}
+
+.ppl-prof__limb,
+.ppl-prof__head {
+  transform-box: view-box;
+  transition: transform var(--dur-3) var(--ease);
+}
+
+.ppl-prof__brows path {
+  transition: d var(--dur-3) var(--ease);
+}
+
+.ppl-prof__paper {
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease);
+}
+
+.ppl-prof__paper.is-shown {
+  opacity: 1;
+}
+
+.ppl-prof__eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Idle life: a slow breath and an occasional blink. Off when motion is reduced (class not applied). */
+.ppl-prof.is-animated .ppl-prof__bob {
+  animation: ppl-prof-bob 3.6s ease-in-out infinite;
+}
+
+.ppl-prof.is-animated .ppl-prof__eyes {
+  animation: ppl-prof-blink 5.2s infinite;
+}
+
+.ppl-prof.is-animated .ppl-prof__talk {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: ppl-prof-talk 0.42s ease-in-out infinite alternate;
+}
+
+.ppl-prof.is-animated.is-cheer .ppl-prof__bob {
+  animation: ppl-prof-hop 0.9s var(--ease) 2;
+}
+
+@keyframes ppl-prof-bob {
+  50% {
+    transform: translateY(-1.6px);
+  }
+}
+
+@keyframes ppl-prof-blink {
+  0%,
+  94%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes ppl-prof-talk {
+  from {
+    transform: scaleY(0.45);
+  }
+}
+
+@keyframes ppl-prof-hop {
+  30% {
+    transform: translateY(-7px);
+  }
+  60% {
+    transform: translateY(0);
+  }
+}
+
+/* ------------------------------------------------------------ speech bubble */
+
+.ppl-says {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-2);
+  margin: 0;
+}
+
+.ppl-says--stack {
+  flex-direction: column;
+  align-items: center;
+}
+
+.ppl-says__avatar {
+  flex: none;
+  margin-bottom: -4px;
+}
+
+.ppl-says__bubble {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  margin-bottom: var(--s-6);
+  padding: var(--s-4);
+  background: var(--card);
+  border: var(--outline);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  animation: ppl-rise-in var(--dur-3) var(--ease);
+}
+
+/* Tail toward the professor's mouth. */
+.ppl-says__bubble::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  bottom: 22px;
+  width: 18px;
+  height: 18px;
+  background: var(--card);
+  border-left: var(--outline);
+  border-bottom: var(--outline);
+  border-bottom-left-radius: 4px;
+  transform: rotate(45deg) skew(10deg, 10deg);
+}
+
+.ppl-says--stack .ppl-says__bubble {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.ppl-says--stack .ppl-says__bubble::before {
+  left: 50%;
+  top: -9px;
+  bottom: auto;
+  margin-left: -9px;
+  transform: rotate(135deg) skew(10deg, 10deg);
+}
+
+.ppl-says__name {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+
+.ppl-says__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  margin-bottom: var(--s-1);
+  text-wrap: balance;
+}
+
+.ppl-says__text {
+  font-size: var(--fs-md);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+.ppl-says__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  margin-top: var(--s-4);
+}
+
+@media (min-width: 600px) {
+  .ppl-says__avatar .ppl-prof {
+    width: 152px;
+    height: 182px;
+  }
+}

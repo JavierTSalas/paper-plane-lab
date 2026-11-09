@@ -77,7 +77,7 @@ Re = V c / nu. Air at 20 C and 101.325 kPa has nu = 1.516e-5 m^2/s and rho = 1.2
 **Formulas.** All are per rad, incompressible, for alpha in the linear range:
 - **Helmbold:** CLa = 2*pi*AR/(2 + sqrt(AR^2 + 4)) [S8][S34]. The general form with section slope a0 is CLa = a0*AR/(a0/pi + sqrt((a0/pi)^2 + AR^2)) [S8]. It is valid for straight wings of any AR, and for flat plates down to AR of about 0.5. The Aguilar-Cabello correlation for flat plates (AR 1-8, Re 4e4-2e5) builds on this formula [S7].
 - **Jones slender wing:** CLa = pi*AR/2. Valid for AR << 1, and for slender deltas up to AR of about 1 (unverified - model knowledge; R. T. Jones, NACA Rep. 835).
-- **Lowry-Polhamus (DATCOM form):** CLa = 2*pi*AR/(2 + sqrt(AR^2*(beta^2 + tan^2(Lambda_c/2))/kappa^2 + 4)), with beta = 1 and kappa = a0/(2*pi) = 1. For unswept wings it reduces exactly to Helmbold. For a delta with taper ratio 0, tan(Lambda_c/2) = 2/AR (derived: the half-chord line runs from c_r/2 at the root to c_r at the tip over b/2, and AR = 2b/c_r). The same formula is coded in [S34], which cites Raymer sect. 12.4.1 and DATCOM; Raymer's version takes the sweep of the maximum-thickness line, DATCOM the half-chord line. The attribution to NACA TN 3911 is unverified - model knowledge.
+- **Lowry-Polhamus (DATCOM form):** CLa = 2*pi*AR/(2 + sqrt(AR^2*(beta^2 + tan^2(Lambda_c/2))/kappa^2 + 4)), with beta = 1 and kappa = a0/(2*pi) = 1. For unswept wings it reduces exactly to Helmbold. For a delta with taper ratio 0, tan(Lambda_c/2) = 2/AR (derived: the half-chord line runs from c_r/2 at the root to c_r at the tip over b/2, and AR = 2b/c_r). The same formula is coded in [S34], which cites Raymer sect. 12.4.1 and DATCOM and takes the sweep of the maximum-thickness line. That DATCOM itself uses the half-chord line, and the attribution to NACA TN 3911, are unverified - model knowledge.
 
 | AR | Helmbold (rect) | Jones pi*AR/2 | Lowry-Polhamus delta | e_eff = CLa/(pi AR) with no LE suction |
 |---|---|---|---|---|
@@ -157,12 +157,12 @@ Measured CDmin for thin plates with t/c of about 2 % at Re 6e4-1e5 is about 0.01
 ## 7. Unsteady and falling-paper regimes
 
 - **Phase diagram.** Andersen, Pesavento & Wang (JFM 541, 2005) map fluttering, tumbling and steady descent over Re, the dimensionless moment of inertia I* and the thickness ratio [S25][S26]. Flutter turns into tumble through a homoclinic bifurcation, and the period diverges logarithmically at the transition [S26].
-- **Thresholds disagree between studies:**
+- **Thresholds disagree between studies** (all three taken from search snippets of the secondary sources in [S27]; none checked against the original paper):
   - numerical: 0.2 < I* < 0.3, for thickness ratios 1/4-2/5;
   - a chaotic band at 0.12 < I* < 0.35;
   - Belmonte et al. 1998: Fr of about 0.67, which is about I* = 0.4 [S27].
 - **Definition and paper values.** I* = 8 rho_s h/(3 pi rho_f l) for a plate of width l (unverified - model knowledge). For 80 g/m^2 paper (rho_s h = 0.080 kg/m^2) and rho_f = 1.204 kg/m^3 this becomes I* = 0.0564/l (derived): 1.13 at l = 0.05 m, 0.56 at 0.10 m, 0.27 at 0.21 m and 0.19 at 0.297 m.
-  - Prefactor check (derived): 8 rho_s h/(3 pi rho_f l) equals 32 I/(pi rho_f l^4) with I = rho_s h l^3/12 per unit span. That is the plate's moment of inertia over that of a fluid cylinder of diameter l. With this prefactor, Belmonte's Fr = 0.67 (Fr^2 = rho_s h/(rho_f l)) maps to I* = 0.38, and aluminium plates in water with h/l = 1/14, 1/8 and 1/5 give I* = 0.16, 0.29 and 0.48, the values I recall from [S25] (unverified - model knowledge).
+  - Prefactor check (derived): 8 rho_s h/(3 pi rho_f l) equals 32 I/(pi rho_f l^4) with I = rho_s h l^3/12 per unit span. That is the plate's moment of inertia over that of a fluid cylinder of diameter l. With this prefactor, Belmonte's Fr = 0.67 (Fr^2 = rho_s h/(rho_f l)) maps to I* = 0.38, and aluminium plates in water with h/l = 1/14, 1/8 and 1/5 give I* = 0.16, 0.29 and 0.48 (derived), which are the experimental values the verifier recalls from [S25] (that recollection is unverified - model knowledge).
   - A loose A4 sheet therefore sits near flutter or the chaotic band, while strips narrower than about 0.15 m tumble.
   - Paper's h/l of 3e-4 to 2e-3 is far thinner than any tested plate, so treat this as an extrapolation.
 - **Falling disks.** Field et al. (Nature 1997) found steady, periodic, chaotic and tumbling regimes for disks, using I* = pi rho_d h/(64 rho_f d) (unverified - model knowledge, not retrieved).
@@ -263,7 +263,7 @@ add bend moment M_b = -Cm_delta*delta*eta_f*(Kp/(2*pi))*q*S_e*c_e*(1-s) * (x cro
 - Under sideslip beta this form gives a strip normal force between simple-sweep theory (factor cos^2(beta)) and no reduction. That is adequate for the low-AR surfaces here (unverified - model knowledge).
 - No separate induced-drag term: the normal-only force gives CD = CD0 + CL tan(a) (section 4).
 - Dihedral comes in through the element normals, so lift scales as cos^2(Gamma) (derived).
-- Optional LE suction for rounded edges: F_s = eta_s*q*S_e*Kp*sin^2(ae)*(1-s), pointing toward the upstream edge. Default eta_s = 0.
+- Optional LE suction for rounded edges: F_s = eta_s*q*S_e*(Kp - Kp^2/(pi*AR))*sin^2(ap)*(1-s), pointing toward the upstream edge. Default eta_s = 0. Corrected in verification: the earlier coefficient Kp*sin^2 is the 2-D value and would cancel all induced drag at eta_s = 1. The 3-D full-suction value leaves CDi = CL^2/(pi*AR) (derived; it is Polhamus's Kp - Kp^2*Ki with Ki = 1/(pi*AR)).
 - Optional stall hysteresis: reattach at alpha_s - 3 deg [S10] (offset is a calibration).
 - Optional added mass in the body frame: M_a = sum of m_a,e * n n^T (section 7).
 
@@ -343,3 +343,53 @@ Sources [S34]-[S36] were added in the verification pass. Each is an open-source 
 34. [S34] AeroSandbox 4.2.10 (P. Sharpe, MIT). `aerosandbox/library/aerodynamics/viscous.py`, function `Cf_flat_plate` (Blasius 1.328/sqrt(Re_L), citing Cengel & Cimbala Table 10-4, valid Re_L <= 5e5, "double it (two sides)"). `aerosandbox/library/aerodynamics/inviscid.py`, function `CL_over_Cl` (Helmbold form AR/(2 + sqrt(4 + AR^2)); DATCOM form with sweep, citing Raymer sect. 12.4.1). https://pypi.org/project/AeroSandbox/4.2.10/
 35. [S35] WISDEM 4.2.9 (NREL). `wisdem/ccblade/Polar.py`, methods `extrapolate` and `__Viterna` (cdmax = 1.11 + 0.018 AR; A, B, CL and CD forms; cites Viterna & Janetzke 1982). https://pypi.org/project/wisdem/4.2.9/
 36. [S36] pyfly-fixed-wing 0.1.2 (E. Bohn; 6-DOF fixed-wing simulator for the Skywalker X8). `pyfly/pyfly.py`, lines 1203-1215 (the same sigmoid blend and flat-plate post-stall CL). The package does not name Beard & McLain; that attribution stays model knowledge. https://pypi.org/project/pyfly-fixed-wing/0.1.2/
+
+---
+
+## Verification notes
+
+**Access.** This pass had no web access. WebFetch failed for mdpi.com and mdpi-res.com (hosts outside the session's network policy) and the WebSearch quota was already spent. No cited paper, report or web page was re-opened, so every [S1]-[S33] tag still rests on the first author's search snippets. To check them, allow ntrs.nasa.gov, apps.dtic.mil, mdpi.com, jstage.jst.go.jp, arxiv.org, dragonfly.tam.cornell.edu, m-selig.ae.illinois.edu and cambridge.org. Package registries were reachable, so three open-source packages were downloaded from PyPI and read ([S34]-[S36]). Everything else below is hand derivation or a numeric recomputation (throwaway Python scripts, not kept in the repo).
+
+**Checked and confirmed.**
+
+| # | Claim | How it was checked | Result |
+|---|---|---|---|
+| 1 | Helmbold CLa and the section 3 table | [S34] code; recomputed | Confirmed |
+| 2 | Lowry-Polhamus/DATCOM form, tan(Lambda_c/2) = 2/AR for a delta, table values | [S34] code; geometry derived; recomputed | Confirmed |
+| 3 | Polhamus CN form and Kv = pi for slender deltas | Slender limit of Kv = (Kp - Kp^2 Ki)/cos(Lambda) derived | Kv -> pi confirmed; range restated as 3.1-3.4 at AR 1-2 |
+| 4 | Blasius 2.656/sqrt(Re) for both faces, CD0 table | [S34] code; recomputed | Confirmed |
+| 5 | Zero-suction polar CD = CD0 + CL tan(a), e_eff = CLa/(pi AR), (L/D)max = 0.5 sqrt(CLa/CD0) and its numbers | Derived; recomputed | Confirmed |
+| 6 | Viterna CDmax = 1.11 + 0.018 AR and the A2, B2, CL, CD forms | [S35] code | Confirmed |
+| 7 | Bluff-body shape sin(a)/(0.56 + 0.44 sin(a)) and Hoerner's 0.222, 0.283 | Derived from Kirchhoff-Rayleigh | Confirmed as the same curve rescaled; text corrected |
+| 8 | Kirchhoff-Rayleigh and Joessel CoP values; fit within 0.03c for 30-90 deg; trim angles 4.6 and 11.5 deg | Recomputed | Numbers confirmed; the two formulas stay model knowledge |
+| 9 | Delta strip AC = 1/3 + 2k/3 of c_r, so k0 = 0.5 gives 2/3 c_r | Integral re-derived | Confirmed |
+| 10 | Thin-airfoil flap tau and Cm_delta, the section 8 table, the 2.8-5.6x and -46 % to +18 % figures | Fourier coefficients re-derived; recomputed | Confirmed |
+| 11 | Sigmoid stall blend and post-stall CL = 2 sign(a) sin^2(a) cos(a) | [S36] code | Form confirmed; constants and attribution not |
+| 12 | I* prefactor 8/(3 pi), paper values, Fr 0.67 mapping | Derived from 32 I/(pi rho_f l^4); recomputed | Consistent; coefficient is 0.0564/l, not 0.0566/l |
+| 13 | Added mass 1.43 g (29 % of 5 g), pitch added inertia 7.3e-7 kg m^2 | Recomputed | Confirmed |
+| 14 | Re table, nu, rho, glide speed range, Re 9.6e4 for the 4.90 m/s dart | Recomputed | Confirmed |
+| 15 | Section 10.4 unit-test table | Model re-implemented from section 10 and swept in 0.01 deg steps | All entries reproduced |
+| 16 | Section 10.2 pseudocode | Re-implemented in 3-D and run in limiting cases | Three defects found, see below |
+
+**Changed, and why.**
+1. **Incidence in section 10.2.** as = atan2(vn, |vx|) became atan2(vn, vt), with vt the full in-plane speed. Test (AR 2 strip, velocity 5 m/s along its own span, vn = 0.05 m/s, vx = 0.001 m/s): the old line gave an incidence of 89 deg and CN = 1.17. The true incidence is 0.57 deg and CN = 0.026. Straight flight is unchanged.
+2. **Force point in section 10.2.** Added the direction-cosine factor cx and the explicit point r_F, so the force point no longer jumps when vx changes sign in spanwise flow.
+3. **Bend moment in sections 8 and 10.2.** The axis and sign were not stated. Now M_b acts about (x cross n) with the factor -Cm_delta*delta. Test: TE bent toward +n at alpha = 0 gives a force along -n and a nose-up moment about c/4, and the increment acts at 0.47c for E = 0.1, as thin-airfoil theory requires.
+4. **Smoothstep** is now written out as t*t*(3 - 2t), since the unit-test numbers depend on it.
+5. **Delta stall blend.** d_alpha_s for delta surfaces went from 10 to 20 deg, because the old value contradicted doc 02's V4 target. The dart row of section 10.4 and summary item 8 changed from CLmax 1.33 at 35.8 deg to 1.36 at 37.7 deg. This is still a calibration with no measured polar behind it.
+6. **Glide speeds** in section 10.4: dart 3.9 to 4.0 m/s, glider 2.85 to 2.9 m/s. The formula is now stated.
+7. **Added mass for AR < 1.** The reference dimension is the shorter side. The old formula overstated m_a by about 1/AR for surfaces with chord longer than span.
+8. **Optional LE suction.** Coefficient changed from Kp to Kp - Kp^2/(pi AR); the undefined symbol "ae" became ap.
+9. **Section 5.** The sentence saying Kirchhoff-Rayleigh should be used only for the CoP was wrong: the recommended CN shape is that curve.
+10. **Tags.** Blasius, Helmbold, DATCOM, Viterna A2/B2 and the sigmoid form moved from "unverified" to [S34]-[S36]. The attribution of the sigmoid to Beard & McLain, of the swept formula to NACA TN 3911, and the lower Re limit of Blasius stay unverified.
+11. **Elevator at low AR.** Added the caveat that tau(E) is 2-D and understates flap power on slender surfaces.
+
+**Still uncertain (not checked against any source).**
+- The per-AR "measured" table in section 2 and every statement about what [S1]-[S33] contain. No citation was found to be fabricated, but none could be opened. [S16] (TN D-7631), [S3] (report number), [S22], [S27] and [S28] (arXiv numbers) are the ones I could not match to anything I know; open them before relying on them.
+- Rectangular Kv = 2.3 and the stall angle and blend formulas. The model gives CLmax 1.19 at AR 1 but only 1.08 at AR 0.5, a non-monotonic trend that should be compared with Torres & Mueller [S2].
+- Post-stall level. The 2-D shape gives CN = 0.81 CD90 at 45 deg. Low-AR plates probably hold a flatter CN (near CD90) from about 45 to 90 deg (unverified - model knowledge), so the lift lost at stall may be overstated for AR <= 1.5.
+- The CoP fit 0.25 + 0.25 sin(a). It sets trim and pitch stability of every rectangular-wing plane and is a calibration between Kirchhoff-Rayleigh and thin-airfoil theory. The numeric COM limits of Li et al. [S23] are the right check.
+- With k0 = 0.5 a delta strip's CoP does not move with alpha, so a dart's pitch trim comes only from the COM-to-AC distance and the elevator bend. The lifting-surface AC of an AR 1-2 delta may be 0.03-0.07 c_r ahead of 2/3 c_r.
+- Elevator effectiveness on low-AR surfaces (eta_f), the +0.006 edge drag, the folded-edge drag estimate and k_Re.
+- The Ng et al. flight numbers (4.90 m/s, CL 0.17, L/D about 5) come from doc 02 and were not opened here.
+- The flutter/tumble thresholds, the Andersen experimental I* values, the DNV C_A table, the White/Hoerner CD90 table and the Beard-McLain constants are model knowledge.
