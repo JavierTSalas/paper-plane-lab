@@ -124,6 +124,8 @@ foldPointToPoint(from, to): FoldLine             // perpendicular bisector; `fro
 bisectorOfLines(l1, l2): FoldLine[]              // angle bisectors
 mirrorLine(line, centreX): FoldLine
 mirrorStep(step, centreX): FoldStep              // mirrored fold (swaps left/right as needed)
+// animation: 3D polygons (table x, y, height z in metres) of every piece of a step at progress t in [0, 1]
+frameAt(frame, t, layerGap): AnimPiece[]         // AnimPiece = { id, verts: Vec3[], sheet: Vec2[], frontUp: boolean, moving: boolean }
 // 3D
 finalHingeAngles(shape): HingeAngles
 poseModel(flat, shape, angles?): { model: PosedModel; issues: FoldIssue[] }
