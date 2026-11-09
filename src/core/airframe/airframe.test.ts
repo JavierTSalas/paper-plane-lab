@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { DEG, mat3Det } from '../math';
 import { PAPER_STOCK, sheetMass } from '../paper';
 import {
-  A4_PORTRAIT, a4AreaPlate, dartFixture, dihedralPlateModel, flatDeltaModel, flatPlateModel, foldedModel,
+  A4_PORTRAIT, a4AreaDelta, a4AreaPlate, dartFixture, dihedralPlateModel, flatDeltaModel, flatPlateModel, foldedModel,
   gliderFixture, NEUTRAL_TRIM, trimOf,
 } from '../testing/fixtures';
 import type { Airframe, Mat3, PosedModel, Vec3 } from '../types';
@@ -94,7 +94,11 @@ describe('mass properties', () => {
   it('folded fixtures conserve the A4 sheet: 4.99 g, layers add mass', () => {
     const sheet = sheetMass(A4_PORTRAIT);
     expect(sheet).toBeCloseTo(0.0049896, 7);
-    for (const model of [dartFixture(), dartFixture({ layering: 'classic' }), gliderFixture(), a4AreaPlate(3)]) {
+    const models = [
+      dartFixture(), dartFixture({ layering: 'classic' }), gliderFixture(), gliderFixture({ wingletAt: 0.13, wingletDeg: 60 }),
+      a4AreaPlate(1), a4AreaPlate(3), a4AreaPlate(6), a4AreaDelta(1),
+    ];
+    for (const model of models) {
       const af = buildAirframe(model, NEUTRAL_TRIM);
       expect(af.mass).toBeCloseTo(sheet, 9);
       expectSymmetricPositiveDefinite(af.inertia);

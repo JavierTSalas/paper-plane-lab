@@ -97,6 +97,13 @@ export function a4AreaPlate(aspectRatio: number): PosedModel {
   return flatPlateModel(span, area / span);
 }
 
+/** Flat delta of the given aspect ratio with the area of an A4 sheet (0.06237 m², 4.99 g). */
+export function a4AreaDelta(aspectRatio = 1): PosedModel {
+  const area = A4_PORTRAIT.width * A4_PORTRAIT.height;
+  const span = Math.sqrt(area * aspectRatio);
+  return flatDeltaModel(span, (2 * area) / span);
+}
+
 /* ------------------------------------------------------------------ */
 /* Folded planes: keel + wings (+ winglets) from a flat half layout   */
 /* ------------------------------------------------------------------ */

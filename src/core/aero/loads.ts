@@ -1,12 +1,12 @@
 /**
  * Quasi-steady thin flat-plate element aerodynamics.
- * Model: docs/research/01-aerodynamics.md section 10.2 (see the notes on `elementLoad` for the two places
- * where a step function of the pseudocode is replaced by a continuous factor).
+ * Model: docs/research/01-aerodynamics.md section 10.2. The notes on `accumulate` and `bendTerms` list the
+ * places where this file goes beyond the document's pseudocode, and why.
  */
 import type { Air, Airframe, LiftingSurface, Vec3 } from '../types';
 import { flapCmDelta, flapTau } from './flap';
 
-// The model constants live in this file as plain module constants: the element kernel runs millions of
+// The model constants live in this file as plain module constants: the element loop runs millions of
 // times per second and must not reach them through an import binding.
 
 /** Laminar skin friction on both faces, Blasius: 2 x 1.328 / sqrt(Re) (doc 01 section 4, [S34]). */
