@@ -19,11 +19,17 @@ export function levelState(lift: number, weight: number): LevelState {
 }
 
 /** Lift against weight, spelled out. */
-export function LevelBanner({ reading, weight }: { reading: TunnelReading; weight: number }): ReactElement {
-  const state = levelState(reading.lift, weight);
+export function LevelBanner({ reading, weight, gliding = false }: { reading: TunnelReading; weight: number; gliding?: boolean }): ReactElement {
+  const level = levelState(reading.lift, weight);
+  const state = gliding && level === 'sink' ? 'level' : level;
   const pct = formatPercent(weight > 0 ? reading.lift / weight : 0);
   const text =
-    state === 'level'
+    gliding && level === 'sink'
+      ? {
+          title: 'This is its steady glide',
+          body: `Lift is ${pct} of the weight. Gliding, the plane leans its lift slightly forward and trades height for speed, so lift needs to carry a little less than the full weight.`,
+        }
+      : state === 'level'
       ? { title: 'It would fly level at this speed', body: `Lift is ${pct} of the weight.` }
       : state === 'climb'
         ? { title: 'More lift than weight', body: `Lift is ${pct} of the weight: at this speed and angle it would climb (and slow down).` }

@@ -125,6 +125,7 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
     arcEnd[1] - 8 * unit * k * Math.sin(arcDir) - side * 4.5 * unit * Math.cos(arcDir),
   ];
 
+  const eddyDur = `${(9 / Math.sqrt(Math.max(1, reading.speed))).toFixed(2)}s`;
   const smokeDur = `${(2.6 / Math.sqrt(Math.max(1, reading.speed))).toFixed(2)}s`;
   const label = `Side view of the test section at ${speedText} and ${fixed(reading.alphaDeg, 0)} degrees angle of attack. ${
     stalled ? 'The flow has separated from the top of the plane and a wavy wake trails behind it.' : 'Smoke lines bend smoothly around the plane.'
@@ -156,9 +157,10 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
             ))}
           </g>
           {flow.eddies.length > 0 && (
-            <g className={reduced ? 'ppl-tunnel__eddy' : 'ppl-tunnel__eddy is-moving'} strokeWidth={2.2 * unit} strokeDasharray="0.04 0.05">
+            <g className={reduced ? 'ppl-tunnel__eddy' : 'ppl-tunnel__eddy is-moving'} strokeWidth={2 * unit}>
+              {/* Spirals turn in place (a cheap transform), clockwise on top, counter-clockwise below. */}
               {flow.eddies.map((l, i) => (
-                <path key={i} d={pathData(l, shift)} style={{ animationDuration: smokeDur }} />
+                <path key={i} d={pathData(l, shift)} className={i % 2 === 0 ? 'is-cw' : 'is-ccw'} style={{ animationDuration: eddyDur }} />
               ))}
             </g>
           )}

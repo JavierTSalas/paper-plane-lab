@@ -77,11 +77,29 @@
   stroke-opacity: 0.35;
 }
 
-.ppl-tunnel__smoke.is-moving path,
-.ppl-tunnel__eddy.is-moving path {
+.ppl-tunnel__smoke.is-moving path {
   animation-name: ppl-tunnel-smoke;
   animation-timing-function: linear;
   animation-iteration-count: infinite;
+}
+
+.ppl-tunnel__eddy path {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.ppl-tunnel__eddy.is-moving path {
+  animation: ppl-tunnel-spin linear infinite;
+}
+
+.ppl-tunnel__eddy.is-moving path.is-ccw {
+  animation-direction: reverse;
+}
+
+@keyframes ppl-tunnel-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes ppl-tunnel-smoke {
@@ -228,6 +246,10 @@
 }
 
 /* ---------------------------------------------------------------- controls */
+
+.ppl-tunnel__controls.ppl-stack {
+  gap: var(--s-5);
+}
 
 .ppl-tunnel__trimrow {
   display: flex;

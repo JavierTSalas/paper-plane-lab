@@ -166,7 +166,7 @@ export default function TunnelPage(): ReactElement {
         </div>
 
         <div className="ppl-tunnel__side">
-          <LevelBanner reading={reading} weight={weight} />
+          <LevelBanner reading={reading} weight={weight} gliding={atTrim && betaDeg === 0} />
           <Readouts reading={reading} weight={weight} mass={airframe.mass} units={units} />
           <Card as="section" className="ppl-stack" aria-labelledby="ppl-tunnel-polars">
             <SectionHeader as="h3" id="ppl-tunnel-polars" title="Polars" subtitle={`Every angle at ${formatSpeed(polarSpeed, units)}, in one sweep.`} />

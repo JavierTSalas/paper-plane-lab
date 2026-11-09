@@ -85,11 +85,10 @@ export function StabilityCard({ model, airframe, trim, polar, units, elevatorDeg
         hint={`Good: ${MARGIN_GOOD[0]} – ${MARGIN_GOOD[1]} %`}
       />
 
-      <StatGrid minWidth={130}>
+      <StatGrid minWidth={150}>
         <Stat
           label="Trim angle"
-          value={trim.alphaDeg === null ? DASH : fixed(trim.alphaDeg, 1)}
-          unit={trim.alphaDeg === null ? undefined : '°'}
+          value={trim.alphaDeg === null ? DASH : `${fixed(trim.alphaDeg, 1)}°`}
           size="sm"
           info={
             <InfoDot label="What is the trim angle?" title="Trim angle" topic="stability-and-trim">
