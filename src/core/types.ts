@@ -374,6 +374,12 @@ export interface LiftingSurface {
   vortexCp: number;
   /** Plain-flap efficiency eta_f applied to the bends of this surface's elements (research doc 01 section 8). */
   flapEfficiency: number;
+  /**
+   * How far the bend behaves as on a slender wing instead of a thin airfoil, 0 to 1 (research doc 01 section 8,
+   * low-AR limit): at 1 the full bend angle counts (tau = 1) and its load sits at the hinge line; at 0 it is
+   * the thin-airfoil flap.
+   */
+  flapSlenderness: number;
 }
 
 export interface Airframe {

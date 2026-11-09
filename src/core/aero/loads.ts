@@ -3,7 +3,7 @@
  * Model: docs/research/01-aerodynamics.md section 10.2 (see the notes on `elementLoad` for the two places
  * where a step function of the pseudocode is replaced by a continuous factor).
  */
-import type { Air, Airframe, Vec3 } from '../types';
+import type { Air, Airframe, LiftingSurface, Vec3 } from '../types';
 import { flapCmDelta, flapTau } from './flap';
 
 // The model constants live in this file as plain module constants: the element kernel runs millions of
@@ -44,7 +44,7 @@ const CHORD = 10;
 const EXPOSURE = 11;
 const FRICTION = 12; // wetted faces / 2
 const BEND_SIN = 13; // sin(eta_f tau(E) delta): sine of the incidence shift of the bend
-const BEND_MOMENT = 14; // -Cm_delta delta eta_f (Kp / 2 pi) S c exposure: bend moment per unit dynamic pressure
+const BEND_MOMENT = 14; // bend moment per unit dynamic pressure: Kp eta_f tau delta (offset of the bend's load) S c exposure
 const AX = 15; // bend moment axis, chord x normal (3)
 const KP = 18;
 const KV = 19;
@@ -65,6 +65,37 @@ interface Compiled {
 
 /** Largest incidence shift a bend may produce, radians: keeps the shifted angle inside the model's range. */
 const MAX_BEND_SHIFT = 1.2;
+
+/**
+ * A bent trailing edge as a plain flap (doc 01 sections 8 and 10.2), for a bend of `delta` radians toward
+ * +normal over the chord fraction E.
+ *
+ *  shift   incidence added in attached flow: eta_f tau delta.
+ *  moment  coefficient (per q S c) of the couple about the span axis that puts the bend's share of the normal
+ *          force, Kp shift, where it really acts instead of at the strip's centre of pressure.
+ *
+ * Thin-airfoil limit (wide wings): tau = tau(E) and the bend's load acts |Cm_delta| / (2 pi tau) chords behind
+ * the centre of pressure, which is exactly the document's couple -Cm_delta delta eta_f Kp / (2 pi).
+ * Slender limit (AR -> 0, doc 01 section 8 "low-AR limit"): tau = 1 and the load sits at the hinge line,
+ * (1 - E) - k0 chords behind the centre of pressure. The surface's `flapSlenderness` blends the two. Without
+ * the slender limit a bend at the rear of a long keel would act a quarter chord behind the keel's NOSE and
+ * turn the plane the wrong way.
+ */
+export function bendTerms(
+  chordFrac: number,
+  delta: number,
+  surface: Pick<LiftingSurface, 'kp' | 'k0' | 'flapEfficiency' | 'flapSlenderness'>,
+): { shift: number; moment: number } {
+  const tau2d = flapTau(chordFrac);
+  if (!(tau2d > 0)) return { shift: 0, moment: 0 };
+  const slender = Math.max(0, Math.min(1, surface.flapSlenderness));
+  const tau = tau2d + (1 - tau2d) * slender;
+  const offset2d = -flapCmDelta(chordFrac) / (2 * Math.PI * tau2d);
+  const offsetSlender = Math.max(0, 1 - chordFrac - surface.k0);
+  const offset = offset2d + (offsetSlender - offset2d) * slender;
+  const shift = surface.flapEfficiency * tau * delta;
+  return { shift, moment: surface.kp * shift * offset };
+}
 
 function compile(airframe: Airframe): Compiled {
   const count = airframe.elements.length;
@@ -92,12 +123,11 @@ function compile(airframe: Airframe): Compiled {
     data[o + EXPOSURE] = e.exposure;
     data[o + FRICTION] = e.wettedFaces / 2;
     if (e.bendFrac > 0 && e.bendRad !== 0) {
-      const shift = s.flapEfficiency * flapTau(e.bendFrac) * e.bendRad;
-      const limited = Math.max(-MAX_BEND_SHIFT, Math.min(MAX_BEND_SHIFT, shift));
+      const bend = bendTerms(e.bendFrac, e.bendRad, s);
+      const limited = Math.max(-MAX_BEND_SHIFT, Math.min(MAX_BEND_SHIFT, bend.shift));
       data[o + BEND_SIN] = Math.sin(limited);
       data[o + BEND_COS_LESS_ONE] = Math.cos(limited) - 1;
-      data[o + BEND_MOMENT] =
-        -flapCmDelta(e.bendFrac) * e.bendRad * s.flapEfficiency * (s.kp / (2 * Math.PI)) * e.area * e.chord * e.exposure;
+      data[o + BEND_MOMENT] = bend.moment * e.area * e.chord * e.exposure;
     }
     data[o + AX] = ey * nz - ez * ny;
     data[o + AX + 1] = ez * nx - ex * nz;
@@ -156,14 +186,22 @@ const EPS = 1e-12;
  *
  *  - velocity through the air at the 3/4-chord point measured from the upstream edge;
  *  - signed incidence against the plate plane from the normal and the full in-plane speed;
- *  - bend: incidence shift eta_f tau(E) delta and the thin-airfoil bend moment, blended out by the stall;
+ *  - bend: incidence shift and bend moment of a plain flap (`bendTerms`), blended out by the stall;
  *  - CN: potential + vortex term, smoothstep blend into the bluff-plate curve;
- *  - friction on the in-plane velocity; normal force at the centre of pressure, friction at mid-chord.
+ *  - friction on the in-plane velocity; normal force at the centre of pressure, friction at mid-chord;
+ *  - pitch-rate couple (not in the document's pseudocode, see below).
  *
  * The pseudocode switches on the sign of the chordwise velocity vx in two places: which 3/4-chord point is
  * used, and whether the bend terms act. Here both fade linearly while |vx| is below UPSTREAM_FADE times the
  * flight speed (`ramp` = 1 / that speed), so the loads stay continuous when a strip slides sideways or
  * tumbles. Outside that narrow band the result is exactly the pseudocode.
+ *
+ * Pitch-rate couple. The pseudocode takes the incidence at the 3/4-chord point and applies the whole normal
+ * force at the centre of pressure near the quarter chord. That reproduces the thin-airfoil LIFT due to pitch
+ * rate but not its MOMENT: a strip turning about a point between its quarter and 3/4 chord would be driven on
+ * instead of damped (a long keel in yaw, the root strips of a dart in pitch). In quasi-steady thin-airfoil
+ * theory (Theodorsen with C(k) = 1) the lift added by rotation about mid-chord has no moment about mid-chord.
+ * The kernel therefore applies the rotation-induced share of the attached normal force at mid-chord.
  */
 function elementLoad(
   d: Float64Array, o: number,
@@ -196,9 +234,14 @@ function elementLoad(
   const lead = upstream > 0 ? upstream : 0;
   // Move to the 3/4-chord point from the upstream edge: r_eval = r_mid - 0.25 c upstream x.
   const back = -EVAL_AFT_OF_MID * chord * upstream;
-  ux += back * (wy * ez - wz * ey);
-  uy += back * (wz * ex - wx * ez);
-  uz += back * (wx * ey - wy * ex);
+  const kx = wy * ez - wz * ey;
+  const ky = wz * ex - wx * ez;
+  const kz = wx * ey - wy * ex;
+  ux += back * kx;
+  uy += back * ky;
+  uz += back * kz;
+  // Normal velocity the strip's own rotation adds between mid-chord and the evaluation point.
+  const unRotation = back * (kx * nx + ky * ny + kz * nz);
   const u2 = ux * ux + uy * uy + uz * uz;
   if (u2 < MIN_SPEED * MIN_SPEED) {
     if (detail) result.fill(0);
@@ -274,8 +317,14 @@ function elementLoad(
   const fty = kt * (uy - un * ny);
   const ftz = kt * (uz - un * nz);
 
-  // Thin-airfoil bend moment about the span axis (chord x normal).
-  const mb = d[o + BEND_MOMENT] * q * (1 - sep) * lead;
+  // Couples about the span axis (chord x normal):
+  //  - the thin-airfoil bend moment;
+  //  - the pitch-rate couple. The normal force that the strip's own rotation adds through the 3/4-chord rule
+  //    acts at mid-chord, not at the centre of pressure (quasi-steady thin-airfoil theory: the rotation is an
+  //    apparent camber). Its attached-flow part, 0.5 rho V S Kp cos(2a) un_rotation, is moved there.
+  const slope = cosA * cosA - sp * sp;
+  const rate = slope > 0 ? 0.5 * rho * speed * area * d[o + KP] * slope * d[o + EXPOSURE] * unRotation * arm : 0;
+  const mb = (d[o + BEND_MOMENT] * q * lead + rate) * (1 - sep);
 
   const fx = fnx + ftx;
   const fy = fny + fty;

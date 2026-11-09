@@ -63,7 +63,17 @@ export interface SurfaceCoefficients {
   k0: number;
   vortexCp: number;
   flapEfficiency: number;
+  flapSlenderness: number;
 }
+
+/**
+ * Weight of the slender-wing limit in the bend (flap) model: 1 / (1 + AR²).
+ * Doc 01 section 8 notes that thin-airfoil tau(E) is a 2D result and that tau tends to 1 as AR tends to 0
+ * (R. T. Jones: the lift depends on the incidence at the trailing edge only), with a dart "between tau(E) and 1".
+ * This weight has those two limits (1 at AR 0, 0 for wide wings: 0.03 at AR 6) and gives 0.5 at AR 1.
+ * The shape in between is a calibration.
+ */
+export const flapSlenderness = (aspectRatio: number): number => 1 / (1 + aspectRatio * aspectRatio);
 
 /**
  * The constants of doc 01 section 10.1, blended between the straight and the delta set by `deltaness`.
@@ -88,6 +98,7 @@ export function surfaceCoefficients(aspectRatio: number, deltaness: number, delt
     k0: lerp(K0_RECT, deltaCp, d),
     vortexCp: lerp(VORTEX_CP_RECT, deltaCp, d),
     flapEfficiency: FLAP_EFFICIENCY,
+    flapSlenderness: flapSlenderness(ar),
   };
 }
 
@@ -140,6 +151,7 @@ export function blendCoefficients(a: SurfaceCoefficients, b: SurfaceCoefficients
     k0: lerp(a.k0, b.k0, t),
     vortexCp: lerp(a.vortexCp, b.vortexCp, t),
     flapEfficiency: lerp(a.flapEfficiency, b.flapEfficiency, t),
+    flapSlenderness: lerp(a.flapSlenderness, b.flapSlenderness, t),
   };
 }
 

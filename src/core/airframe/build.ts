@@ -108,6 +108,7 @@ const surfaceOf = (
   k0: c.k0,
   vortexCp: c.vortexCp,
   flapEfficiency: c.flapEfficiency,
+  flapSlenderness: c.flapSlenderness,
 });
 
 /** How far a secondary panel stands out of the wing plane: 0 = coplanar (use the wing's constants), 1 = its own surface. */
