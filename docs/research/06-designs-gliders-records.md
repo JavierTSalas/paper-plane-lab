@@ -202,7 +202,6 @@ SK_PROXY: default sheet A6, g = W/4, d_n = W/32, d_t = W/16, winglet e = W/16 at
 FLYING_WING: landscape, a = W/8, k = 4 (MOUNTAIN rolls), V-dihedral 8, tip fins e = H/20 up 90,
   reflex hinge 0.15c at +10 deg ; throw level 2-3 m/s
 TEST INVARIANTS (FLAT model, before SHAPE3D): area = W*H ; cg_x = W/2 ; NL lock apex y = H-W ;
-  facet count NL = SZ = SK = 13 ; SNB = 4 + 4n ;
   NL A4 CG 80.42 mm aft of nose ; NL Letter 77.32 ; SZ A4 80.01 ; SK A4 82.65 ;
   SNB A4 n=2 CG 40.11 mm (n = 0,1,3: 74.43, 54.76, 29.71) ; FW A4 k=4 CG 32.81 mm from LE (k=5: 22.97)
   (exact polygon values; allow +-0.05 mm)
