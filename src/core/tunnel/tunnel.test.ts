@@ -3,7 +3,7 @@ import { STANDARD_GRAVITY, buildAirframe } from '../airframe';
 import { DEG } from '../math';
 import {
   a4AreaPlate, dartFixture, DART_TRIM, dihedralPlateModel, finnedPlateModel, flatDeltaModel, flatPlateModel,
-  GLIDER_TRIM, gliderFixture, NEUTRAL_TRIM, TEST_AIR, trimOf,
+  flyableDart, flyableGlider, GLIDER_TRIM, gliderFixture, NEUTRAL_TRIM, TEST_AIR, trimOf,
 } from '../testing/fixtures';
 import type { Airframe, PolarPoint } from '../types';
 import { analyzeTrim, computePolar, tunnelReading } from './tunnel';
@@ -262,6 +262,36 @@ describe('analyzeTrim', () => {
       expect(above.cm).toBeLessThan(0);
       expect(below.cm).toBeGreaterThan(0);
     }
+  });
+
+  it('the flyable fixture variants trim, glide in their bands and are laterally sound', () => {
+    const dart = analyzeTrim(buildAirframe(flyableDart(), DART_TRIM), AIR);
+    expect(dart.trimmable).toBe(true);
+    expect(dart.glideRatio!).toBeGreaterThan(3.6);
+    expect(dart.speed!).toBeGreaterThan(3.5);
+    expect(dart.speed!).toBeLessThan(6);
+    expect(dart.rollStable).toBe(true);
+    expect(dart.cnBetaDynamic).toBeGreaterThan(0);
+    const glider = analyzeTrim(buildAirframe(flyableGlider(), GLIDER_TRIM), AIR);
+    expect(glider.trimmable).toBe(true);
+    expect(glider.glideRatio!).toBeGreaterThan(5);
+    expect(glider.glideRatio!).toBeLessThan(8);
+    expect(glider.rollStable).toBe(true);
+    expect(glider.yawStable).toBe(true);
+    expect(glider.cnBetaDynamic).toBeGreaterThan(0);
+  });
+
+  it('survives a model with no paper', () => {
+    const empty = buildAirframe({ ...flatPlateModel(0.2, 0.1), pieces: [], panels: [] }, NEUTRAL_TRIM);
+    expect(empty.mass).toBe(0);
+    expect(empty.elements).toHaveLength(0);
+    const t = analyzeTrim(empty, AIR);
+    expect(t.trimmable).toBe(false);
+    for (const v of Object.values(t)) if (typeof v === 'number') expect(Number.isFinite(v)).toBe(true);
+    const r = tunnelReading(empty, { speed: 5, alphaDeg: 5, betaDeg: 0 }, AIR);
+    expect(r.lift).toBe(0);
+    expect(r.cl).toBe(0);
+    expect(r.cpX).toBeNull();
   });
 
   it('is deterministic', () => {

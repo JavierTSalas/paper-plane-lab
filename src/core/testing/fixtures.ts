@@ -394,3 +394,11 @@ export function gliderFixture(options: GliderFixtureOptions = {}): PosedModel {
 
 /** The fixture glider needs no bend: its centre of pressure travels aft with incidence and meets the centre of gravity. */
 export const GLIDER_TRIM: TrimSpec = NEUTRAL_TRIM;
+
+/**
+ * The two fixtures as they would be flown: with the dihedral that keeps them upright and on heading.
+ * (With flat wings the strip model has no roll stability at all, and the long keel of the dart is not
+ * weathercock stable: see `TrimAnalysis.cnBetaDynamic`.)
+ */
+export const flyableDart = (): PosedModel => dartFixture({ dihedralDeg: 10 });
+export const flyableGlider = (): PosedModel => gliderFixture({ dihedralDeg: 8 });
