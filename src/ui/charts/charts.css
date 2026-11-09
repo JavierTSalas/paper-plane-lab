@@ -1,0 +1,290 @@
+/* Charts: hairline recessive axes, 2 px lines, ringed dots, text in ink tokens only. */
+
+.ppl-viz-stroke-1 { stroke: var(--viz-1); }
+.ppl-viz-stroke-2 { stroke: var(--viz-2); }
+.ppl-viz-stroke-3 { stroke: var(--viz-3); }
+.ppl-viz-stroke-4 { stroke: var(--viz-4); }
+.ppl-viz-stroke-5 { stroke: var(--viz-5); }
+.ppl-viz-stroke-6 { stroke: var(--viz-6); }
+.ppl-viz-fill-1 { fill: var(--viz-1); }
+.ppl-viz-fill-2 { fill: var(--viz-2); }
+.ppl-viz-fill-3 { fill: var(--viz-3); }
+.ppl-viz-fill-4 { fill: var(--viz-4); }
+.ppl-viz-fill-5 { fill: var(--viz-5); }
+.ppl-viz-fill-6 { fill: var(--viz-6); }
+.ppl-viz-bg-1 { background: var(--viz-1); }
+.ppl-viz-bg-2 { background: var(--viz-2); }
+.ppl-viz-bg-3 { background: var(--viz-3); }
+.ppl-viz-bg-4 { background: var(--viz-4); }
+.ppl-viz-bg-5 { background: var(--viz-5); }
+.ppl-viz-bg-6 { background: var(--viz-6); }
+
+.ppl-chart {
+  margin: 0;
+  min-width: 0;
+}
+
+.ppl-chart__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-4);
+  margin-bottom: var(--s-2);
+}
+
+.ppl-chart__title {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ppl-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
+.ppl-chart__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ppl-chart__plot {
+  position: relative;
+  width: 100%;
+}
+
+.ppl-chart__svg {
+  display: block;
+  overflow: visible;
+  touch-action: pan-y;
+  border-radius: 8px;
+}
+
+.ppl-chart__svg:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 4px;
+}
+
+.ppl-chart__grid line {
+  stroke: var(--viz-grid);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.ppl-chart__grid line.ppl-chart__zero {
+  stroke: var(--viz-axis);
+}
+
+.ppl-chart__tick {
+  font-size: 12px;
+  fill: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.ppl-chart__axis-label {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--ink-2);
+}
+
+.ppl-chart__line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ppl-chart__dot {
+  stroke: var(--card);
+  stroke-width: 2;
+}
+
+.ppl-chart__marker-label {
+  font-size: 12px;
+  font-weight: 700;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.ppl-chart__guide line {
+  stroke: var(--ink-3);
+  stroke-width: 1;
+}
+
+.ppl-chart__cursor {
+  stroke: var(--ink-2);
+  stroke-width: 1;
+}
+
+.ppl-chart__tip {
+  position: absolute;
+  top: 0;
+  transform: translate(-50%, -100%) translateY(-8px);
+  min-width: 128px;
+  padding: var(--s-2) var(--s-3);
+  border-radius: 10px;
+  background: var(--card);
+  border: var(--outline);
+  box-shadow: var(--shadow);
+  font-size: var(--fs-xs);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ppl-chart__tip-x {
+  margin-bottom: 4px;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.ppl-chart__tip-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-2);
+}
+
+.ppl-chart__tip-label {
+  flex: 1;
+}
+
+.ppl-chart__tip-row .ppl-num {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.ppl-chart__key {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+/* ------------------------------------------------------------ sparkline */
+
+.ppl-spark {
+  display: inline-block;
+  vertical-align: middle;
+  overflow: visible;
+}
+
+.ppl-spark__line {
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ppl-spark__muted {
+  stroke: var(--viz-muted);
+}
+
+.ppl-spark__area {
+  opacity: 0.12;
+  stroke: none;
+}
+
+.ppl-spark__muted-fill {
+  fill: var(--viz-muted);
+}
+
+/* ------------------------------------------------------------ meter */
+
+.ppl-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ppl-meter__head,
+.ppl-meter__foot {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+
+.ppl-meter__label {
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ppl-meter__value {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.ppl-meter__track {
+  position: relative;
+  height: 12px;
+  border-radius: var(--r-pill);
+  background: var(--paper-2);
+}
+
+.ppl-meter__band {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--sage-wash);
+  border-inline: 2px solid var(--good-fill);
+}
+
+.ppl-meter__fill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  max-width: calc(100% - 6px);
+  border-radius: var(--r-pill);
+  background: var(--warn-fill);
+}
+
+.ppl-meter--good .ppl-meter__fill {
+  background: var(--good-fill);
+}
+
+.ppl-meter__pin {
+  position: absolute;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--ink);
+  border: 3px solid var(--card);
+  box-shadow: var(--shadow-sm);
+}
+
+.ppl-meter__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--warn);
+}
+
+.ppl-meter--good .ppl-meter__state {
+  color: var(--good);
+}
+
+.ppl-meter__hint {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+  text-align: right;
+}
