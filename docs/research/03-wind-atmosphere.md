@@ -2,18 +2,18 @@
 
 Research note for the Paper Plane Lab physics core. Scope: the air a paper plane flies through, from 0 to about 30 m above the ground, at airspeeds of about 3-12 m/s. Everything is in SI units unless stated otherwise. Tags: `[S#]` is a numbered source at the end of this note. "(unverified - model knowledge)" means I could not confirm it online in this session. "(derived here)" means I calculated it from tagged inputs; the arithmetic was checked with a short script.
 
-> **Research-access caveat.** In this session WebFetch could not reach any host, and the shared web-search budget ran out before the last sections were done. So every `[S#]` was confirmed from **search-result extracts of that URL**, not from reading the full document. Formulas that rest only on model knowledge are marked as such. See "Open questions and limits".
+> **Research-access caveat.** In this session WebFetch could not reach any host, and the shared web-search budget ran out before the last sections were done. So every `[S#]` was confirmed from **search-result extracts of that URL**, not from reading the full document. Formulas that rest only on model knowledge are marked as such. See "Open questions and limits". A later fact-check pass had no web access either (fetch blocked, search budget spent). It re-derived the formulas and recomputed the tables instead; see "Verification notes" at the end.
 
 ## Summary for implementers
 
 1. **Air:** use `rho = (p - 0.378 e) / (287.053 T)` and Sutherland's law `mu = 1.458e-6 T^1.5 / (T + 110.4)`. At ISA sea level this gives 1.225 kg/m^3 and 1.789e-5 Pa s. The brief's 1.81e-5 Pa s is the value at 20 °C. Humidity lowers density by at most about 1.6 % at 30 °C; temperature and altitude matter roughly 10 times more.
 2. **Mean wind:** use the neutral log law `U(z) = U10 ln((z-d)/z0) / ln((10-d)/z0)`. Over open grass (z0 = 0.03 m), the wind at 2 m is **0.72 x U10**. Do not use the 1/7 power law below about 10 m: the effective exponent between 2 and 10 m is 0.10-0.36, depending on z0.
 3. **Turbulence:** use a Dryden model sampled in the plane's frame. Take the **intensities** from surface-layer similarity (`sigma_u, sigma_v, sigma_w = 2.4, 1.9, 1.25 x u*`), which knows about terrain roughness. Take the **length scales** from the MIL low-altitude formulas (at 2 m: L_u = 15.4 m and L_w = 2 m, in the MIL-F-8785C convention). Step it with the exact discrete recurrences in section 3.4: an AR(1) for u, and a 2-state system for v and w. These keep the variance exact at any `V*dt/L`.
-4. **Gusts:** the Dryden noise already contains ordinary gustiness. Optional scripted gust events use the MIL-F-8785C "1-cosine" ramp. The peak-to-mean ratio at 2 m over grass is about **1.7**.
+4. **Gusts:** the Dryden noise already contains ordinary gustiness. Optional scripted gust events use the MIL-F-8785C "1-cosine" ramp. The 3 s peak-to-mean ratio at 2 m over grass is about **1.6** within 10 min and **1.7** within an hour.
 5. **Thermals:** near the ground they are weak. Using Allen (2006) scaling with w* = 1.5 m/s and z_i = 1000 m gives a peak updraft of about 0.5 m/s at 2 m and 0.8 m/s at 10 m. That is still comparable to a paper plane's 0.5-1 m/s sink rate.
-6. **Ridge lift:** use linear potential flow over a cosine hill, or the exact potential flow round a half-cylinder for a cliff. These give about 1 m/s of lift over a 17° grassy slope in a 4.5 m/s breeze. In front of and above a 25 m cliff in a 4 m/s onshore breeze, they give about 1.4-2.2 m/s.
+6. **Ridge lift:** use linear potential flow over a row of cosine hills or a single bell-shaped ridge, or the exact potential flow round a half-cylinder for a cliff (section 5.3). These give about 0.9-1 m/s of lift over a 17° grassy slope in a 4.5 m/s breeze. Out from a 25 m cliff along the 45° up-and-upwind diagonal, in a 4 m/s onshore breeze, they give 2.2 m/s at 10 m from the face, falling to 1.4 m/s at 19 m.
 7. **Indoors:** occupied rooms have air speeds of about 0.05-0.2 m/s; ASHRAE 55 and ISO 7730 draught limits sit around 0.1-0.2 m/s. That is 1-4 % of the plane's airspeed, which is why records are set indoors.
-8. **Gust sensitivity:** a paper plane is roughly **70 times more gust-sensitive** than an airliner. A 0.3 m/s vertical gust changes its load factor by about 0.8 g.
+8. **Gust sensitivity:** a paper plane is roughly **70 times more gust-sensitive** than an airliner. A 0.3 m/s vertical gust changes its load factor by about 0.8 g. Both figures are sharp-edged upper bounds; for a smooth gust the ratio is nearer 25 (section 7).
 
 ---
 
@@ -47,7 +47,7 @@ nu  = mu / rho                                    # m^2/s, for Reynolds number R
 
 - **Sutherland, reference form [S4]:** `mu = 1.716e-5 (T/273.15)^1.5 (273.15 + 110.4)/(T + 110.4)`. It gives the same numbers as the form above. NASA Glenn's Wind-US code uses Sutherland's law as its default for ideal gases above 180 °R (100 K) [S5].
 - **Magnus coefficients:** 6.1094 hPa, 17.625 and 243.04 °C come from Alduchov and Eskridge (1996) [S7]. They are a fit for water. The paper's fit range of about -40 to +50 °C is (unverified - model knowledge).
-- **Moist-air density:** the rho formula is the ideal-gas reduction of the CIPM-2007 equation [S6]. CIPM-2007 adds a compressibility factor Z and an enhancement factor (about 1.0006) [S6]. Both are below 0.1 % and can be ignored here.
+- **Moist-air density:** the rho formula is the ideal-gas reduction of the CIPM-2007 equation [S6]. CIPM-2007 adds a compressibility factor Z and a vapour enhancement factor f [S6]. Z is about 0.9996, and f is about 1.004 at 101 kPa and 20 °C; 1.00062 is only the constant term of f (values unverified - model knowledge). Together they change density by less than 0.05 % (derived here) and can be ignored.
 - **Pressure-altitude exponent:** 5.25588 equals g0 M/(R* L) for ISA (unverified - model knowledge, but it reproduces 1.225 kg/m^3 at h = 0).
 
 ### 1.3 How big each effect is (derived here)
@@ -59,7 +59,7 @@ nu  = mu / rho                                    # m^2/s, for Reynolds number R
 | 20 °C | 1.2041 | 1.1936 | -0.87 % | 1.813e-5 | 1.506e-5 |
 | 30 °C | 1.1644 | 1.1460 | -1.58 % | 1.861e-5 | 1.598e-5 |
 | 35 °C | 1.1455 | 1.1215 | -2.10 % | 1.884e-5 | 1.645e-5 |
-| ISA 1609 m (Denver), 4.7 °C | 1.0467 | - | - | - | - |
+| ISA 1609 m (Denver), 4.5 °C, 83 431 Pa | 1.0467 | - | - | - | - |
 
 - Going from 0 °C to 35 °C changes density by 11 %. Going from sea level to 1600 m changes it by 15 %. Humidity changes it by at most 2 %.
 - Humidity matters far more through the **paper** (moisture uptake, limpness, curl) than through the air. Takuo Toda's failed record attempt in humid conditions is reported in [S35]. Treat this as a paper-model concern, not an air-model one.
@@ -160,6 +160,7 @@ SI form (h_m in metres; L comes out in metres):  0.177 + 0.0027 h_m  replaces  0
 - Transfer functions (8785C form, driven by unit white noise; unverified - model knowledge):
   - `H_u(s) = sigma_u sqrt(2L_u/(πV)) / (1 + (L_u/V)s)`
   - `H_w(s) = sigma_w sqrt(L_w/(πV)) (1 + √3 (L_w/V)s) / (1 + (L_w/V)s)^2`, and the same form for v.
+  - These gains are normalised so that `∫0^∞ |H(iω)|² dω = sigma²` (derived here). That means noise with a one-sided spectral density of 1 per rad/s, not unit variance per time step. Section 3.4 avoids the issue by scaling the states to unit variance.
 
 **Values at paper-plane heights** (derived here, 8785C convention):
 
@@ -220,7 +221,8 @@ if tau < 1e-3: q11 ≈ (4/3) tau^3, q12 ≈ 2 tau^2, q22 ≈ 4 tau - 8 tau^2    
 
 - **Why it works:** the states are scaled to unit variance, so their stationary covariance is the identity matrix. The step covariance `Q = I - Φ Φ^T` is then exact.
 - **Changing sigma or L every step** (the plane climbs or descends) creates no transient, because sigma multiplies only the output.
-- **Verification:** with L = 2 m, V = 6 m/s, dt = 1/60 s and 400 000 steps, the variance came out at 1.01 σ². The autocorrelation at ξ = 0.6, 1.2 and 2.4 m was 0.634, 0.389 and 0.131, against theory values of 0.630, 0.384 and 0.120 (derived here).
+- **Verification:** with L = 2 m, V = 6 m/s, dt = 1/60 s and 400 000 steps, the variance came out at 1.01 σ². The autocorrelation at ξ = 0.6, 1.2 and 2.4 m was 0.634, 0.389 and 0.131, against theory values of 0.630, 0.384 and 0.120 (derived here). The differences are sampling noise: the exact lag-m autocorrelation of the recurrence, `c·Φ(mτ)·c` with c = (1/2, √3/2), equals `(1 - ξ/(2L)) e^{-ξ/L}` to 1e-16 (derived here).
+- **The series branch is required, not optional.** In double precision the plain q11 formula loses all its digits near τ = 1e-6 and the Cholesky step fails. The slow-plane floor reaches τ = 3e-4 (V_s = 0.3 m/s, L = 15.4 m). With the series as written, the stationary output variance is within 2e-6 of σ² at τ = 1e-3 (derived here).
 - **Initial state:** start from s ~ N(0, I) so the series is stationary from t = 0.
 - **Determinism:** use a seeded PRNG plus Box-Muller.
 
@@ -252,15 +254,17 @@ V_g(x) = 0                              x < 0
 - Mean speeds must **not** be converted between averaging periods with gust factors; only gust speeds can be [S24].
 - The Durst curve corresponds to a turbulence intensity of 16.5 % [S25]. It applies only to open terrain at 10 m [S27].
 - In open terrain at 10 m, a 3 s gust divided by the 10 min mean is about 1.38 (30 / 21.7 m/s [S26]). A hurricane data set with z0 ≈ 0.03 m gave about 1.43 [S27].
-- The WMO 2010 guidance tabulates factors by exposure (at-sea, off-sea, off-land, in-land) [S24]. I did not see its exact numbers.
-- A good model is `G ≈ 1 + g I_u`, with peak factor g ≈ 3 for a 3 s gust in 10 min (unverified - model knowledge). With I_u = 0.165 this gives 1.50, consistent with Durst.
-- At 2 m, I_u is larger, so G is larger too (derived here):
+- The WMO 2010 guidance tabulates factors by exposure (at-sea, off-sea, off-land, in-land) [S24]. I did not see its exact numbers. From memory, its 3 s / 10 min factors are about 1.23, 1.38, 1.52 and 1.66 in that order (unverified - model knowledge; check Table 1.1 of the report before quoting them).
+- A good model is `G ≈ 1 + g I_u`. The peak factor g depends on the reference period: **g ≈ 3.0 for a 3 s gust within 1 h, and g ≈ 2.5 for a 3 s gust within 10 min.** The evidence:
+  - With I_u = 0.165, g = 3.0 gives 1.50. That matches Durst's 3 s / 1 h factor of about 1.52. Durst's 10 min / 1 h factor is about 1.07, so his 3 s / 10 min factor is about 1.43, which needs g = 2.6 (Durst values unverified - model knowledge). The 1.43 also agrees with [S27].
+  - Running this note's own u recurrence past a fixed mast gives g = 2.45-2.55 within 10 min and 2.95-3.15 within 1 h (derived here: I_u from section 3.2, time scale L_u/U from section 3.1, 3 s moving average, 300 ten-minute and 60 one-hour blocks per case).
+- At 2 m, I_u is larger, so G is larger too (derived here with g = 2.5 and g = 3.0):
 
-| Terrain | z0 (m) | G at 10 m | G at 2 m |
+| Terrain | z0 (m) | G at 10 m, within 10 min / 1 h | G at 2 m, within 10 min / 1 h |
 |---|---|---|---|
-| Sea | 0.0002 | 1.27 | 1.31 |
-| Open grass | 0.03 | 1.50 | 1.69 |
-| Low crops | 0.1 | 1.63 | 1.96 |
+| Sea | 0.0002 | 1.22 / 1.27 | 1.26 / 1.31 |
+| Open grass | 0.03 | 1.41 / 1.50 | 1.57 / 1.69 |
+| Low crops | 0.1 | 1.52 / 1.63 | 1.80 / 1.96 |
 
 **App use:** Dryden noise already produces gusts with these statistics, so scripted 1-cos events must not double-count them. Use them as rare, labelled "gust events" (a tutorial or a test button):
 - amplitude ΔU = 1.5 σ_u;
@@ -286,18 +290,21 @@ Allen built the model from balloon and surface data at Desert Rock, Nevada; the 
 ```
 w_bar(z) = w* (z/z_i)^(1/3) (1 - 1.1 z/z_i)                                  [S29]
 r2(z)    = max(10 m, 0.102 (z/z_i)^(1/3) (1 - 0.25 z/z_i) z_i)               (attributed to Lenschow in [S28]; coefficients unverified - model knowledge)
-w_peak   = 3 w_bar (r2^3 - r2^2 r1) / (r2^3 - r1^3),  r1/r2 ≈ 0.15 here       (unverified - model knowledge)
+r1/r2    = 0.0011 r2 + 0.14  for r2 < 600 m,  else 0.8  (r2 in metres)        (unverified - model knowledge)
+w_peak   = 3 w_bar (r2^3 - r2^2 r1) / (r2^3 - r1^3)                           (unverified - model knowledge)
 ```
 
 - Profile shape: roughly constant updraft inside r1, a smooth fall-off to r2, and a downdraft ring from r2 to 2r2. There is no influence beyond 2r2 [S29].
+- In Allen's paper the downdraft ring is switched on only for 0.5 < z/z_i < 0.9. Lower down, the compensating sink is a weak uniform "environment" sink spread between the thermals (unverified - model knowledge). At paper-plane heights (z/z_i < 0.03) the Allen model therefore has **no sink ring**.
 - Allen's version uses a bell shape with shape constants k1-k4 that depend on r1/r2 [S28][S29].
+- Validity: the fits come from measurements well above the surface. Using them at z/z_i ≈ 0.002 is an extrapolation, and the 10 m floor on r2 is a numerical guard rather than a measurement (unverified - model knowledge).
 
-Values with w* = 1.5 m/s and z_i = 1000 m (derived here):
+Values with w* = 1.5 m/s and z_i = 1000 m (derived here; r1/r2 runs from 0.151 to 0.170):
 
 | z (m) | 1 | 2 | 5 | 10 | 20 |
 |---|---|---|---|---|---|
 | w_bar (m/s) | 0.15 | 0.19 | 0.26 | 0.32 | 0.40 |
-| w_peak (m/s) | 0.38 | 0.48 | 0.65 | 0.82 | 1.02 |
+| w_peak (m/s) | 0.38 | 0.48 | 0.65 | 0.81 | 1.00 |
 | r2 (m) | 10.2 | 12.8 | 17.4 | 21.9 | 27.5 |
 
 A paper plane sinks at about 0.5-1 m/s, so a thermal at 2-10 m can measurably stretch a flight. That is defensible and fun, but it rarely produces sustained climb.
@@ -305,28 +312,30 @@ A paper plane sinks at about 0.5-1 m/s, so a thermal at 2-10 m can measurably st
 **Simpler shape for the game** (engineering choice):
 
 ```
-w(r) = w_peak · exp(-(r/R)^2) · (1 - (r/R)^2),   with R ≈ r2/1.5
+w(r) = w_peak · exp(-(r/R)^2) · (1 - (r/R)^2),   with R = r2
 ```
 
-- It has zero net mass flux (∫ w 2πr dr = 0, derived here), so it builds in its own sink ring.
+- It has zero net mass flux (∫ w 2πr dr = 0, derived here), so it builds in its own sink ring. The ring is a gameplay choice: Allen has none this low (see above).
+- **Use R = r2.** The updraft then ends at r2, as in Allen. Its mean over r < r2 is w_peak/e = 0.37 w_peak, 6 % below Allen's w_bar = 0.39 w_peak. The strongest sink is 0.135 w_peak at r = 1.41 r2, inside Allen's r2-2r2 ring (all derived here). A smaller R, such as r2/1.5, cuts the mean updraft over r < r2 to 0.105 w_peak, about a quarter of Allen's.
 - The core drifts with U(z). Lifetime of about 5-15 min is (unverified - model knowledge).
-- The Gedeon model also includes outer downdrafts [S31]. I could not confirm its exact equations.
+- This shape is the Gedeon thermal model (unverified - model knowledge). [S31] confirms only that the Gedeon model includes outer downdrafts.
 
 ### 5.3 Ridge and slope lift
 
-Two closed-form, mass-conserving fields (the formulas are derived from standard potential-flow theory):
+Three closed-form fields, derived from standard potential-flow theory. Each conserves mass in its pure form (uniform U):
 
-**(a) Gentle grassy hill: linear potential flow over a cosine bump.**
+**(a) Gentle grassy hills: linear potential flow over a row of cosine hills.**
 
 ```
-Hill:  z_s(x) = (H/2)(1 + cos kx),  |x| <= π/k,  wind in +x
+Terrain:  z_s(x) = (H/2)(1 + cos kx) for all x  (crest spacing 2π/k),  wind in +x
 u' = U a k cos(kx) e^{-k ζ}
 w  = -U a k sin(kx) e^{-k ζ}
 a = H/2,  ζ = height above local ground
 ```
 
-- Divergence-free (derived here). At the surface w/U equals the local slope, which is the kinematic boundary condition.
-- Replace U with the log-profile U(ζ). This hybrid is an approximation (engineering judgement).
+- With uniform U and ζ measured from the mean terrain level, the field is exactly divergence-free and irrotational (derived here). At the surface w/U equals the local slope, which is the kinematic boundary condition.
+- **It is the solution for an endless row of hills, not for one hill.** If it is switched on only for |x| ≤ π/k, the horizontal wind jumps by a·k·U at each foot of the hill: 0.31 U, about 1 m/s in the example below (derived here). Either keep the terrain periodic, or use the single ridge in (c).
+- Replace U with the log-profile U(ζ), with ζ above local ground. This hybrid keeps the flow tangent to the ground but no longer conserves mass exactly. The leftover divergence is second order in the slope; near the ground, where the shear is strong, it reaches about 0.7 of U10 a k² (derived here). That is acceptable for a wind field that is only sampled (engineering judgement).
 - Keep the maximum slope a·k ≤ 0.3 (about 17°). Steeper lee slopes separate (unverified - model knowledge).
 - Example (derived here): H = 15 m, half-width 75 m, so the maximum slope is 0.31 (17.4°). In U10 = 4.5 m/s over z0 = 0.03 m, w = 0.94 m/s at 2 m and 1.0 m/s at 5 m, with a crest speed-up of 29 %. A plane sinking at 0.8 m/s can just soar there.
 - For comparison, the simple estimate `w ≈ U(ζ) sin θ` gives the same value at the surface.
@@ -339,8 +348,22 @@ u = U (1 - (R/r)^2 cos 2φ),   w = -U (R/r)^2 sin 2φ
 
 - φ is measured from the downwind horizontal, so the windward face spans 90-180°.
 - At the surface w is largest at φ = 135°, where w = U. Away from the surface it decays as (R/r)².
-- Example (derived here): H_c = 25 m and U = 5.4 m/s at cliff-top height. 10-15 m upwind and above the top of the face, w = 1.7-2.7 m/s.
+- Example (derived here): H_c = 25 m. Along the φ = 135° diagonal, w/U = (R/r)² is 0.51, 0.39 and 0.32 at 10, 15 and 19 m from the surface. With U = 4.34 m/s at cliff-top height (the Coastal cliff preset) that is 2.2, 1.7 and 1.4 m/s; with U = 5.4 m/s it is 2.8, 2.1 and 1.7 m/s.
 - Real sharp-edged cliffs form a separation bubble on top. Inside it, within about 2 H_c downstream and H_c/2 high, double the sigmas and cut U by half (unverified - model knowledge).
+
+**(c) Single hill: linear potential flow over a bell-shaped ("Witch of Agnesi") ridge** (derived here from the same theory as (a); checked numerically to be divergence-free and irrotational, with w = U dz_s/dx at the surface).
+
+```
+Ridge:  z_s(x) = H b^2 / (x^2 + b^2)        b = half-width at half-height,  wind in +x
+D  = x^2 + (ζ + b)^2
+u' = U H b ((ζ + b)^2 - x^2) / D^2
+w  = -2 U H b (ζ + b) x / D^2
+```
+
+- The maximum slope is 0.650 H/b, at x = ±b/√3. The speed-up at the crest surface is H/b.
+- The field is smooth everywhere and fades with distance, so there is no edge to truncate.
+- The same U(ζ) substitution and slope limit apply as in (a).
+- Example (derived here): H = 15 m and b = 31 m give a maximum slope of 0.31 (17.4°). In U10 = 4.5 m/s over z0 = 0.03 m, at the steepest point w = 0.90 m/s at 2 m and 0.91 m/s at 5 m. The crest speed-up at 2 m is 43 %.
 
 ---
 
@@ -367,11 +390,12 @@ u = U (1 - (R/r)^2 cos 2φ),   w = -U (R/r)^2 sin 2φ
   - Open doors and destratification fans produce 0.3-1 m/s local drafts.
 - **Why records are indoors** (derived reasoning plus record facts):
   - A 0.1 m/s room drift is about 2 % of a 6 m/s glide speed.
-  - Outdoors at 2 m in Bft 2, σ_u is already 0.3-0.5 m/s and the gusts are about 1.7 times the mean.
-  - Current records:
+  - Outdoors at 2 m in Bft 2, σ_u is already 0.3-0.5 m/s and the gusts are about 1.6-1.7 times the mean.
+  - Records confirmed in this note's sources:
     - **Distance:** 88.31 m, 2 Dec 2022, Crown Point, Indiana, USA; A4 paper up to 100 gsm. The previous record was 77 m in April 2022 [S34].
     - **Time aloft:** 29.2 s, Takuo Toda, 19 Dec 2010, Japan. His earlier 27.9 s flight in 2009 used a taped plane [S35].
-  - I could not confirm the venue type for these flights or that Guinness *requires* indoor attempts.
+  - **These are no longer the current records** according to `02-flight-dynamics-validation.md` and `04-paper-and-competition-rules.md`. Those notes report 98.43 m (Shanghai, 28 Dec 2025) and 31.2 s (Kunshan, 11 Feb 2026), with their own sources. Take record values from those notes, not from this one.
+  - I could not confirm the venue type for these flights or that Guinness *requires* indoor attempts. Note 04 reports that Guinness and Red Bull Paper Wings attempts are held indoors in still air (its sources, not re-checked here).
 
 ---
 
@@ -389,6 +413,7 @@ u = U (1 - (R/r)^2 cos 2φ),   w = -U (R/r)^2 sin 2φ
    - The gust angle-of-attack change is `Δα ≈ w_g / V`. A 0.3 m/s gust gives 2.9° at 6 m/s but 0.25° at 70 m/s.
    - The sharp-edged-gust load factor is `Δn = ρ V a w_g / (2 W/S)` (formula unverified - model knowledge).
    - An A4 80 gsm sheet weighs 0.049 N (derived here). On roughly 0.014 m² of wing that is W/S ≈ 3.5 N/m². With a ≈ 2.5 /rad (low aspect ratio), Δn ≈ 0.77. An airliner (W/S ≈ 6000 N/m², V = 70 m/s, a = 5) gets 0.010. **The paper plane is about 70 times more sensitive.**
+   - That is the sharp-edged upper bound. A light plane also heaves with the gust: its heave time constant `2 (W/S) / (ρ V a g)` is 0.04 s, which is 0.24 m of travel (derived here). The usual alleviation factor is `K_g = 0.88 μ / (5.3 + μ)` with mass ratio `μ = 2 (W/S) / (ρ c a g)` (unverified - model knowledge). With c = 0.10 m the paper plane has μ = 2.4 and K_g = 0.27; the airliner (c = 5 m) has μ = 41 and K_g = 0.78. For a smooth gust the ratio is then about 25 (derived here). The 6-DOF simulation produces this effect by itself; the numbers are for explanation only.
 5. **Resonance.** The Lanchester phugoid period, `T ≈ π√2 V/g`, is 2.7 s at 6 m/s (formula unverified - model knowledge). The gust timescale L_u/V at 2 m is 15.4/6 = 2.6 s (derived here). Outdoor turbulence therefore drives the phugoid directly, which explains the porpoising seen in real outdoor flights.
 
 ---
@@ -406,9 +431,9 @@ Table values are derived here from the listed sources.
 |---|---|---|---|---|---|---|
 | **Classroom** (9×7×3 m) | 21 °C, 40 % → 1.1956 kg/m³, 1.818e-5 Pa s | 0.05 m/s, random horizontal direction, slowly wandering (OU, L = 3 m) | 0.04 / 0.04 / 0.03 m/s; OU with L = 1 m on all axes (V_s floor 0.3 m/s) | none | none. Optional radiator plume 0.15 m/s, R = 0.5 m; optional ceiling-diffuser jet 0.25-0.5 m/s in the top 0.5 m | ASHRAE 55 ≤ 0.15-0.20 m/s [S32]; ISO 7730 cat. A ≈ 0.10 m/s [S33] |
 | **Gymnasium** (40×25×8 m) | 18 °C, 45 % → 1.2082, 1.804e-5 | 0.10 m/s | 0.05 / 0.05 / 0.04 m/s; OU L = 3 m | optional "door opens" event: 1-cos to 0.5 m/s over 3 s, hold 5-10 s | none. Optional stratification +0.5 K/m (cosmetic) | ASHRAE 55 [S32]; draft and door values (unverified - model knowledge) |
-| **Calm meadow** | 24 °C, 50 % → 1.1813, 1.833e-5 | U10 = 1.5 m/s (Bft 1-2), z0 = 0.03 m → U(2 m) = 1.08 m/s, u* = 0.103 m/s | 0.25 / 0.20 / 0.13 m/s; 15.4 / 15.4 / 2.0 m | G(2 m) ≈ 1.7; event ΔU = 0.37 m/s, d_m = 8 m, every 30-90 s | Allen: w* = 1.5 m/s, z_i = 1000 m → w_peak 0.48 m/s at 2 m, 0.82 m/s at 10 m, r2 = 13-22 m; one thermal drifting with U(z) | [S8][S21][S14][S15][S28][S29][S30] |
-| **Breezy hill** | 15 °C, 60 % → 1.2203, 1.789e-5 | U10 = 4.5 m/s (Bft 3), z0 = 0.03 m → U(2 m) = 3.25 m/s, u* = 0.31 m/s | 0.74 / 0.59 / 0.39 m/s; 15.4 / 15.4 / 2.0 m (heights above local ground) | G ≈ 1.7; event ΔU = 1.1 m/s, d_m = 8 m | Cosine hill H = 15 m, half-width 75 m (17°): ridge lift w ≈ 0.94 m/s at 2 m, 1.0 m/s at 5 m; crest speed-up 29 %. Thermals off, or w* = 1 m/s | [S8][S21] + section 5.3(a) |
-| **Coastal cliff** | 16 °C, 80 % → 1.2142, 1.794e-5 | onshore U10 = 4 m/s over sea, z0 = 0.0002 m → U(H_c = 25 m) = 4.34 m/s | upstream 0.36 / 0.28 / 0.19 m/s (u* = 0.148 m/s), L as above; ×2 sigma and ×0.5 U in the cliff-top separation zone | G ≈ 1.3 upstream, ≈ 1.7 on top | Half-cylinder R = 25 m: w = U (R/r)² |sin 2φ| → 1.4-2.2 m/s 10-15 m in front of and above the face; plane can hover. No thermals (marine air) | [S8][S10][S21] + section 5.3(b); separation factors (unverified) |
+| **Calm meadow** | 24 °C, 50 % → 1.1813, 1.833e-5 | U10 = 1.5 m/s (Bft 1-2), z0 = 0.03 m → U(2 m) = 1.08 m/s, u* = 0.103 m/s | 0.25 / 0.20 / 0.13 m/s; 15.4 / 15.4 / 2.0 m | G(2 m) ≈ 1.6 within 10 min (1.7 within 1 h); event ΔU = 0.37 m/s, d_m = 8 m, every 30-90 s | Allen: w* = 1.5 m/s, z_i = 1000 m → w_peak 0.48 m/s at 2 m, 0.81 m/s at 10 m, r2 = 13-22 m; shape of section 5.2 with R = r2; one thermal drifting with U(z) | [S8][S21][S14][S15][S28][S29][S30] |
+| **Breezy hill** | 15 °C, 60 % → 1.2203, 1.789e-5 | U10 = 4.5 m/s (Bft 3), z0 = 0.03 m → U(2 m) = 3.25 m/s, u* = 0.31 m/s | 0.74 / 0.59 / 0.39 m/s; 15.4 / 15.4 / 2.0 m (heights above local ground) | G ≈ 1.6 within 10 min (1.7 within 1 h); event ΔU = 1.1 m/s, d_m = 8 m | Row of cosine hills, H = 15 m, half-width 75 m (17°): ridge lift w ≈ 0.94 m/s at 2 m, 1.0 m/s at 5 m; crest speed-up 29 %. For one hill, use the bell ridge with b = 31 m: 0.90 m/s at 2 m, 0.91 m/s at 5 m, crest speed-up 43 %. Thermals off, or w* = 1 m/s | [S8][S21] + section 5.3(a) and (c) |
+| **Coastal cliff** | 16 °C, 80 % → 1.2142, 1.794e-5 | onshore U10 = 4 m/s over sea, z0 = 0.0002 m → U(H_c = 25 m) = 4.34 m/s | upstream 0.36 / 0.28 / 0.19 m/s (u* = 0.148 m/s), L as above; ×2 sigma and ×0.5 U in the cliff-top separation zone | G ≈ 1.3 upstream, ≈ 1.7 on top | Half-cylinder R = 25 m: w = U (R/r)² · abs(sin 2φ) → 2.2 / 1.7 / 1.4 m/s at 10 / 15 / 19 m from the face along the 45° diagonal; plane can hover. No thermals (marine air) | [S8][S10][S21] + section 5.3(b); separation factors (unverified) |
 | *Wind tunnel* | user T; default 20 °C | uniform 0-15 m/s | optional Tu 0-5 % (OU, L = 0.2 m); a clean tunnel is < 0.5 % (unverified) | none | none | - |
 
 **Constants block:**
@@ -419,6 +444,8 @@ eps = 0.622 (factor 0.378); Magnus 610.94 Pa, 17.625, 243.04 °C
 z_ref = 10 m; W20 height = 6.096 m
 Dryden: 0.177, 0.000823/ft (0.0027/m), exponents 0.4 and 1.2; sigma_w = 0.1 W20
 Similarity: 2.4, 1.9, 1.25 x u*
+Gust peak factor g (3 s gust): 2.5 within 10 min, 3.0 within 1 h
+Thermal: r1/r2 = 0.0011 r2 + 0.14; game shape radius R = r2
 Clamps: h_eff >= max(1 m, d + 10 z0); sigma_w taper below 0.5 m; V_s >= max(0.3 m/s, sigma_u)
 ```
 
@@ -426,7 +453,7 @@ Clamps: h_eff >= max(1 m, d + 10 z0); sigma_w taper below 0.5 m; V_s >= max(0.3 
 
 ## Open questions and limits
 
-- **Evidence quality:** no source document was opened in full, because the fetch tool was blocked. These items rest on model knowledge or partial snippets and should get a human check against the primary documents before release:
+- **Evidence quality:** no source document was opened in full, because the fetch tool was blocked, and the fact-check pass could not open any either. These items rest on model knowledge or partial snippets and should get a human check against the primary documents before release:
   - exact MIL spectra and transfer functions;
   - Allen's r2, r1/r2 and w_peak relations, plus the k1-k4 constants;
   - the ISO 7730 DR equation;
@@ -435,10 +462,10 @@ Clamps: h_eff >= max(1 m, d + 10 z0); sigma_w taper below 0.5 m; V_s >= max(0.3 
   - roughness classes at 0.005 m and at 1.0 m and above.
 - **No validated near-ground cutoff** was found for Dryden. The clamps in section 3.3 are engineering judgement.
 - **Mixed sigma sources:** taking similarity sigmas with Dryden length scales is a pragmatic hybrid. Near-neutral sigma_u/u* varies from 2 to 3 [S21]. Stability (sunny versus overcast) is not modelled.
-- **Ridge and cliff fields are inviscid idealisations.** The log-profile substitution for U is not exact, and real separation is unsteady.
+- **Ridge and cliff fields are inviscid idealisations.** The log-profile substitution for U does not conserve mass exactly (section 5.3), and real separation is unsteady.
 - **Thermal lifetimes, spacing and near-surface inflow** (radial convergence `u_r = -(r/2) ∂w/∂z`) are not modelled. They are cheap to add if wanted.
 - **Indoor flows** (diffuser jets, door drafts) depend strongly on the room. The values given are typical, not measured for a specific room.
-- **Record venues and rules:** whether Guinness requires indoor attempts was not confirmed (see `04-paper-and-competition-rules.md`).
+- **Records, venues and rules:** this note's record values are out of date and its sources did not confirm the indoor requirement. `04-paper-and-competition-rules.md` is the reference for both.
 - **Paper humidity effects** (mass and stiffness) are likely larger than the air-density effect, but they belong to the paper model.
 
 ## Sources
@@ -480,3 +507,51 @@ Clamps: h_eff >= max(1 m, d + 10 z0); sigma_w taper below 0.5 m; V_s >= max(0.3 
 35. [S35] Guinness World Records (JP), Longest time flying a paper aircraft - https://www.guinnessworldrecords.jp/world-records/longest-time-flying-a-paper-aircraft ; Japan Times (2009) - https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/ ; The Register (2009) - https://www.theregister.com/2009/12/29/paper_plane_record/ ; humid-conditions attempt - https://reuters.screenocean.com/record/467151 , https://www.dailymotion.com/video/xc8t51
 36. [S36] ScienceDirect Topics, "Continuous Turbulence" (low-altitude Dryden L forms) - https://www.sciencedirect.com/topics/engineering/continuous-turbulence
 37. [S37] arXiv 1905.09954, "Spatio-Temporal Wind Modeling for UAV Simulations" (von Kármán forms) - https://arxiv.org/pdf/1905.09954
+
+## Verification notes
+
+Fact-check pass, 9 Nov 2026.
+
+**How it was checked.** No source could be opened in this pass. WebFetch failed for every host tried (mathworks.com, ntrs.nasa.gov; the proxy refused wikipedia.org and arxiv.org), and the shared web-search budget was already spent, so no search ran. Every `[S#]` therefore still rests on the original author's search-result extracts. The checks below are hand re-derivations, throwaway numerical scripts, and comparison with the sibling research notes. Where I add a fact from memory, it carries "(unverified - model knowledge)".
+
+**Checked and found correct.** There are 22 numbered items in all: 15 confirmed here and 7 changed below.
+
+| # | Claim | How checked | Result |
+|---|---|---|---|
+| 1 | Moist-air density, Sutherland and Magnus formulas; table in 1.3; the five preset air values in section 8 | Recomputed every cell | All reproduce. R_d = 8314.32/28.9644 = 287.053; exponent g0 M/(R* L) = 5.25588; L/T0 = 2.25577e-5 |
+| 2 | Log-law table in 2.2, u*/U10, equivalent alpha in 2.3, Counihan 0.13, "at 2 m" Beaufort column | Recomputed | All reproduce |
+| 3 | Dryden low-altitude table in 3.1; SI form with 0.0027 per metre | Recomputed in feet and in metres | Identical to 4 figures |
+| 4 | MIL-F-8785C and MIL-HDBK-1797 transverse spectra are the same once L_HDBK = L_8785C/2 | Algebra, then numerically | Identical; each integrates to sigma² |
+| 5 | Transfer functions H_u and H_w | Integrated \|H\|² over ω | Equal sigma²; normalisation note added |
+| 6 | Euler difference equation overstates variance by 1/(1 - x/2) | Stationary variance of the AR(1) | Confirmed: +5.3 % at x = 0.1, +11.1 % at x = 0.2 |
+| 7 | Exact 2-state recurrence for v and w | Re-derived: A = [[0,1],[-1,-2]], noise on state 2 with intensity 2, stationary covariance I, output (s1 + √3 s2)/2. Checked Q = I - ΦΦᵀ and the discrete Lyapunov solution | Exact. Autocorrelation matches (1 - ξ/2L)e^(-ξ/L) to 1e-16 |
+| 8 | Small-τ series for Q | Stationary variance with the series at τ = 1e-3 to 1e-6 | Error below 2e-6. The plain formula fails near τ = 1e-6 |
+| 9 | OU substitute with L/2 for v and w | Integral of the transverse correlation; spectral level at zero frequency | Both give L_OU = L/2 |
+| 10 | Similarity versus Dryden cross-check in 3.2 | Recomputed | 0.25 vs 0.27 m/s and 0.44 vs 0.94 m/s reproduce. Extra check: over grass 1.25 u* = 0.094 W20, against the MIL 0.1 W20 |
+| 11 | ISO 7730 limits 0.10 / 0.16 / 0.22 m/s | Solved the DR equation | 0.099 / 0.162 / 0.221 m/s |
+| 12 | Cosine-hill example (0.94 and 1.0 m/s, 29 %, 17.4°) | Recomputed | Reproduces |
+| 13 | Half-cylinder field | Re-derived from the polar form of the cylinder solution | Correct |
+| 14 | Wind-gradient, launch, load-factor and phugoid numbers in section 7 | Recomputed | All reproduce (ratio 73.6) |
+| 15 | Zero net flux of the game thermal shape | Integrated | Zero |
+
+**Changed.**
+
+| # | Was | Now | Why |
+|---|---|---|---|
+| 16 | Peak factor g ≈ 3 "for a 3 s gust in 10 min"; one G table | g ≈ 3.0 within 1 h, g ≈ 2.5 within 10 min; table gives both; "about 1.7" statements now say 1.6 (10 min) / 1.7 (1 h) | The note's own cited 3 s / 10 min values (1.38-1.43) need g = 2.3-2.6. Simulating the section 3.4 recurrence at a fixed mast gave g = 2.45-2.55 (10 min) and 2.95-3.15 (1 h). The old value mixed the two reference periods |
+| 17 | Game thermal radius R ≈ r2/1.5 | R = r2 | With r2/1.5 the updraft ends at 0.67 r2 and carries about a quarter of Allen's mean updraft. R = r2 matches Allen's outer radius and mean updraft to 6 % |
+| 18 | "r1/r2 ≈ 0.15 here"; w_peak 0.82 and 1.02 m/s at 10 and 20 m | r1/r2 formula written out; 0.81 and 1.00 m/s | The formula was missing from the code block. With it, r1/r2 is 0.164 and 0.170 at those heights |
+| 19 | Allen profile described as always having a sink ring | Ring exists only for 0.5 < z/z_i < 0.9 in Allen; none at paper-plane heights | From memory of the paper (unverified - model knowledge). The game shape's ring is now labelled a gameplay choice |
+| 20 | Cosine hill presented as one hill, "divergence-free" | Stated as a row of hills; truncation and mass-conservation limits spelled out; single bell ridge added as 5.3(c) | Truncating the periodic solution to one hill leaves a wind step of 0.31 U at each foot. With U(ζ) above local ground the computed divergence reaches about 0.7 of U10 a k² near the ground. The bell-ridge field was derived and checked numerically |
+| 21 | Cliff lift "1.7-2.7 m/s (or 1.4-2.2 m/s) 10-15 m" from the face | 2.2 / 1.7 / 1.4 m/s at 10 / 15 / 19 m along the 45° diagonal for the preset | The old range matched 10-19 m, not 10-15 m, and the example used a different U from the preset |
+| 22 | "Current records" 88.31 m and 29.2 s | Marked as superseded, pointing to notes 02 and 04 | Those notes report 98.43 m (28 Dec 2025) and 31.2 s (11 Feb 2026) with sources. I could not check either set online |
+
+Smaller fixes: the CIPM-2007 enhancement factor is about 1.004, not 1.0006 (1.00062 is its constant term; from memory). ISA temperature at 1609 m is 4.5 °C, not 4.7 °C. The "70 times more gust-sensitive" figure is now labelled a sharp-edged upper bound, with about 25 once gust alleviation is counted.
+
+**Still uncertain.**
+
+- **No citation was re-opened.** Nothing was found to be fabricated, but nothing could be confirmed either. The [S8] address ends in "18.03:_Section_4-", which looks like a truncated or auto-generated page name; check that it resolves.
+- These constants match my own recollection but have no opened source in either pass: the Dryden coefficients (0.177, 0.000823, exponents 0.4 and 1.2, sigma_w = 0.1 W20) and the spectra; Allen's 0.102, 0.25, 10 m, 0.0011, 0.14 and the w_peak relation; the ISO 7730 DR equation; Davenport classes at 0.005 m and 1.0 m; Sutherland and Magnus coefficients; Beaufort bands. Agreement between two recollections is weak evidence.
+- New items added from memory in this pass: the Durst factors 1.52 and 1.07, the WMO gust factors, Allen's height range for the sink ring, the Gedeon attribution, the K_g alleviation formula, and the CIPM Z and f values.
+- The gust peak factors come from an Ornstein-Uhlenbeck process, which is what the app will run. Real wind has a different spectrum, so the real g may differ by a few tenths.
+- The 5.3 fields ignore the boundary layer, stratification and separation. The near-ground clamps in 3.3 and all indoor "typical" values remain engineering judgement.

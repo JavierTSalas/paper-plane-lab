@@ -2,7 +2,7 @@
 
 Research note for **Paper Plane Lab** (physics core + leaderboards). Date: 2026-11-09.
 
-> **How sources were checked.** WebFetch to guinnessworldrecords.com, redbull.com and cl.cam.ac.uk was blocked by this session's network policy, so every tag below points to a URL whose content was confirmed **through search-engine result text**, not by opening the page in full. Numbers that are my own arithmetic from tagged inputs are marked **(derived)** and show the formula. Claims I could not find online are marked **(unverified - model knowledge)**.
+> **How sources were checked.** WebFetch to guinnessworldrecords.com, redbull.com and cl.cam.ac.uk was blocked by this session's network policy, so every tag below points to a URL whose content was confirmed **through search-engine result text**, not by opening the page in full. Numbers that are my own arithmetic from tagged inputs are marked **(derived)** and show the formula. Claims I could not find online are marked **(unverified - model knowledge)**. A later fact-check pass re-derived every formula and number and traced the dart folds numerically, but had no web access at all, so no source was re-opened; see **Verification notes** at the end.
 
 ## Summary for implementers
 
@@ -11,7 +11,7 @@ Research note for **Paper Plane Lab** (physics core + leaderboards). Date: 2026-
 3. **Paper is not rigid at paper-plane loads.** Effective bending stiffness per unit width of one layer: D_MD ≈ 3.7×10⁻⁴ N·m, D_CD ≈ 1.8×10⁻⁴ N·m (derived from L&W data [S7], ±30 %). An unsupported single-layer 80 mm wing panel would deflect by centimetres at 1 g, and launch loads reach about 10 g. Rigid-body results are valid only for multi-layer, creased, braced wings. Say this in the UI.
 4. **Creases relax.** Fold angles reopen quickly at first, then logarithmically in time [S17][S18][S19]. Trim folds (elevator, dihedral) drift. This is a real but second-order effect, so treat it as cosmetic or optional.
 5. **Surface roughness does not matter.** Copy paper is aerodynamically smooth at Re ≈ 10⁴–10⁵: Re_k ≲ 13 against a critical ~600 [S27]. Model skin friction as a smooth plate. Layer steps and blunt folded edges matter much more.
-6. **Official scoring.** Distance is measured from a base point on the launch line to the **first** point where the plane touches the ground **or any object**. Airtime runs from leaving the hand to the **first** contact with the ground or any object. Both are indoors in still air, hand-thrown from behind a line, with no run-up [S32][S33][S30].
+6. **Official scoring.** Red Bull wording: distance is measured from a base point on the launch line to the **first** point where the plane touches the ground **or any object**; airtime runs from leaving the hand to the **first** contact with the ground or any object [S32][S33]. GWR's measuring text is not public; the app assumes the same first-touch convention for GWR-style boards (assumption). Both bodies require an indoor, still-air venue and a hand throw from behind a line [S30][S31][S32]. **"No run-up" is a Red Bull rule only** [S32]; it is not confirmed for GWR (§5.1).
 7. **Current records:** distance **98.43 m** (Liu Liwen et al., Shanghai, 28 Dec 2025) [S28][S37]; airtime **31.2 s** (seven-person Chinese team, Kunshan, 11 Feb 2026) [S29][S40].
 8. Leaderboards: offer "GWR-style" and "Red Bull-style" Distance and Airtime under fixed indoor still-air conditions (23 °C, 50 % RH, ISO 187 [S13]). Outdoor and wind results go on a separate, unofficial board.
 
@@ -64,7 +64,7 @@ So 80 g/m² office paper is **93–114 µm thick, typically 104–110 µm**. App
 Formulas: `m_sheet [kg] = G [kg/m²] · w [m] · h [m]`, `t = G / ρ`. Real caliper at a given grammage varies with density by about ±8 %, and heavier premium papers are often denser. The derived calipers are therefore estimates.
 
 **Recommended single default: G = 80 g/m², t = 0.106 mm.** Reasons:
-- It is the dominant office grade worldwide (A4 80 g/m²), and it is within 6 % of US 20 lb.
+- It is the dominant office grade worldwide (A4 80 g/m²), and it is 6.4 % heavier than US 20 lb (80 / 75.2, derived).
 - Both record bodies allow it, since both set the limit at 100 g/m² [S28][S31][S32].
 - The caliper is the median of the measured data sheets.
 
@@ -95,9 +95,11 @@ The l = 10 mm assumption is required for consistency: l = 50 mm would imply E �
 
 | Load case (single layer, D_CD = 1.8×10⁻⁴ N·m) | L = 50 mm | L = 80 mm |
 |---|---|---|
-| Self-weight 0.785 N/m² | 3.4 mm | 22 mm |
-| 1 g flight, p = 2.2 N/m² | 9.5 mm | 63 mm (outside validity) |
-| 5 g launch, p = 11 N/m² | 48 mm | >> L (outside validity) |
+| Self-weight, plane held by the keel, p = G·g = 0.785 N/m² | 3.4 mm | 22 mm † |
+| 1 g flight, net p = W/S − G·g = 1.4 N/m² | 6.1 mm † | 40 mm † |
+| 5 g launch, net p = 5·1.4 = 7.0 N/m² | 30 mm † | >> L † |
+
+† δ/L > 0.1, so the entry is outside small-deflection validity. Linear theory overestimates there; read these as "large", not as a number to code. In flight the panel's own weight (inertia) opposes lift, so the bending load on a single-layer panel is n·(W/S − G·g), not n·W/S, assuming lift is spread evenly over the wing (derived). Using the gross n·W/S (2.2 and 11 N/m²) would give 9.5 / 63 mm and 48 mm, about 1.6× too much.
 
 - **Launch load factor** (derived): `n = q·C_L / (W/S)`, with `q = ½ρV²`. At V = 20 m/s, q = 238 Pa, so **each 0.01 of C_L adds ≈ 1.1 g** at W/S = 2.2 N/m². A hard throw at C_L = 0.1 loads the wings to ~10 g. This is why record distance planes are thrown fast at near-zero lift and are folded thick and stiff. The 2022 team chose a "low-drag" design and a ~40° launch angle [S42].
 - **Layers stiffen.** n stacked layers that can slide give D ≈ n·D₁. Layers locked by creases or tape give up to D ≈ n³·D₁ (unverified - model knowledge, standard plate theory). A 4-layer locked leading edge is up to 64× stiffer than one layer. Creases and dihedral also add geometric stiffness, because a V-section resists bending far better than a flat plate.
@@ -129,9 +131,9 @@ The l = 10 mm assumption is required for consistency: l = 50 mm would imply E �
 ## 4. Surface roughness and skin friction
 
 - Paper roughness is measured as air leakage: Bendtsen in ml/min, Bekk in s, Parker Print-Surf (PPS) in µm. None of these is a profilometer Ra [S24]. 80 g/m² office papers measure **80–300 ml/min Bendtsen** [S7][S8][S9][S12]. Uncoated office paper is typically PPS ≈ 4–7 µm (unverified - model knowledge), so take an equivalent roughness height **k ≈ 5–10 µm**.
-- **Laminar transition test.** Roughness trips a laminar boundary layer only when `Re_k = u_k·k/ν` reaches ~600 (Braslow & Knox; isolated elements 325–1000) [S27]. Using the free-stream U as an upper bound for u_k, with k = 10 µm and ν = 1.53×10⁻⁵ m²/s: Re_k ≤ 3.3 at 5 m/s and ≤ 13 at 20 m/s (derived). That is two orders of magnitude below critical.
-- **Turbulent test.** Surfaces are hydraulically smooth for k_s⁺ < 5 and fully rough above ~60–70 [S25]. Schlichting's admissible roughness has the form `k_adm ≈ 100·ν/U` (a newer analysis argues for a 3× tighter bound) [S26]. That gives k_adm = 307 µm at 5 m/s and 77 µm at 20 m/s (derived), well above paper's ~10 µm.
-- For scale, the Blasius laminar thickness `δ ≈ 5.0·x/√Re_x` is ≈ 2.7 mm at x = 0.1 m and 5 m/s (unverified - model knowledge). Paper roughness is ~0.4 % of that.
+- **Laminar transition test.** Roughness trips a laminar boundary layer only when `Re_k = u_k·k/ν` reaches ~600 (Braslow & Knox; isolated elements 325–1000) [S27]. Using the free-stream U as an upper bound for u_k, with k = 10 µm and ν = 1.54×10⁻⁵ m²/s: Re_k ≤ 3.2 at 5 m/s and ≤ 13 at 20 m/s (derived). That is two orders of magnitude below critical.
+- **Turbulent test.** Surfaces are hydraulically smooth for k_s⁺ < 5 and fully rough above ~60–70 [S25]. Schlichting's admissible roughness has the form `k_adm ≈ 100·ν/U` (a newer analysis argues for a 3× tighter bound) [S26]. That gives k_adm = 308 µm at 5 m/s and 77 µm at 20 m/s (derived), well above paper's ~10 µm.
+- For scale, the Blasius laminar thickness `δ ≈ 5.0·x/√Re_x` is ≈ 2.8 mm at x = 0.1 m and 5 m/s (formula: unverified - model knowledge; value derived, Re_x = 3.25×10⁴). Paper roughness is ~0.4 % of that.
 - **Conclusion: treat paper as aerodynamically smooth.** Use smooth flat-plate laminar friction, e.g. Blasius mean `C_f = 1.328/√Re_L` per wetted side for Re_L ≲ 5×10⁵ (unverified - model knowledge; the aero research note owns the final friction law).
 - What does matter: **layer steps** (0.106 mm each), **blunt multi-layer leading edges** (0.4–0.9 mm for 4–8 layers), sharp folded edges that fix separation, and tape edges.
 
@@ -147,9 +149,9 @@ GWR does not publish its full guidelines; they are issued to applicants. Public 
 | Modification | Folded only: no glue, tears or cuts [S31] | Reported: "can be cut but not spliced" [S40] (conflicts with [S31]; the categories may differ) |
 | Tape | One small piece of clear tape, **25 mm × 30 mm** [S31] | Tape area ≤ **2.5 × 3 cm** [S40] |
 | Venue | Indoors [S31]. Record page describes a plane with "clear recognisable wings" [S28] | Indoors in a "closed-air environment" [S30] |
-| Launch | Hand throw from behind a line; a foot crossing the line disqualifies [S31] | Hand launch. Record attempts throw nearly straight up (Blackburn: baseball-style throw [S47]) |
+| Launch | Hand throw from behind a line; a foot crossing the line disqualifies [S31]. **Run-up: no source found.** Footage of the 2012 and 2022 record throws shows the thrower taking a few steps before release (unverified - model knowledge), so do not code "no run-up" as a GWR rule | Hand launch. Record attempts throw nearly straight up (Blackburn: baseball-style throw [S47]) |
 | Attempts | Not public | Toda's attempts followed GWR rules allowing **10 tries** [S49] |
-| Timing/measuring | Not public | One search summary of the GWR page says time is recorded to the nearest 0.01 s (not confirmed) |
+| Timing/measuring | Not public. Published distance records are quoted to 0.01 m (69.14, 88.31, 98.43 m) or 0.001 m (77.134 m) [S28][S57] | One search summary of the GWR page says time is recorded to the nearest 0.01 s (not confirmed). The four GWR airtime records in §6 are all quoted to **0.1 s** (27.6, 27.9, 29.2, 31.2 s) [S29][S47][S48]; some pre-1998 records were quoted to 0.01 s, e.g. 16.89 s (unverified - model knowledge) |
 
 Other GWR paper-plane titles require an "unmodified, flat, standard A4" sheet (fold-and-throw skills record) [S58].
 
@@ -163,7 +165,7 @@ Sources are the official rules page [S32] and the 2022 World Final rules [S33]. 
 | Modification | **Folding only**: no ripping, gluing, cutting, stapling or ballast [S33]. No tape |
 | Launch | Thrown **unaided from behind a straight launch line**. Touching the line or beyond during launch makes the attempt invalid. **No run-up or fast walk; no ramps or devices** [S32] |
 | Distance measurement | Measured from the **base point on the starting line** to the **first point where the plane hits the ground or any object**, by standard tape or laser/video [S32] |
-| Airtime measurement | From the moment the plane **leaves the hand** to its **first contact with the ground or any object** [S32][S33]. One summary says results are counted in tenths of a second; published results use 0.01 s (e.g. 14.06 s) [S33] |
+| Airtime measurement | From the moment the plane **leaves the hand** to its **first contact with the ground or any object** [S32][S33]. One summary says results are counted in tenths of a second; published results use 0.01 s (e.g. the 14.86 s winning time, §6) [S33][S34] |
 | Attempts | Two distance throws, best counts (secondary sources) [S55] |
 | Venue | Indoors without wind. World Final at Hangar-7, Salzburg [S33] |
 | Aerobatics | Judged on creativity, submitted as video [S33] |
@@ -175,20 +177,20 @@ Sources are the official rules page [S32] and the 2022 World Final rules [S33]. 
 | Record | Value | Who | Where / when | Plane, paper, notes | Source |
 |---|---|---|---|---|---|
 | **Farthest flight (current)** | **98.43 m** (322 ft 11 in) | Liu Liwen (thrower), with Tang Shuai, Yang Shian, Huang Yizhou, Qiao Yuchen, Wang Chenghao (China) | Shanghai, 28 Dec 2025. Shanghai Automobile Exhibition Center, Jiading [S37] | New design named "Research". Record came on the 9th throw of the team's 3rd attempt day. Paper stock not published | [S28][S37][S38][S50] |
-| Previous distance | 88.31 m (289 ft 9 in) | Dillon Ruble, with Nathaniel Erickson and Garrett Jensen (USA, Boeing engineers) | Crown Point, Indiana, 2 Dec 2022 | "Mach 5" (hypersonic-inspired, low-drag). A4 at **100 g/m²**. Launch ≈ 40°, 3rd throw, folding takes >20 min | [S28][S42][S43][S44] |
+| Previous distance | 88.31 m (289 ft 9 in) | Dillon Ruble, with Nathaniel Erickson and Garrett Jensen (USA, Boeing engineers) | Crown Point, Indiana, 2 Dec 2022 | "Mach 5" (hypersonic-inspired, low-drag). A4 at **100 g/m²**. Launch ≈ 40°, 3rd throw, folding takes >20 min. GWR may list the value to the millimetre as 88.318 m (unverified - model knowledge); 289 ft 9 in = 88.32 m | [S28][S42][S43][S44] |
 | Earlier distance | ≈ 77 m (77.134 m; 252 ft 7 in in one report) | Kim Kyu Tae, Shin Moo Joon, Chee Yie Jian | South Korea, Apr 2022 | – | [S57][S59] |
 | Earlier distance | 69.14 m (226 ft 10 in) | Joe Ayoob (thrower); design by John M. Collins | McClellan AFB hangar, near Sacramento, 26 Feb 2012 | "Suzanne" glider, single uncut A4 sheet | [S45][S46] |
 | Earlier distance | 63.19 m (2003, Stephen Krieger; spelled "Kreiger" in some reports); 58.82 m (May 1985, Tony Felch, first GWR distance record) | – | – | – | [S30] |
 | **Longest time aloft (current)** | **31.2 s** | Tang Shuai, Yang Shian, Liu Liwen, Wang Chenghao, Rao Chongyi, Pan Zichen, Jia Siyi (China) | Kunshan Sports Center, Jiangsu, 11 Feb 2026 | Team brought its 10 best designs. Individual flights reported as 31.15–31.25 s. Design and paper not published | [S29][S39][S40] |
 | Previous time | 29.2 s | Takuo Toda (Japan) | Fukuyama City, Hiroshima, 19 Dec 2010 | One secondary source names the design "Zero Fighter" (unconfirmed) | [S29][S41] |
 | Earlier time | 27.9 s (2009, Toda, "Sky King"); 27.6 s (8 Oct 1998, Ken Blackburn, Georgia Dome, Atlanta) | – | – | Blackburn's "World Record Paper Airplane" glider, thrown straight up | [S47][S48] |
-| Red Bull World Final 2022 | Distance **61.11 m**; airtime **14.86 s** (super final; 16.66 s qualifying is a Red Bull record, single-sourced) | Lazar Krstić (Serbia); Rana Muhammad Usman Saeed (Pakistan) | Hangar-7, Salzburg, May 2022 | Runner-up distance 57.07 m (Yicheng Sun, GB) | [S34][S35][S36] |
+| Red Bull World Final 2022 | Distance **61.11 m**; airtime **14.86 s** (super final; 16.66 s qualifying is a Red Bull record, single-sourced) | Lazar Krstić (Serbia); Rana Muhammad Usman Saeed (Pakistan) | Hangar-7, Salzburg, May 2022 | A 57.07 m distance throw by Yicheng Sun (GB) is also reported, but his placing is unconfirmed (unverified): this note first called it the runner-up, while the URL of [S36] reads "yorkshire-student-comes-sixth", which may refer to him. Do not use it as a reference value | [S34][S35][S36] |
 
 Other titles: GWR lists a "farthest distance to hit a target with a paper aircraft" record (Raman Suri, Cranfield University, 26 May 2026, ~20 m per one summary) [S56]. The largest-paper-aircraft title has passed from TU Braunschweig (2013) to a University of Pisa team (no size figure confirmed) [S30].
 
 ## 7. Finished dimensions and mass distribution of classic designs
 
-Published measurements are scarce. The dart has been studied in water-tunnel and LES work by Ng, Kng, Pey & Schlüter (AIAA 2009-3958) and Schlüter (Proc. IMechE G 228(4):567–576, 2014). They found that its high-sweep delta gives high C_L at low Re and that the centre fold (keel) improves performance [S51][S52]. A CFD study reports the dart's "aspect ratio" as 0.5408 [S53]. That number matches **b/c_root**, not b²/S. For a delta, b²/S = 2·b/c_root, which gives ≈ 1.1. Thin-plate glider studies find an optimum centre-of-mass position and maximum glide ratios of ~3–4 [S54].
+Published measurements are scarce. The dart has been studied in water-tunnel and LES work by Ng, Kng, Pey & Schlüter (AIAA 2009-3958) and Schlüter (Proc. IMechE G 228(4):567–576, 2014). They found that its high-sweep delta gives high C_L at low Re and that the centre fold (keel) improves performance [S51][S52]. A CFD study reports the dart's "aspect ratio" as 0.5408 [S53]. That number matches **span / overall length (b/L)**, not b²/S. For a pure delta whose root chord is the overall length, b²/S = 2·b/L, which gives ≈ 1.1. Thin-plate glider studies find an optimum centre-of-mass position and maximum glide ratios of ~3–4 [S54].
 
 **Derived A4 classic dart geometry** (my fold computation, for validating the engine's mass and CG code). Steps: (1) top corners to the centre line; (2) new slanted edges to the centre line (22.5° fold lines); (3) fold in half; (4) wing folds parallel to the keel at keel depth k = 25 mm.
 
@@ -198,13 +200,13 @@ Published measurements are scarce. The dart has been studied in water-tunnel and
 | Span b (flat wings) | 160 mm | 166 mm |
 | Wing root chord at fold / tip chord | 236.6 / 43.5 mm | 219.0 / 18.8 mm |
 | Wing area S (both wings) | 0.0224 m² | 0.0197 m² |
-| Aspect ratio b²/S (b/c_root) | 1.14 (0.54) | 1.40 (0.59) |
+| Aspect ratio b²/S (span / overall length b/L) | 1.14 (0.54) | 1.40 (0.59) |
 | Mass at 80 g/m² | 4.990 g | 4.826 g |
 | Wing loading W/S | 2.18 N/m² | 2.40 N/m² |
 | **CG aft of nose** (nose folds only; later folds are parallel to the axis) | **159.8 mm = 53.8 % L** | **152.4 mm = 54.6 % L** |
 | Wing MAC / quarter-MAC aft of nose | 162 mm / 175 mm | 147 mm / 169 mm |
 
-The CG sits ≈ 15 mm (≈ 9 % MAC) ahead of the quarter-MAC point. Low-AR delta wings have their aerodynamic centre aft of quarter-MAC, so the dart is statically stable (unverified - model knowledge). Glide-speed check: `V = √(2(W/S)/(ρ·C_L))` = 2.7 m/s at C_L = 0.5. Re on the MAC is 2.9×10⁴ at 2.7 m/s and 8.5×10⁴ at 8 m/s (derived). This matches the planned Re range. Dimensions for "Suzanne", "Mach 5" and "Research" are not published online; they are in Collins's book, or not public.
+The CG sits 15.5 mm (9.5 % MAC) ahead of the quarter-MAC point on A4 and 16.7 mm (11.4 % MAC) on Letter (derived). Low-AR delta wings have their aerodynamic centre aft of quarter-MAC, so the dart is statically stable (unverified - model knowledge). Glide-speed check: `V = √(2(W/S)/(ρ·C_L))` = 2.7 m/s at C_L = 0.5 (A4). Re on the A4 MAC is 2.9×10⁴ at 2.7 m/s and 8.4×10⁴ at 8 m/s (derived). This matches the planned Re range. Dimensions for "Suzanne", "Mach 5" and "Research" are not published online; they are in Collins's book, or not public.
 
 ## 8. RECOMMENDED APP CONSTANTS
 
@@ -220,7 +222,7 @@ The CG sits ≈ 15 mm (≈ 9 % MAC) ahead of the quarter-MAC point. Low-AR delta
 | `PAPER_ROUGHNESS_K` | 1×10⁻⁵ m (treated as smooth) | §4 |
 | `LAYER_GAP_RENDER` | = thickness per layer | geometric |
 | `TAPE_PIECE` (optional, GWR only) | 25 × 30 mm | [S31][S40] |
-| `AIR_STD` (ISO 187: 23 °C, 50 % RH, 101.325 kPa) | ρ = 1.19 kg/m³, μ = 1.83×10⁻⁵ Pa·s, ν = 1.53×10⁻⁵ m²/s | [S13]; ideal gas + Sutherland (derived) |
+| `AIR_STD` (ISO 187: 23 °C, 50 % RH; 101.325 kPa is an app choice, since ISO 187 fixes temperature and humidity only (unverified - model knowledge)) | ρ = 1.19 kg/m³ (dry air 1.192, at 50 % RH 1.186), μ = 1.83×10⁻⁵ Pa·s, ν = μ/ρ = 1.54×10⁻⁵ m²/s. Compute ν from μ and ρ in code; do not store a third rounded constant | [S13]; ideal gas + Sutherland (derived) |
 
 **Paper sizes** (portrait w × h; mass = 0.080 × w × h)
 
@@ -242,8 +244,8 @@ The CG sits ≈ 15 mm (≈ 9 % MAC) ahead of the quarter-MAC point. Low-AR delta
 
 | Category | Paper / build | Launch | Environment | Score | Basis |
 |---|---|---|---|---|---|
-| **GWR Distance** | A4, one sheet, folds only, no cuts; optional one 25×30 mm tape | Hand throw from behind line, no run-up; line foul voids attempt | Indoor hangar, still air, ISO 187 air | Ground distance from base point to first contact with ground or any object, 0.01 m. Best of N | [S28][S31][S32] |
-| **GWR Airtime** | A4, one sheet, ≤ 1 tape piece | Hand throw (any angle) | Indoor tall arena, still air; walls and ceiling are colliders | Release to first contact with ground or any object, 0.01 s | [S29][S30][S40] |
+| **GWR Distance** | A4, one sheet, folds only, no cuts; optional one 25×30 mm tape | Hand throw from behind line; line foul voids attempt. Run-up is not confirmed either way for GWR (§5.1), so treat it as a launch-speed preset, not a rule | Indoor hangar, still air, ISO 187 air | Ground distance from base point to first contact with ground or any object, 0.01 m (first-touch convention assumed from Red Bull wording). Best of N | [S28][S31][S32] |
+| **GWR Airtime** | A4, one sheet, ≤ 1 tape piece | Hand throw (any angle) | Indoor tall arena, still air; walls and ceiling are colliders | Release to first contact with ground or any object. Store 0.01 s; compare and show at 0.1 s on this board, because the GWR reference values since 1998 are quoted to 0.1 s (§5.1; GWR's timing and rounding rule is not public) | [S29][S30][S40] |
 | **Paper Wings Distance** | A4 "official paper", folding only, **no tape** | As above; no run-up, no devices | Indoor, no wind | As GWR Distance. Best of 2 | [S32][S33][S55] |
 | **Paper Wings Airtime** | Same | Same | Same | As GWR Airtime | [S32][S33] |
 | **Design Benchmark** (app-defined) | Any size | Fixed robot launch: e.g. release height 1.8 m and speeds 5/10/20 m/s, with the best pitch angle chosen automatically | Indoor still air | Distance and time. Ranks designs independent of thrower skill | app choice (unverified - model knowledge for human throw speeds) |
@@ -324,3 +326,46 @@ All were confirmed via search-result text; direct page fetches were blocked by t
 57. [S57] WFAE/NPR (20 May 2022), Korean–Malaysian team record. https://www.wfae.org/2022-05-20/paper-airplane-enthusiasts-break-record-for-farthest-flight-by-a-paper-aircraft
 58. [S58] DSAuk, "GWR individual record – fold and throw paper planes" (unmodified flat standard A4). https://dsauk.org/guinness-world-records-challenge/gwr-individual-record-paper-plane
 59. [S59] Yahoo News (2023), "Engineers break record for farthest paper airplane flight" (prior mark 252 ft 7 in). https://news.yahoo.com/engineers-break-record-farthest-paper-203009388.html
+
+## Verification notes
+
+Fact-check pass, 2026-11-09.
+
+**Method and its limit.** This pass had **no web access**. The turn's WebSearch budget was already spent (no query ran), and WebFetch failed with a DNS error for every host tried: guinnessworldrecords.com, foldnfly.com, paperwings.redbull.com, arxiv.org and cdn.lomax.dk. So **no source was opened, and no citation was confirmed, corrected or removed**. Every [S..] tag still rests on the author's search-result text. What was done instead: (a) every derived number was recomputed independently with a throwaway script; (b) the dart fold sequence was traced numerically (polygon clip-and-reflect, all layers, both sides); (c) formulas were re-derived and checked for units and limiting cases; (d) standards and pre-2023 records were compared with model knowledge, which is not evidence.
+
+**Checked, no change needed**
+
+| # | Claim | How checked | Result |
+|---|---|---|---|
+| 1 | Sheet sizes, areas, aspect ratios, masses at 80 g/m² (§1, §8) | Recomputed all 11 rows; ISO 216 / ANSI values match model knowledge | All correct to the digits shown |
+| 2 | 1 lb bond = 3.7597 g/m² (§2) | 453.59237 g / (500 × 0.4318 m × 0.5588 m) | 3.75973. Correct |
+| 3 | ρ = 755 kg/m³; calipers and sheet masses in the grade table (§2) | Recomputed | Correct (754.7; 99.6 / 119.5 / 132.5 µm) |
+| 4 | `D = F·l²/(3·θ·b)` and D_MD, D_CD, E_b (§3.1) | Re-derived from the cantilever F = 3·EI·δ/l³ with θ = δ/l. Identical to the L&W form S_b = 60·F·l²/(π·α°·b). ISO 2493 geometry of 15°, 38 mm, and 50 mm or 10 mm matches model knowledge | 3.69×10⁻⁴ / 1.84×10⁻⁴ N·m; 3.71 / 1.86 GPa; l = 50 mm gives 92.8 GPa. Correct |
+| 5 | Elasto-gravity length 61–78 mm (§3.2) | (D/(G·g))^(1/3) | 61.7 / 77.7 mm. Correct. At L = L_eg the self-weight tip sag is exactly L/8 |
+| 6 | Launch load factor, q = 238 Pa, ≈ 1.1 g per 0.01 C_L (§3.2) | Recomputed | 1.09 g per 0.01 C_L. Correct |
+| 7 | Re_k and k_adm numbers (§4) | Recomputed | Correct; last digits adjusted for ν (see below) |
+| 8 | Dart fold sequence and every row of the §7 table, A4 and Letter | Numerical fold trace. Fold 1 runs from the top-edge midpoint to (±w/2, w/2) on the side edges. Fold 2 runs from the nose to (±w/2, 1.2071·w) on the side edges: y = 253.5 mm (A4), 260.6 mm (Letter), both ahead of the tail. The old corner lands on the centre line at y = 0.7071·w. Area is conserved and the CG stays on the centre line | Length, span, chords, S, AR, W/S, CG (159.81 mm / 152.41 mm), MAC and quarter-MAC all reproduce |
+| 9 | ft/in equivalents of the records (§6) | Converted | 98.43 m = 322 ft 11 in; 69.14 m = 226 ft 10 in; 252 ft 7 in = 76.99 m ≠ 77.134 m, as the note already says |
+| 10 | Pre-2023 records and 2022 Red Bull winners (§6) | Compared with model knowledge only | 69.14 m, 77.134 m, 88.31 m, 29.2 s, 27.9 s, 27.6 s, 61.11 m and 14.86 s agree. Not evidence |
+
+**Changed, and why**
+
+1. **"No run-up" was applied to GWR without a source** (summary item 6, §8 GWR Distance). The note's own §5.1 table has no GWR run-up rule, and footage of record throws shows a few approach steps (model knowledge). Now stated as a Red Bull rule only; §5.1 launch row says so.
+2. **GWR airtime resolution of 0.01 s was coded into §8 on one unconfirmed summary.** The four GWR airtime records in §6 are all quoted to 0.1 s, so the reference values cannot support a 0.01 s comparison. §5.1 and §8 now say: store 0.01 s, compare and show at 0.1 s on the GWR-style board. GWR's actual timing rule is still unknown.
+3. **Summary item 6 presented Red Bull's measuring wording as the rule of both bodies.** It is now attributed to Red Bull, with the GWR use marked as an assumption.
+4. **Cantilever table (§3.2).** Five of the six entries exceeded the stated validity δ/L ≲ 0.1 but only two were flagged. The 1 g and 5 g rows also used the gross wing loading as the bending load. A panel's own inertia relieves it, so the net load is n·(W/S − G·g) = 1.4·n N/m². Rows recomputed and flagged. The conclusion (single-layer panels flex a lot) is unchanged.
+5. **§7 label "b/c_root" was wrong.** 0.54 is span over overall length (160/297). Span over the root chord at the wing fold is 0.68. Label and the sentence about [S53] corrected.
+6. **Air constants (§8).** ρ, μ and ν were three separately rounded values that do not multiply out (1.19 × 1.53×10⁻⁵ ≠ 1.83×10⁻⁵). ν is now 1.54×10⁻⁵ m²/s (μ/ρ, also the 50 % RH value), with an instruction to compute it in code. 101.325 kPa is labelled an app choice, because ISO 187 fixes temperature and humidity only (model knowledge). Dependent digits in §4 and §7 follow: Re_k 3.2, k_adm 308 µm, Blasius δ 2.8 mm (was 2.7), Re 8.4×10⁴ (was 8.5×10⁴).
+7. **"Within 6 % of US 20 lb"** was 6.4 %. Reworded.
+8. **Red Bull runner-up (§6).** The 57.07 m / Yicheng Sun "runner-up" claim conflicts with the URL of its own source [S36] ("comes sixth"). Now marked unverified.
+9. **Red Bull timing example "14.06 s" (§5.2)** matched no result elsewhere in the note. Replaced with the 14.86 s winning time.
+10. **88.31 m (§6).** Added that GWR may list 88.318 m (model knowledge, unverified).
+11. Letter static-margin figure added next to the A4 one in §7 (16.7 mm, 11.4 % MAC).
+
+**Still uncertain**
+
+- **All 59 citations are unopened.** The 2025/26 records (98.43 m, 31.2 s, team names, venues), the target-accuracy record, the GWR May 2026 news item and the Red Bull rule wording could not be checked in any way in this pass. Check [S28], [S29], [S32] and [S33] by hand before the leaderboard reference values ship.
+- **GWR rules:** run-up, cutting, measuring method, timing resolution and whether US Letter is accepted alongside A4 (model knowledge says it was, historically) all remain unconfirmed.
+- **Stiffness.** D comes from a 15° / 10 mm bending-resistance test, and the 10 mm length is assumed, not read from the data sheet. Typical copy-paper tensile moduli (4–7 GPa MD, model knowledge) would give D_MD = E·t³/12 ≈ 4–7×10⁻⁴ N·m, so the true small-strain stiffness may sit above the ±30 % band. None of this enters the rigid-body model.
+- **Dart recipe limit.** The §7 closed-form geometry needs h ≥ 1.207·w, so that the 22.5° fold meets the side edge. On the two square sizes it leaves through the tail edge instead. The engine must take the geometry from the fold trace, not from these formulas.
+- **Literature details not re-checked:** Farain's constants and units [S19], whether Thiria & Adda-Bedia tested paper as well as Mylar [S18], the humidity findings [S17][S21][S22], the glide ratio of 3–4 [S54], the 0.5408 figure [S53], and the arXiv identifiers of [S25]–[S27].

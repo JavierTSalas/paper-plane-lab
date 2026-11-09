@@ -10,7 +10,7 @@ Research date: 2026-11-09. Scope: Cloudflare hosting for the Vite + React + Type
 2. **Ship static-only now.** Static-asset requests are free and unlimited [S9]. For build and deploy, run `vite build` → `dist/`, then `npx wrangler deploy`. Add `public/_headers` with `/assets/*  Cache-Control: public, max-age=31536000, immutable` [S4][S51].
 3. **API later.** Add a Worker `main` with `run_worker_first: ["/api/*"]` [S3]. Do not use Pages Functions (Pages has no Rate Limiting binding, no Cron and no Workers Logs [S2]).
 4. **Leaderboard storage.** Code against a `LeaderboardRepo` interface now and ship an in-memory or offline implementation. For DynamoDB, use one item per (player, board) and a GSI with `GSI1PK = boardKey` and `GSI1SK = score`, queried with `ScanIndexForward=false, Limit=N`. This is AWS's own GameScores/GameTitleIndex pattern [S26][S27]. Call DynamoDB with `aws4fetch` and keep credentials as Worker secrets [S25][S22].
-5. **Anti-cheat.** The server re-simulates (design fold-sequence, throw, environment id, seed, engine version) and its score is the only one stored. Bit-exact replay needs the sim to use only `+ − × ÷`, `Math.sqrt`, `Math.abs/min/max/floor/fround/imul` (exact per spec). Do not use `Math.sin/cos/exp/log/pow/atan2/hypot/**` (they are "implementation-approximated" [S31] and differ by engine and OS [S33][S34]); ship our own polynomial versions instead.
+5. **Anti-cheat.** The server re-simulates (design fold-sequence, throw, environment id, seed, engine version) and its score is the only one stored. Bit-exact replay needs the sim to use only `+ − × ÷`, `Math.sqrt`, `Math.abs/min/max/floor/fround/imul` (exact per spec). Do not use `Math.sin/cos/exp/log/pow/atan2/hypot/**` (they are "implementation-approximated" [S31] and differ by engine, by engine *version* and by OS [S32][S34][S57][S58][S59]); ship our own polynomial versions instead.
 6. **CPU budget.** The Workers Free plan allows 10 ms CPU per request [S8]. A full 6-DOF re-sim will almost certainly need Workers Paid (default 30 s, max 5 min; $5/month minimum) [S8][S9].
 7. **Mobile WebGL.** Use WebGL2 only (three r163+ dropped WebGL 1) [S42]. Cap the pixel ratio at 2 and the pixel count. Use no real-time shadow maps on phones; a fake blob shadow is enough [S39]. Use `InstancedMesh` for repeated props, dispose everything [S38], handle `webglcontextlost` [S45], and lazy-load the `three` chunk.
 8. **PWA.** It's worth doing late and cheaply with `vite-plugin-pwa` (`generateSW`), as long as `sw.js` and `index.html` are never cached immutably [S48].
@@ -157,7 +157,9 @@ Implementations: `MemoryRepo` (unit tests, `wrangler dev`), `D1Repo`, `DynamoRep
 | Design | `D#{designHash}` | `D` | – | – | canonical fold sequence, name, preset id, first author |
 | Rank histogram bucket | `H#{boardKey}` | `{bucket:04d}` | – | – | `count` (atomic `ADD`) |
 
-This is AWS's documented leaderboard pattern: base items keyed by user, plus a GSI whose partition key is the game and whose sort key is the score, queried in descending order [S26]. GSI keys need not be unique [S26]. Use a **string** score-key so ties break deterministically: `GSI1SK = zeroPad(score, 10) + "#" + zeroPad(9_999_999_999_999 − createdAtMs, 13)`. With `ScanIndexForward=false`, the higher score comes first and, at equal score, the *earlier* submission does.
+This is AWS's documented leaderboard pattern: base items keyed by user, plus a GSI whose partition key is the game and whose sort key is the score, queried in descending order [S26]. GSI keys need not be unique [S26]. Use a **string** score-key so ties break deterministically: `GSI1SK = zeroPad(score, 10) + "#" + zeroPad(9_999_999_999_999 − createdAtMs, 13)`. With `ScanIndexForward=false`, the higher score comes first and, at equal score, the *earlier* submission does (string sort keys are ordered by UTF-8 bytes [S27]; ordering re-checked numerically, see **Verification notes**).
+
+**Constraint: `score` must be an integer in 0 … 9,999,999,999 and higher must be better.** A zero-padded string does not sort negative numbers: `−250` would rank above `−30`. For a lower-is-better metric, store `score = SCORE_CAP − value`, clamped at 0 (see the Accuracy board in §4). The D1 schema below has no such restriction, but keep the same convention so both repos return identical orderings.
 
 **Query patterns**
 
@@ -168,11 +170,19 @@ This is AWS's documented leaderboard pattern: base items keyed by user, plus a G
 | Exact rank | `Query GSI1: GSI1PK = :board AND GSI1SK > :myKey`, `Select=COUNT` → `rank = Σ Count + 1`. This reads every entry above you, 1 MB per page [S27]. GSI reads cost 0.5 RCU per 4 KB [S26] |
 | Approx. rank (large boards) | `Query PK=H#{board}` (all buckets in one page) → `rank ≈ 1 + Σ_{buckets above} count + within-bucket fraction` |
 | Around me | two GSI queries from `:myKey`, one in each direction, `Limit=k` |
-| Submit | 1) `PutItem RUN` with `attribute_not_exists(PK)` (dedupe). 2) Per board, `UpdateItem P#…` with `ConditionExpression: attribute_not_exists(PK) OR score < :new`. 3) On improvement, `ADD count -1` to the old bucket and `+1` to the new one, using `TransactWriteItems` for 2+3 *(transaction item cap: unverified)* |
+| Submit | 1) `PutItem RUN` with `attribute_not_exists(PK)` (dedupe). 2) Per board, `UpdateItem P#…` with `ConditionExpression: attribute_not_exists(PK) OR score < :new` (basic form; the rules below tighten it when the histogram is used). 3) On improvement, `ADD count -1` to the old bucket and `+1` to the new one, using `TransactWriteItems` for 2+3. See the transaction rules below |
+
+**`TransactWriteItems` rules that shape step 2+3** (archived snapshot [S60][S29]): at most 100 actions, 4 MB in total, and **no two actions may target the same item**. Consequences:
+
+- Use **one transaction per board** (3 per run). One condition failure cancels the whole transaction, and a run can improve the weekly board without improving the all-time board.
+- If the old and the new score fall in the **same bucket**, send no bucket action at all. A `−1` and a `+1` on the same item is rejected.
+- A first entry (no previous best) has only the `+1` action.
+- The old bucket comes from a prior `GetItem`. To keep the histogram right under concurrent submissions by the same player, make the condition `attribute_not_exists(PK)` for a first entry, or `score = :oldScore` otherwise, and retry on failure *(design recommendation, not from a source)*.
+- Transactional writes consume twice the write capacity of plain writes [S29].
 
 Bucket widths (design choice): distance 0.25 m over 0–150 m (600 buckets), airtime 0.05 s over 0–60 s (1,200 buckets). Use exact rank when the player is in the top about 1,000, approximate rank otherwise. A hot board partition throttles above 1,000 writes/s [S28], far beyond expected load. If that ever binds, shard `GSI1PK` with `#s0..#s{k−1}` and merge top-N client-side.
 
-**D1 equivalent** (same interface; SQLite UPSERT syntax is *unverified - model knowledge*):
+**D1 equivalent** (same interface). The schema and the three statements, including the `ON CONFLICT … DO UPDATE … WHERE` UPSERT, were run during verification against stock SQLite 3.53.1 and behave as described (ties, rank, no overwrite on a worse score). They were not run against D1 itself.
 
 ```sql
 CREATE TABLE best(board TEXT, player_id TEXT, score INTEGER, created_at INTEGER, run_id TEXT,
@@ -224,7 +234,13 @@ A modified client therefore cannot change a score. It can only choose inputs, so
 | `Math.abs, min, max, floor, ceil, round, trunc, sign, fround, imul, clz32` | exactly specified [S31] | ✅ |
 | `Math.sin cos tan asin acos atan atan2 sinh cosh tanh asinh acosh atanh exp expm1 log log1p log2 log10 cbrt hypot pow` and `**` | **"implementation-approximated"** [S31]. fdlibm is recommended, not required [S31] | ❌ not guaranteed |
 
-**Engine evidence.** V8 ships an fdlibm-derived `ieee754` library. V8 moved `asin`/`acos` off the OS libm because results differed by OS [S32][S33]. Cloudflare Workers run V8 [S24]. SpiderMonkey has switched between fdlibm and the OS libm over the years. A 2026 bug reports libm `pow` giving a **1-ulp different** result on some Android ARM devices, fixed by always calling `fdlibm_pow` [S34]. A Linux-vs-Windows `Math.tan(-1e300)` difference is also recorded [S34]. JavaScriptCore (all iOS browsers) is believed to use the platform libm *(unverified - model knowledge)*. Conclusion: an iPhone and a V8 Worker **cannot be assumed** to agree bit-for-bit if the sim calls `Math.sin`. Flight with turbulence is chaotic, so a 1-ulp difference can grow into a visibly different landing point.
+**Engine evidence** (engine sources opened on their GitHub mirrors during verification, see **Verification notes**).
+
+- **V8 (Chrome, Edge, Android WebView, Cloudflare Workers [S24]).** V8 carries its own math library in `src/base/ieee754.cc` instead of calling the OS libm for almost every function (in the 15.0–15.6 branches `tanh` is a plain `std::tanh`); Chromium's copy of it is described as "useful when mathematical consistency across OS platforms is desired" [S32]. The library itself has changed, though. Up to branch `14.9-lkgr` it is a ~100 kB fdlibm-derived port (with an optional glibc-derived `sin`/`cos` behind `V8_USE_LIBM_TRIG_FUNCTIONS`). From branch `15.0-lkgr` on, `sin, cos, tan, asin, acos, atan, atan2, exp, expm1, log, log1p, log2, log10, cbrt, pow` delegate to LLVM-libc (`LIBC_NAMESPACE::shared::…`), and `main` adds `sinh, cosh, tanh` [S57]. V8 15.0 corresponds to Chrome 150 *(version mapping: unverified - model knowledge)*. So **two V8 builds of different age are not guaranteed to agree with each other**, and the Workers runtime and a player's browser are rarely on the same V8 version. The claim that V8 moved `asin`/`acos` off the OS libm because results differed by OS [S33] was not re-opened.
+- **SpiderMonkey (Firefox).** `Math.sin/cos/tan` call the platform `std::sin/cos/tan` unless a pref or realm option selects fdlibm. `acos, asin, atan, atan2, exp, log, log2, log10, log1p, expm1, sinh, cosh, tanh, asinh, acosh, atanh, hypot, cbrt` always call fdlibm. `Math.pow` calls the platform `std::pow`, except on ARM Android API ≤ 28, where bionic's `pow(π, −100)` is **1 ulp off** (1.9275814160560204e-50 vs 1.9275814160560206e-50) and `fdlibm_pow` is used instead [S58][S34]. (The first version of this document said the fix was "always calling `fdlibm_pow`". The test file's comment says that, but the current `Math.cpp` restricts it to those devices.) A Linux-vs-Windows `Math.tan(-1e300)` difference is recorded in an older bug [S34] *(not re-opened)*.
+- **JavaScriptCore (Safari and every iOS browser).** All unary functions (`sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh, log, log2, log10, log1p, exp, expm1, cbrt`) are defined "via std", which is the platform libm. `atan2`, `hypot` and (outside 32-bit ARM Darwin) `pow` also call the C library. Before that, `pow` takes shortcuts: a small non-negative integer exponent is evaluated by square-and-multiply, `y = 0.5` by `sqrt(x)` and `y = −0.5` by `1/sqrt(x)` [S59]. So even `x ** 3` is not the same computation in every engine; write `x * x * x`.
+
+Conclusion: an iPhone (Apple libm), a Firefox user (mixed platform libm / fdlibm) and a V8 Worker (LLVM-libc or the fdlibm port, depending on version) **cannot be assumed** to agree bit-for-bit if the sim calls `Math.sin`. Flight with turbulence is chaotic, so a 1-ulp difference can grow into a visibly different landing point.
 
 ### 3.3 Mitigations (in priority order)
 
@@ -240,7 +256,7 @@ A modified client therefore cannot change a score. It can only choose inputs, so
 |---|---|---|
 | Turnstile token | ≤ 2048 chars, valid 300 s, **single use** (replay → `timeout-or-duplicate`); verify at `POST https://challenges.cloudflare.com/turnstile/v0/siteverify` with `secret`, `response`, optional `remoteip`, `idempotency_key` | [S21] |
 | Workers Rate Limiting binding | `ratelimits: [{ name, namespace_id, simple: { limit, period } }]`. `period` must be **10 or 60** s. Approximate, per Cloudflare location; Wrangler ≥ 4.36.0 | [S20] |
-| Suggested limits (design choice) | `submit:{playerId}` 10/60 s; `submit:{ip}` 30/60 s; `read:{ip}` 120/60 s | – |
+| Suggested limits (design choice) | `submit:{playerId}` 10/60 s; `submit:{ip}` 30/60 s; `read:{ip}` 120/60 s. Note that Cloudflare's own best-practice text says "It is not recommended to use IP addresses or locations" as keys, because many valid users share one (schools, mobile carriers). Keep the IP limits loose and treat `playerId` as the primary key | [S20] |
 | Body size | The platform allows 100 MB [S8], so the app must enforce its own cap: reject `Content-Length > 16384` and stop reading after 16 KiB → `413`. A design of ≤ 64 folds fits in about 4 KB | [S8] + design choice |
 | Leaderboard item | DynamoDB ≤ 400 KB/item [S29]; D1 ≤ 2 MB/row [S14] | |
 
@@ -252,13 +268,22 @@ A modified client therefore cannot change a score. It can only choose inputs, so
 
 ## 4. How real competitions rank (motivation for categories)
 
-*Everything in this section is unverified (model knowledge). The web-search quota ran out and redbull.com / guinnessworldrecords.com were unreachable.* Red Bull Paper Wings is an international student paper-plane contest whose world finals were held at Hangar-7, Salzburg. It has three disciplines: **Longest Distance**, **Longest Airtime** and **Aerobatics** (a judged freestyle routine). Planes are folded from one standard sheet of A4 paper, with no cutting, tape or glue. Guinness lists separate records for distance (about 69 m in 2012, then about 77 m in 2022) and time aloft (about 27–29 s). Re-check before quoting any of these numbers in the UI.
+*Everything in this section is unverified (model knowledge). The web-search quota ran out and redbull.com / guinnessworldrecords.com were unreachable.* Red Bull Paper Wings is an international student paper-plane contest whose world finals were held at Hangar-7, Salzburg. It has three disciplines: **Longest Distance**, **Longest Airtime** and **Aerobatics** (a judged freestyle routine). Planes are folded from one standard sheet of A4 paper, with no cutting, tape or glue. Guinness lists separate records for distance and time aloft. From model knowledge *(all unverified - model knowledge; the verification pass could not reach guinnessworldrecords.com, redbull.com or Wikipedia either)*:
+
+| Record | Value | Date / holder as remembered |
+|---|---|---|
+| Distance | 69.14 m | 26 Feb 2012, Joe Ayoob (thrower) / John Collins (designer), USA |
+| Distance | 77.134 m | April 2022, Kim Kyu Tae, Shin Moo Joon, Chee Yie Jian, South Korea |
+| Distance (**current as far as known**) | **88.318 m** | 2 Dec 2022, Dillon Ruble, Garrett Jensen, Nathan Erickson, Crown Point, Indiana, USA |
+| Time aloft (current as far as known) | 29.2 s | 19 Dec 2010, Takuo Toda, Japan (earlier: 27.9 s Toda 2009; 27.6 s Ken Blackburn 1998) |
+
+The first version of this document stopped at "about 77 m in 2022" and so missed the 88.318 m record set later that year. Re-check every one of these numbers against guinnessworldrecords.com before quoting them in the UI.
 
 | Leaderboard category | Metric (integer stored) | Objective in sim? | Notes |
 |---|---|---|---|
 | Distance | horizontal distance launch → first ground contact (mm) | ✅ | Red Bull "Longest Distance" analogue |
 | Airtime | release → first ground contact (ms) | ✅ | Red Bull "Longest Airtime" analogue; reward low sink rate |
-| Accuracy | miss distance to target (mm, lower is better: store `−miss`) | ✅ | fun indoor mode |
+| Accuracy | miss distance to target (mm, lower is better: store `max(0, 1_000_000 − miss_mm)`, never a negative number, see §2.5; the 1 km cap is a design choice) | ✅ | fun indoor mode |
 | Glide efficiency | best steady L/D from the wind tunnel (×1000) | ✅ | design-only board, needs no seed |
 | Aerobatics | loops, rolls, heading change (scored formula) | ⚠️ judged in reality | Replace judges with a transparent formula, or keep it unranked |
 
@@ -272,7 +297,7 @@ Board dimensions: category × environment (`classroom`, `gym`, `outdoor-calm`, `
 |---|---|---|
 | WebGL version | WebGL2 only. Since r163, `WebGLRenderer` throws on WebGL 1. Check with `WebGL.isWebGL2Available()` and fall back to an **SVG 2-D trajectory view**, which the renderer-independent physics core makes free | [S40][S42] |
 | WebGPU | `WebGPURenderer` (import `three/webgpu`) falls back to WebGL2 automatically, and `forceWebGL: true` is available. Stay on `WebGLRenderer` for now and revisit later | [S41] |
-| Pixel ratio | Never render at raw DPR 3 (9× the pixels). Size the canvas yourself: `min(devicePixelRatio, 2)` (*cap value is a design choice*) **and** a max pixel count (three's sample caps at 3840×2160). Lower the cap adaptively if frame time stays above 20 ms. Use `ResizeObserver` with `device-pixel-content-box` for exact sizes | [S37][S43] |
+| Pixel ratio | Never render at raw DPR 3 (9× the pixels). Size the canvas yourself: `min(devicePixelRatio, 2)` (*cap value is a design choice*) **and** a max pixel count (three's sample caps at 3840×2160). Lower the cap adaptively if frame time stays above 20 ms. Use `ResizeObserver` with `device-pixel-content-box` for exact sizes "on supporting browsers", with MDN's fallback to the CSS content box × DPR elsewhere [S43]. Safari / iOS has historically not supported it *(unverified - model knowledge)*, so on iPhones the fallback is the normal path | [S37][S43] |
 | Smaller back buffer | Render below native resolution and let CSS upscale | [S43] |
 | powerPreference | Default `'default'`; values `'default' / 'high-performance' / 'low-power'` are only hints. Keep the default and don't set `failIfMajorPerformanceCaveat: true` unless you have a 2-D fallback | [S42][S44] |
 | Shadows | A shadow map re-renders the scene once per shadow-casting light (6× for a point light). On phones use a **fake blob shadow** (textured quad under the plane, scaled and faded by height), which also helps depth perception. Allow at most one directional shadow on desktop | [S39] |
@@ -280,10 +305,10 @@ Board dimensions: category × environment (`classroom`, `gym`, `outdoor-calm`, `
 | Idle | Render on demand in fold and menu screens, and stop the rAF loop when the flight view is hidden | three manual "Rendering on demand" [S38] |
 | Dispose | Geometries, materials, textures and render targets are **not** freed automatically. Call `.dispose()` on scene teardown and `ImageBitmap.close()` for bitmap textures | [S38] |
 | Context loss | `webglcontextlost` can fire on GPU memory pressure. three attaches listeners itself. The app should pause the render loop, keep the sim state (it lives outside the renderer), show a "tap to restore" overlay, and rebuild GPU resources on `webglcontextrestored` | [S42][S43][S45] |
-| Avoid | `alpha:false` (can be expensive), `preserveDrawingBuffer`, and `getError` / `getParameter` in the frame loop (sync stalls of about 1 ms) | [S43] |
+| Avoid | `preserveDrawingBuffer`, and `getError` / `getParameter` in the frame loop (sync stalls of about 1 ms) [S43]. **Sources disagree on `alpha`:** MDN says "Avoid alpha:false, which can be expensive" on some platforms [S43], but three's `WebGLRenderer` defaults to `alpha = false` [S42]. Keep three's default, and only try `alpha: true` with an opaque `scene.background` if profiling on a real phone shows a compositing cost | [S42][S43] |
 | Lazy-load three | Keep onboarding, fold (SVG) and menus three-free, and load the flight scene through `React.lazy(() => import("./flight/FlightScene"))` so Vite emits a separate chunk. The unminified r187 `three.core.js` + `three.module.js` measure **2.13 MB raw / 419 KB gzip** (upper bound; minified and tree-shaken builds are smaller). Vite warns at 500 kB per chunk | [S51][S56] |
 
-**Headless WebGL tests (local, optional).** Chromium's automatic SwiftShader fallback is deprecated, so WebGL context creation *fails* unless you opt in. The documented flags are `--use-gl=angle --use-angle=swiftshader` (GL driver) or `--use-gl=angle --use-angle=swiftshader-webgl --enable-unsafe-swiftshader` (WebGL fallback). They are meant for trusted content only [S35]. Playwright runs the separate *chromium headless shell* by default. `channel: 'chromium'` selects "new headless", which is the real Chrome browser [S36]. A smoke test (`launchOptions.args` = the flags above) should assert that `canvas.getContext('webgl2')` is non-null and that a frame is non-blank. Keep it out of the default CI job.
+**Headless WebGL tests (local, optional).** Chromium's automatic SwiftShader fallback is deprecated: the doc says WebGL context creation "will soon fail instead of falling back" (a console warning during the deprecation period), so opt in explicitly. The documented flags are `--use-gl=angle --use-angle=swiftshader` (GL driver) or `--use-gl=angle --use-angle=swiftshader-webgl --enable-unsafe-swiftshader` (WebGL fallback). They are meant for trusted content only [S35]. Playwright runs the separate *chromium headless shell* by default. `channel: 'chromium'` selects "new headless", which is the real Chrome browser [S36]. A smoke test (`launchOptions.args` = the flags above) should assert that `canvas.getContext('webgl2')` is non-null and that a frame is non-blank. Keep it out of the default CI job.
 
 ---
 
@@ -292,7 +317,7 @@ Board dimensions: category × environment (`classroom`, `gym`, `outdoor-calm`, `
 **Yes, as a late, small task.** The physics runs entirely on the client, so offline play is natural.
 
 - Installability on Chromium needs a manifest with `name`/`short_name`, `icons` at **192 px and 512 px**, `start_url`, `display` (or `display_override`), and `prefer_related_applications` absent or `false`. It must be served over HTTPS (or localhost) [S46]. iOS 16.4+ allows install from the Share menu in Safari, Chrome, Edge, Firefox and Orion. Firefox desktop doesn't install manifest PWAs. On Android, true WebAPK install happens only in Chrome (with GMS) and Samsung Internet [S46].
-- `vite-plugin-pwa` 2.0.0 (peer `vite ^8`, Node ≥ 20.19) generates the manifest, a Workbox service worker (`generateSW`) and its registration with `VitePWA({ registerType: 'autoUpdate' })` [S47][S55]. By default it precaches only `js, css, html`. Add `svg, png, woff2` through `workbox.globPatterns` [S49]. Workbox skips files above `maximumFileSizeToCacheInBytes` = **2,097,152 B** by default [S50], so check that the three chunk stays below it.
+- `vite-plugin-pwa` 2.0.0 (peer range `vite ^3.1 … ^8`, so Vite 8 is covered; Node ≥ 20.19) generates the manifest, a Workbox service worker (`generateSW`) and its registration with `VitePWA({ registerType: 'autoUpdate' })` [S47][S55]. By default it precaches only `js, css, html`. Add `svg, png, woff2` through `workbox.globPatterns` [S49]. Workbox skips files above `maximumFileSizeToCacheInBytes` = **2,097,152 B** by default [S50], so check that the three chunk stays below it.
 - Never cache `/`, `/index.html`, `/sw.js` or `/manifest.webmanifest` with `immutable` [S48]. Cloudflare's default `max-age=0, must-revalidate` [S4] already satisfies this. Exclude `/api/*` from runtime caching, and queue leaderboard submissions while offline.
 
 ---
@@ -349,17 +374,17 @@ No Playwright, no deploy, no matrix. Deploys go through Workers Builds (Git inte
 3. Add the `ratelimits` bindings (`period` 10 or 60) [S20]. Move to **Workers Paid** before enabling server re-simulation [S8][S9].
 4. **DynamoDB path.** Create table `PaperPlaneLab` (PK S, SK S, on-demand) and GSI `GSI1` (GSI1PK S, GSI1SK S, projection INCLUDE `displayName, score, designHash, runId`). Create a least-privilege IAM user. Run `wrangler secret put AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`, set var `AWS_REGION` (pick a region near most players), then implement `DynamoRepo` with aws4fetch (`retries: 2`).
 5. **D1 path (alternative).** Run `wrangler d1 create ppl`, add the `d1_databases` binding, apply the §2.5 schema migration and implement `D1Repo`.
-6. Optional: cache top-50 JSON per board in KV or the Workers Cache for 30–60 s [S16].
+6. Optional: cache top-50 JSON per board for 30–60 s. With KV, a key's `expirationTtl` cannot be below **60 s** [S61]; the 30 s figure is the minimum read-side `cacheTtl` [S16]. One refresh per minute per board is 1,440 writes/day, above the Free plan's 1,000 KV writes/day [S16], so this needs Workers Paid (already required for re-simulation) or the Workers Cache API instead.
 7. PWA: add `vite-plugin-pwa`, the manifest (192 and 512 icons) and globPatterns, and check the three chunk is ≤ 2 MiB.
 
 ---
 
 ## Open questions and limits
 
-- **Red Bull Paper Wings rules and Guinness record values** are unverified (search quota exhausted, sites unreachable). Verify before showing them in the UI.
-- **JavaScriptCore Math implementation** (Safari/iOS) was not confirmed. The `detmath.ts` approach makes this moot, but the golden tests should still be run once in WebKit.
+- **Red Bull Paper Wings rules and Guinness record values** are unverified (search quota exhausted, sites unreachable, in both the research and the verification pass). Verify before showing them in the UI.
+- **JavaScriptCore Math implementation** (Safari/iOS) is now confirmed from WebKit source to be the platform libm [S59]. The `detmath.ts` approach makes this moot, but the golden tests should still be run once in WebKit, on a real iPhone if possible.
 - **Re-simulation CPU cost** is an estimate. Benchmark the real engine before choosing K (multi-seed scoring) and `dt`.
-- **DynamoDB docs** come from the archived 2023 GitHub snapshot. Re-check current quotas (`TransactWriteItems` item cap, GSI features) in the live console before building. Cross-cloud latency from Cloudflare edge to an AWS region was not measured.
+- **DynamoDB docs** come from the archived 2023 GitHub snapshot (the `TransactWriteItems` cap of 100 actions / 4 MB is in that snapshot [S60]). Re-check current quotas and newer GSI features in the live docs before building. Cross-cloud latency from Cloudflare edge to an AWS region was not measured.
 - **The new Cloudflare `cf` CLI / Vite+** appear in the docs [S6]. Wrangler remains the documented path. Re-check before scaffolding.
 - **The SPA's custom domain** decides Pages vs Workers only if its DNS is not on Cloudflare [S2].
 
@@ -400,9 +425,9 @@ Cloudflare pages were read from `github.com/cloudflare/cloudflare-docs` (branch 
 29. [S29] DynamoDB service quotas (400 KB item, key lengths, 20 GSIs): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/ServiceQuotas.md
 30. [S30] DynamoDB low-level API (X-Amz-Target, x-amz-json-1.0): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/Programming.LowLevelAPI.md
 31. [S31] ECMA-262 (implementation-approximated, Math.sqrt, Number::multiply, Math.imul, fdlibm recommendation): https://tc39.es/ecma262/ (source: https://raw.githubusercontent.com/tc39/ecma262/main/spec.html)
-32. [S32] Chromium `third_party/fdlibm/README.chromium` (V8 ieee754 fork; cross-OS consistency) (search-confirmed): https://chromium.googlesource.com/chromium/src/+/refs/tags/113.0.5672.6/third_party/fdlibm/README.chromium
-33. [S33] V8 code review moving asin/acos to fdlibm (search-confirmed): https://codereview.chromium.org/2122643002
-34. [S34] Mozilla bugs (search-confirmed): 531915 (tan differs Linux/Windows) https://bugzilla.mozilla.org/show_bug.cgi?id=531915 ; 1823880 (select fdlibm dynamically) https://bug623317.bugzilla.mozilla.org/show_bug.cgi?id=1823880 ; 2037094 (libm pow 1-ulp off on Android ARM) https://bugzilla.mozilla.org/show_bug.cgi?id=2037094 ; test https://searchfox.org/firefox-main/source/js/src/jit-test/tests/basic/fdlibm-for-pow.js
+32. [S32] Chromium `third_party/fdlibm/README.chromium` (V8 ieee754 fork; cross-OS consistency): https://chromium.googlesource.com/chromium/src/+/main/third_party/fdlibm/README.chromium (opened in verification via the GitHub mirror https://raw.githubusercontent.com/chromium/chromium/main/third_party/fdlibm/README.chromium)
+33. [S33] V8 code review said to move asin/acos to fdlibm (search-confirmed by the first author only; **not re-opened**, host unreachable; nothing in this document depends on it): https://codereview.chromium.org/2122643002
+34. [S34] Mozilla. Opened in verification: the test for bug 2037094 (libm `pow` 1 ulp off on Android ARM), https://raw.githubusercontent.com/mozilla-firefox/firefox/main/js/src/jit-test/tests/basic/fdlibm-for-pow.js (same file as https://searchfox.org/firefox-main/source/js/src/jit-test/tests/basic/fdlibm-for-pow.js). Search-confirmed by the first author only, **not re-opened** (bugzilla.mozilla.org unreachable): bug 531915 (tan differs Linux/Windows) https://bugzilla.mozilla.org/show_bug.cgi?id=531915 ; bug 1823880 (select fdlibm dynamically) https://bugzilla.mozilla.org/show_bug.cgi?id=1823880 ; bug 2037094 https://bugzilla.mozilla.org/show_bug.cgi?id=2037094
 35. [S35] Chromium "Using Chromium with SwiftShader": https://chromium.googlesource.com/chromium/src/+/main/docs/gpu/swiftshader.md (read via https://raw.githubusercontent.com/chromium/chromium/main/docs/gpu/swiftshader.md)
 36. [S36] Playwright Browsers (headless shell vs new headless): https://playwright.dev/docs/browsers (source: https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/browsers.md)
 37. [S37] three.js manual, Responsive Design (HD-DPI, max pixel count): https://threejs.org/manual/#en/responsive (source `mrdoob/three.js/dev/manual/pages/responsive.html`)
@@ -425,3 +450,57 @@ Cloudflare pages were read from `github.com/cloudflare/cloudflare-docs` (branch 
 54. [S54] Node.js release schedule: https://raw.githubusercontent.com/nodejs/Release/main/schedule.json
 55. [S55] npm registry metadata (versions, engines, peers): https://registry.npmjs.org/ (`/<pkg>/latest`, e.g. https://registry.npmjs.org/vite-plugin-pwa/2.0.0)
 56. [S56] three 0.187.0 npm tarball, measured locally (gzip -9): https://registry.npmjs.org/three/-/three-0.187.0.tgz
+57. [S57] V8 `src/base/ieee754.cc` on three branches (GitHub mirror of v8/v8). fdlibm-derived port: https://raw.githubusercontent.com/v8/v8/14.9-lkgr/src/base/ieee754.cc ; LLVM-libc delegation: https://raw.githubusercontent.com/v8/v8/15.0-lkgr/src/base/ieee754.cc and https://raw.githubusercontent.com/v8/v8/main/src/base/ieee754.cc
+58. [S58] SpiderMonkey `js/src/builtin/Math.cpp` (GitHub mirror of Firefox): https://raw.githubusercontent.com/mozilla-firefox/firefox/main/js/src/builtin/Math.cpp
+59. [S59] WebKit JavaScriptCore `runtime/MathCommon.h`, `MathCommon.cpp`, `MathObject.cpp`: https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathCommon.h ; https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathCommon.cpp ; https://raw.githubusercontent.com/WebKit/WebKit/main/Source/JavaScriptCore/runtime/MathObject.cpp
+60. [S60] DynamoDB Developer Guide, transactions (archived snapshot; `TransactWriteItems` up to 100 actions, 4 MB): https://raw.githubusercontent.com/awsdocs/amazon-dynamodb-developer-guide/master/doc_source/transaction-apis.md
+61. [S61] Workers KV, Write key-value pairs (`expirationTtl` minimum 60): https://developers.cloudflare.com/kv/api/write-key-value-pairs/ (source `docs/kv/api/write-key-value-pairs.mdx`)
+
+---
+
+## Verification notes
+
+Independent fact-check pass, 2026-11-09. Same network limits as the research pass: only raw.githubusercontent.com, registry.npmjs.org and nodejs.org were reachable, and the web-search quota was already used up. Every "confirmed" below means the cited source file was downloaded and the exact value or sentence was found in it.
+
+**Confirmed, no change**
+
+| Claim | Evidence |
+|---|---|
+| "Start new projects with Workers"; `not_found_handling: "single-page-application"` serves `/index.html` with 200; navigation requests skip the Worker from compatibility date 2025-04-01; `run_worker_first` array needs Wrangler ≥ 4.20.0 / Vite plugin ≥ 1.7.0; `binding` only valid with `main`; Workers ❌ for domains outside a Cloudflare zone | [S1][S2][S3] |
+| Default `Cache-Control: public, max-age=0, must-revalidate` + `ETag`; `_headers` overrides defaults, 100 rules, 2,000 chars/line, not applied to Worker responses; Cloudflare's `max-age=31556952, immutable` example | [S4][S8] |
+| Every row of the §1.6 limits table (10 ms / 30 s / 5 min CPU, 50 / 10,000 subrequests, 128 MB, 20,000 / 100,000 files, 25 MiB, 100 MB body) and the pricing figures (10 M requests, $0.30/M, 30 M CPU-ms, $0.02/M, $5 minimum, static assets free) | [S8][S9] |
+| KV (1 write/s per key, 1,000 writes/day Free, min `cacheTtl` 30 s, "60 seconds or more"), D1 (5 M / 100 k per day, 25 B / 50 M per month, 10 GB / 500 MB, 100 bound params, 2 MB row), Durable Objects (SQLite backend on Free, 10 GB, 30 s CPU, 100 k requests/day) | [S14]–[S19] |
+| Turnstile (2048 chars, 300 s, single use, `timeout-or-duplicate`, siteverify URL, `idempotency_key`); rate-limit binding (`period` 10 or 60, per location, approximate, Wrangler ≥ 4.36.0) | [S20][S21] |
+| DynamoDB: GameScores / GameTitleIndex pattern, `ScanIndexForward=false`, GSI eventually consistent "within a fraction of a second", 0.5 RCU per 4 KB, 1 MB per Query page, 400 KB item, 2048 / 1024 B keys, 20 GSIs, 3,000 RCU / 1,000 WCU per partition, `X-Amz-Target` / `x-amz-json-1.0` (all from the archived ~2023 snapshot) | [S26]–[S30] |
+| aws4fetch 1.0.20: `retries` default 10, `initRetryMs` 50, 2.5 kB gzipped | [S25] |
+| ECMA-262: the spec source was parsed clause by clause. Exact: `abs, ceil, clz32, floor, fround, imul, max, min, round, sign, sqrt, trunc` and `+ − × ÷`. "Implementation-approximated": `acos, acosh, asin, asinh, atan, atanh, atan2, cbrt, cos, cosh, exp, expm1, hypot, log, log1p, log10, log2, sin, sinh, tan, tanh`, plus `pow` / `**` through `Number::exponentiate`. fdlibm is "recommended (but not specified)" | [S31] |
+| three r187: `REVISION = '187'`, "WebGL 1 is not supported since r163", `powerPreference = 'default'`, context-loss listeners attached by the renderer, `maxPixelCount=3840*2160`, point-light shadows draw the scene 6 times, `WebGL.isWebGL2Available()`, `forceWebGL` | [S37]–[S42] |
+| three 0.187.0 size: `three.core.js` 1,474,799 B + `three.module.js` 658,900 B = 2.13 MB raw; 289,875 + 129,337 = 419 KB gzip -9 (re-measured) | [S56] |
+| MDN WebGL best practices and PWA installability; Workbox `maximumFileSizeToCacheInBytes` default 2097152; vite-plugin-pwa precaches only `js, css, html` and warns against `immutable` on `sw.js` / `index.html` / manifest | [S43]–[S50] |
+| Vite 8 defaults (`dist`, `assets`, target list, 500 kB warning); all npm versions and `engines` in §8; Node 24 maintenance 2026-10-20, Node 26 LTS 2026-10-28; `actions/checkout@v7`, `actions/setup-node@v7` | [S51]–[S55] |
+| Arithmetic: 30 s / 1 ms × 4 × 40 = 4.8 M element evaluations → 144–480 ms at 30–100 ns; 600 and 1,200 histogram buckets; 2026-11-09 is in ISO week 46; score-key ordering for non-negative scores (higher score first, earlier submission first on ties) | recomputed |
+
+**Changed**
+
+| # | What changed | Why |
+|---|---|---|
+| 1 | §3.2 engine evidence rewritten; summary item 5 re-cited | "V8 ships an fdlibm-derived library" is out of date: V8 ≥ 15.0 delegates to LLVM-libc [S57], so V8 differs from V8 across versions. The SpiderMonkey fix is not "always `fdlibm_pow`": current source uses it only on ARM Android API ≤ 28, and `sin/cos/tan` default to the platform libm [S58]. JavaScriptCore's use of the platform libm is no longer "unverified": it is in the WebKit source, along with integer-exponent and ±0.5 shortcuts in `pow` [S59]. The design conclusion (`detmath.ts`, no `Math.sin`-class calls, no `**`) is unchanged and better supported |
+| 2 | §2.5 score-key: added the "non-negative, higher is better" constraint; §4 Accuracy board now stores `max(0, 1_000_000 − miss_mm)` instead of `−miss` | A zero-padded string key sorts `−250` above `−30`, so the Accuracy board would have ranked the worst throw first on DynamoDB |
+| 3 | §2.5 submit step: `TransactWriteItems` rules added; "transaction item cap: unverified" removed | Cap is 100 actions / 4 MB in the archived guide [S60]. More important for the algorithm: two actions on the same item are rejected, so a same-bucket improvement must send no bucket actions, and boards need separate transactions |
+| 4 | §4 record values | The distance record was raised to 88.318 m in December 2022; the document stopped at 77 m. Still model knowledge only |
+| 5 | §2.5 D1 note | The SQL (schema, top-N, rank, UPSERT with `WHERE excluded.score > best.score`) was executed on SQLite 3.53.1 and behaves as described |
+| 6 | §8 step 6 (KV cache) | KV `expirationTtl` minimum is 60 s [S61]; 30 s is only the read `cacheTtl` minimum, and a per-minute refresh exceeds the Free KV write quota |
+| 7 | §3.4 suggested limits | Cloudflare's rate-limit page advises against IP-address keys [S20] |
+| 8 | §5 "Avoid" row and pixel-ratio row | MDN's `alpha:false` warning conflicts with three's default `alpha = false`; stated as a disagreement instead of a rule. `device-pixel-content-box` needs its fallback on iOS |
+| 9 | §5 SwiftShader sentence; §6 vite-plugin-pwa peer range | Wording now matches the sources ("will soon fail"; peer `vite ^3.1 … ^8`) |
+| 10 | Sources [S32]–[S34] | [S32] and the bug-2037094 test are now marked as opened (via GitHub mirrors). [S33] and bugs 531915 / 1823880 are marked not re-opened. The odd `bug623317.bugzilla.mozilla.org` host was replaced by the canonical bugzilla URL for the same bug id |
+
+**Still uncertain**
+
+- Everything in §4 about Red Bull Paper Wings and Guinness (rules, values, dates, names). No record site could be opened in either pass.
+- The V8 15.0 ↔ Chrome 150 mapping, and which V8 version the Workers runtime runs on a given day.
+- Bugzilla bugs 531915 and 1823880 and the V8 code review [S33] were only seen as search-result snippets by the first author and never opened in full.
+- DynamoDB facts are from the archived ~2023 guide; live quotas, pricing and newer GSI features were not checked. Edge-to-AWS latency was not measured.
+- The SQL was run on stock SQLite, not on D1.
+- The re-simulation CPU cost is still an estimate; `detmath.ts` accuracy (≈1e-15) is a target, not a measurement.
+- IAM action list, Safari support for `device-pixel-content-box`, and the maturity of the `cf` CLI / Vite+ remain unverified.

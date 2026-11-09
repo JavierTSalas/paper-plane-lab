@@ -317,7 +317,10 @@ export interface PosedModel {
 /* Airframe (physics-ready)                                           */
 /* ------------------------------------------------------------------ */
 
-/** One thin flat-plate aerodynamic element. */
+/**
+ * One thin flat-plate aerodynamic element: a spanwise strip of one panel.
+ * Model: docs/research/01-aerodynamics.md section 10.
+ */
 export interface AeroElement {
   panel: number;
   role: PanelRole;
@@ -332,17 +335,19 @@ export interface AeroElement {
   le: Vec3;
   /** Unit vector from the leading edge toward the trailing edge, in the element plane. */
   chordDir: Vec3;
-  /** Unit normal of the element plane, body frame (same sense as its panel normal, rotated for flap elements). */
+  /** Unit normal of the element plane, body frame (same sense as its panel normal). */
   normal: Vec3;
-  /** True for the bent trailing-edge strip (elevator / aileron / rudder). */
-  flap: boolean;
+  /** Fraction of the chord that is bent at the trailing edge (elevator / aileron / rudder). 0 = no bend. */
+  bendFrac: number;
+  /** Bend angle, radians. Positive = trailing edge bent toward +normal. */
+  bendRad: number;
   /** Fraction of the normal force this element keeps when shielded by a twin surface (closed keel halves): 0.5 - 1. */
   exposure: number;
   /** Number of wetted faces for skin friction: 1 or 2. */
   wettedFaces: number;
 }
 
-/** A group of elements that shares one finite-wing correction. */
+/** A group of elements that shares one finite-wing correction. Coefficients per research doc 01 section 10.1. */
 export interface LiftingSurface {
   role: PanelRole;
   /** Reference area, m². */
@@ -351,6 +356,19 @@ export interface LiftingSurface {
   span: number;
   aspectRatio: number;
   meanChord: number;
+  /** 0 = rectangular / straight planform, 1 = slender delta. Blends the coefficient sets continuously. */
+  deltaness: number;
+  /** Potential-lift constant Kp, per radian. */
+  kp: number;
+  /** Vortex-lift constant Kv. */
+  kv: number;
+  /** Stall angle and blend width, radians. */
+  alphaStall: number;
+  stallWidth: number;
+  /** Flat-plate drag coefficient at 90 degrees. */
+  cd90: number;
+  /** Centre-of-pressure base position as a fraction of chord at small incidence. */
+  k0: number;
 }
 
 export interface Airframe {
@@ -360,6 +378,12 @@ export interface Airframe {
   cg: Vec3;
   /** Inertia tensor about the CG, body axes, kg m². */
   inertia: Mat3;
+  /**
+   * Apparent (added) mass and inertia of the surrounding air, body axes. Added on the acceleration
+   * side only (research doc 02 section 3). Zero matrices disable the effect.
+   */
+  apparentMass: Mat3;
+  apparentInertia: Mat3;
   elements: AeroElement[];
   surfaces: LiftingSurface[];
   ref: {
@@ -381,6 +405,8 @@ export interface Airframe {
   cgFromNose: number;
   /** Count of paper layers at the thickest point (for display). */
   maxLayers: number;
+  /** Body-frame points used for ground / wall contact tests (nose, tail, wing tips, keel). */
+  contactPoints: Vec3[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -623,9 +649,12 @@ export interface TrimAnalysis {
   /** (x_cg - x_np) / MAC as a percentage. Positive = CG ahead of the neutral point = stable. */
   staticMarginPct: number;
   pitchStable: boolean;
-  /** Sign conventions: negative Cl_beta = stabilising dihedral effect; positive Cn_beta = weathercock stable. */
+  /** Roll moment per radian of sideslip (about +x). Stabilising dihedral effect when `rollStable` is true. */
   clBeta: number;
+  /** Yaw moment per radian of sideslip (about +y). Weathercock stable when `yawStable` is true. */
   cnBeta: number;
+  rollStable: boolean;
+  yawStable: boolean;
   /** Best lift-to-drag ratio in the sweep and where it occurs. */
   bestLd: number;
   bestLdAlphaDeg: number;
