@@ -1,0 +1,349 @@
+.ppl-tunnel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.ppl-tunnel__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-4);
+  align-items: start;
+}
+
+.ppl-tunnel__main,
+.ppl-tunnel__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+  min-width: 0;
+}
+
+@media (min-width: 1000px) {
+  .ppl-tunnel__grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    gap: var(--s-5);
+  }
+  .ppl-tunnel__main {
+    position: sticky;
+    top: calc(var(--safe-top) + var(--s-4));
+  }
+}
+
+/* ---------------------------------------------------------------- test section */
+
+.ppl-tunnel__stage {
+  overflow: hidden;
+}
+
+.ppl-tunnel__view {
+  line-height: 0;
+}
+
+.ppl-tunnel__svg {
+  display: block;
+  height: auto;
+}
+
+.ppl-tunnel__air {
+  fill: var(--sky-wash);
+}
+
+.ppl-tunnel__wall {
+  fill: var(--paper-2);
+  stroke: var(--line);
+  stroke-width: 0.004;
+}
+
+.ppl-tunnel__streams path {
+  fill: none;
+  stroke: #fffaf0;
+  stroke-opacity: 0.95;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ppl-tunnel__smoke path,
+.ppl-tunnel__eddy path {
+  fill: none;
+  stroke: var(--sky);
+  stroke-opacity: 0.55;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ppl-tunnel__eddy path {
+  stroke: var(--ink-2);
+  stroke-opacity: 0.35;
+}
+
+.ppl-tunnel__smoke.is-moving path,
+.ppl-tunnel__eddy.is-moving path {
+  animation-name: ppl-tunnel-smoke;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes ppl-tunnel-smoke {
+  to {
+    stroke-dashoffset: -0.32;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ppl-tunnel__smoke.is-moving path,
+  .ppl-tunnel__eddy.is-moving path {
+    animation: none;
+  }
+}
+
+.ppl-tunnel__sting {
+  stroke: var(--ink-2);
+  stroke-opacity: 0.55;
+  stroke-linecap: round;
+}
+
+.ppl-tunnel__plane path {
+  stroke: var(--ink);
+  stroke-opacity: 0.55;
+  stroke-linejoin: round;
+}
+
+.ppl-tunnel__plane path.is-far {
+  filter: brightness(0.86);
+}
+
+.ppl-tunnel__cg circle {
+  fill: var(--card);
+  stroke: var(--ink);
+}
+
+.ppl-tunnel__cg path {
+  fill: var(--ink);
+}
+
+.ppl-tunnel__cp {
+  fill: var(--viz-2);
+  stroke: var(--card);
+  stroke-width: 0.006;
+}
+
+.ppl-tunnel__arrow path {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.ppl-tunnel__arrow .ppl-tunnel__head {
+  stroke: none;
+}
+
+.ppl-tunnel__arrow text,
+.ppl-tunnel__caption {
+  font-family: var(--font-ui);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  paint-order: stroke;
+  stroke: var(--sky-wash);
+  stroke-linejoin: round;
+}
+
+.ppl-tunnel__caption {
+  fill: var(--ink);
+}
+
+.ppl-tunnel__arrow.is-lift path {
+  stroke: var(--viz-2);
+}
+.ppl-tunnel__arrow.is-lift .ppl-tunnel__head,
+.ppl-tunnel__arrow.is-lift text {
+  fill: var(--viz-2);
+}
+.ppl-tunnel__arrow.is-drag path {
+  stroke: var(--viz-1);
+}
+.ppl-tunnel__arrow.is-drag .ppl-tunnel__head,
+.ppl-tunnel__arrow.is-drag text {
+  fill: var(--viz-1);
+}
+.ppl-tunnel__arrow.is-weight path {
+  stroke: var(--ink);
+}
+.ppl-tunnel__arrow.is-weight .ppl-tunnel__head,
+.ppl-tunnel__arrow.is-weight text {
+  fill: var(--ink);
+}
+
+.ppl-tunnel__moment > path {
+  fill: none;
+  stroke: var(--viz-4);
+  stroke-linecap: round;
+}
+.ppl-tunnel__moment .ppl-tunnel__head {
+  fill: var(--viz-4);
+}
+
+.ppl-tunnel__stage-note {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin: 0;
+  padding: var(--s-2) var(--s-4);
+  border-top: var(--outline);
+}
+
+/* ---------------------------------------------------------------- controls */
+
+.ppl-tunnel__trimrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+}
+
+.ppl-tunnel__trimrow .ppl-small {
+  flex: 1 1 12rem;
+}
+
+.ppl-tunnel__more {
+  border-top: var(--outline);
+  padding-top: var(--s-1);
+}
+
+.ppl-tunnel__more > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--ink-2);
+  font-weight: 600;
+  list-style: none;
+  border-radius: var(--r-control);
+}
+
+.ppl-tunnel__more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ppl-tunnel__more > summary::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  margin-right: var(--s-2);
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--dur-1) var(--ease);
+}
+
+.ppl-tunnel__more[open] > summary::after {
+  transform: rotate(-135deg);
+}
+
+.ppl-tunnel__more[open] > summary {
+  margin-bottom: var(--s-2);
+}
+
+/* ---------------------------------------------------------------- readouts */
+
+.ppl-tunnel__banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-card);
+  border: var(--outline);
+  background: var(--card);
+}
+
+.ppl-tunnel__banner p {
+  margin: 0;
+}
+
+.ppl-tunnel__banner > svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.ppl-tunnel__banner-title {
+  font-weight: 700;
+}
+
+.ppl-tunnel__banner.is-level {
+  background: color-mix(in srgb, var(--good-fill) 22%, var(--card));
+}
+.ppl-tunnel__banner.is-level > svg {
+  color: var(--good);
+}
+.ppl-tunnel__banner.is-climb {
+  background: var(--sky-wash);
+}
+.ppl-tunnel__banner.is-climb > svg {
+  color: var(--viz-2);
+}
+.ppl-tunnel__banner.is-sink {
+  background: color-mix(in srgb, var(--warn-fill) 22%, var(--card));
+}
+.ppl-tunnel__banner.is-sink > svg {
+  color: var(--warn);
+}
+
+.ppl-tunnel__pitch,
+.ppl-tunnel__inline {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.ppl-tunnel__pitch-icon {
+  color: var(--viz-4);
+}
+
+/* ---------------------------------------------------------------- charts and stability */
+
+.ppl-tunnel__chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding-top: var(--s-2);
+}
+
+.ppl-tunnel__chart-note {
+  margin: 0;
+}
+
+.ppl-tunnel__topview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-2);
+  border-radius: var(--r-control);
+  background: var(--paper-2);
+}
+
+.ppl-tunnel__topnote {
+  margin: 0;
+  padding-inline: var(--s-2);
+}
+
+.ppl-tunnel__lateral {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ppl-tunnel__lateral li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+
+.ppl-tunnel__lateral svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--ink-2);
+}
