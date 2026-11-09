@@ -10,7 +10,7 @@
  * the sequence of (position, time) pairs; a different step size is a different sequence and therefore a
  * different realisation of the same statistics.
  */
-import { terrainHeight } from '../env';
+import { cliffTopHeight, terrainHeight } from '../env';
 import { clamp, createRng, DEG, hash32, smoothstep } from '../math';
 import type { Conditions, Environment, Vec3, WindField, WindSpec } from '../types';
 import { thermalUpdraft } from './thermal';
@@ -109,6 +109,7 @@ export function createWindField(spec: WindSpec, seed: number, env: Environment):
   const terrain = env.terrain;
   const bounds = env.bounds;
   const thermals = spec.thermals;
+  const cliffTop = terrain.kind === 'cliff' ? cliffTopHeight(terrain) : 0;
 
   /* ---- mean profile ---- */
   const logSpan = outdoors ? Math.log(REFERENCE_HEIGHT / z0) : 1;
@@ -214,9 +215,11 @@ export function createWindField(spec: WindSpec, seed: number, env: Environment):
       case 'cliff': {
         const radius = terrain.height;
         const xi = x - terrain.edgeX;
+        // Height above the cliff top.
+        const above = y - cliffTop;
         if (xi >= 0) {
           // Seaward of the edge: cylinder centred at sea level under the edge.
-          const eta = y + radius;
+          const eta = above + radius;
           const r2 = xi * xi + eta * eta;
           zeta = y - terrainHeight(terrain, x);
           if (eta <= 0 || r2 <= radius * radius) {
@@ -233,14 +236,14 @@ export function createWindField(spec: WindSpec, seed: number, env: Environment):
           mY = (-ux * ratio * 2 * xi * eta) / r2;
           mZ = u * dirZ;
         } else {
-          zeta = y;
-          if (y <= 0) {
+          zeta = above;
+          if (above <= 0) {
             mX = 0;
             mY = 0;
             mZ = 0;
             break;
           }
-          const eta = radius + y;
+          const eta = radius + above;
           const ratio = (radius * radius) / (eta * eta);
           let u = reference * profile(eta * (1 - ratio));
           if (dirX < 0) {
@@ -248,7 +251,7 @@ export function createWindField(spec: WindSpec, seed: number, env: Environment):
             bubble =
               smoothstep(0, BUBBLE_ONSET, behind) *
               (1 - smoothstep(BUBBLE_LENGTH[0], BUBBLE_LENGTH[1], behind)) *
-              (1 - smoothstep(BUBBLE_HEIGHT[0], BUBBLE_HEIGHT[1], y / radius));
+              (1 - smoothstep(BUBBLE_HEIGHT[0], BUBBLE_HEIGHT[1], above / radius));
             u *= 1 - BUBBLE_WIND_LOSS * bubble;
           }
           mX = u * dirX * (1 + ratio);

@@ -130,8 +130,10 @@ export const ENVIRONMENTS: readonly Environment[] = [
     tempC: 15,
     pressurePa: PRESSURE,
     humidity: 0.6,
-    // U10 = 4.5 m/s over grass, blowing up the slope into the thrower's face.
-    wind: { speed: 4.5, towardDeg: 180, roughness: 0.03, turbulence: null, gustiness: 0.5, thermals: [] },
+    // Wind over grass, blowing up the slope into the thrower's face. Doc 03 section 8 lists U10 = 4.5 m/s;
+    // the default here is 3.5 m/s (still Beaufort 3). At 4.5 m/s the wind at head height plus the gusts
+    // matches the airspeed of a single-sheet plane and every test plane was blown back over the thrower.
+    wind: { speed: 3.5, towardDeg: 180, roughness: 0.03, turbulence: null, gustiness: 0.5, thermals: [] },
     adjustableWind: true,
     maxWind: 9,
     launch: LAUNCH,
@@ -142,13 +144,17 @@ export const ENVIRONMENTS: readonly Environment[] = [
     blurb: 'A cliff top above the sea: the onshore wind sweeps up the face and the water is a long way down.',
     indoor: false,
     bounds: null,
-    // 25 m cliff; the thrower stands 2 m back from the edge (design choice) and throws out to sea.
-    terrain: { kind: 'cliff', height: 25, edgeX: 2 },
+    // 25 m cliff with a rounded top (the wind field is the flow round a half cylinder, so the ground is that
+    // cylinder). The thrower stands on the shoulder, 8 m out from where the top stops being flat: from further
+    // back, every plane landed on the nearly level ground in front of the thrower (design choice).
+    terrain: { kind: 'cliff', height: 25, edgeX: -8 },
     tempC: 16,
     pressurePa: PRESSURE,
     humidity: 0.8,
-    // Onshore U10 = 4 m/s over open water (z0 = 0.0002 m).
-    wind: { speed: 4, towardDeg: 180, roughness: 0.0002, turbulence: null, gustiness: 0.5, thermals: [] },
+    // Onshore wind over open water (z0 = 0.0002 m). Doc 03 section 8 lists U10 = 4 m/s; the default here is
+    // 2.5 m/s. The flow round the cliff top runs at almost twice the profile speed, so at 4 m/s the air at the
+    // lip moves faster than a paper plane flies and nothing thrown from the top gets out to sea.
+    wind: { speed: 2.5, towardDeg: 180, roughness: 0.0002, turbulence: null, gustiness: 0.5, thermals: [] },
     adjustableWind: true,
     maxWind: 9,
     launch: LAUNCH,
