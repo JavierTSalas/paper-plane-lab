@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers static assets. Deploy: npm run build && npx wrangler deploy
+  // The leaderboard API (worker/index.ts) is not wired in yet. See docs/DEPLOY.md.
+  "name": "paper-plane-lab",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

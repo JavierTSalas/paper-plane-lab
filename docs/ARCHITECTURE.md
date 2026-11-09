@@ -23,7 +23,7 @@ Pillars, in priority order:
 
 - Vite 8, React 19, TypeScript 7 (strict), Zustand (persisted store), wouter (hash routing), three.js (flight scene only, lazy chunk).
 - Vitest for unit tests. Tests live next to code as `*.test.ts`. CI = typecheck + vitest + build. Nothing heavier.
-- Hosting: Cloudflare (static assets + optional Functions). No database yet. Storage is behind an interface.
+- Hosting: Cloudflare Workers static assets (`wrangler.jsonc`). No database yet. Storage is behind an interface.
 - `src/core/**` is pure TypeScript. No DOM, no three, no React, no `Math.random`, no `Date.now` in simulation paths. Deterministic given a seed.
 - SI units everywhere in core. Convert only at the display edge (`src/ui/format.ts`).
 - No new npm dependencies without the lead's approval. Report the need instead.
@@ -54,7 +54,7 @@ src/
   ui/                   design system: tokens, components, icons, professor, charts, format
   features/
     onboarding/  hangar/  fold/  fly/  tunnel/  ranks/  notebook/
-functions/api/          Cloudflare Functions (leaderboard stub, storage-agnostic)
+worker/                 Cloudflare Worker API (leaderboard, storage-agnostic; not wired into wrangler.jsonc yet)
 docs/research/          evidence base with sources. Physics constants come from here.
 ```
 
@@ -238,7 +238,7 @@ Every preset has a test: folds with zero errors on A4 and Letter, stays symmetri
   Used to tell a player "your fold is 94 % a Classic Dart", to group identical planes on the leaderboard, and to show look-alikes.
 - Leaderboard: arenas with fixed conditions. Categories `distance` and `airtime`. A ranked flight is a `FlightTicket`; `verifyTicket` re-simulates it and compares within tolerance.
   `LocalLeaderboard` (browser storage + house reference flights of the presets, computed by the simulator, labelled as lab benchmarks) and `HttpLeaderboard` (`/api/leaderboard`).
-  `functions/api` holds a storage-agnostic handler with an in-memory repository and a documented interface for DynamoDB / D1 later. No fake players, ever.
+  `worker/` holds a storage-agnostic fetch handler with a repository interface, an in-memory repository for tests, and documented hookup steps for DynamoDB / D1 (docs/DEPLOY.md). No fake players, ever.
 
 ## 9. UI
 
