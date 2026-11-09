@@ -96,12 +96,12 @@ export function PolarCharts({ polar, trim, alphaDeg, speedText }: PolarChartsPro
         cursorX={alphaDeg}
         height={210}
       />
-      <p className="ppl-small ppl-muted ppl-tunnel__chart-note">
+      <div className="ppl-small ppl-muted ppl-tunnel__chart-note">
         {def.explain}{' '}
         <InfoDot label="How are these curves made?" title="A sweep in the virtual tunnel" topic="lift-and-drag">
           The same element model that flies the plane, swept from −10° to 60° at the glide speed ({speedText}). The vertical line follows your angle slider.
         </InfoDot>
-      </p>
+      </div>
     </div>
   );
 

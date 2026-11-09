@@ -161,38 +161,53 @@ function separate(line: Pt[], o: FlowOptions, le: Pt, te: Pt): Pt[] {
       side = p[1] >= 0 ? 1 : -1;
     }
   }
-  const sign = Math.sign(o.alphaRad) || 1;
+  // The flow leaves the plate at the upper (leeward) edge on the top side and at the lower edge underneath.
+  const upperEdge = le[1] >= te[1] ? le : te;
+  const lowerEdge = le[1] >= te[1] ? te : le;
+  const edge = side > 0 ? upperEdge : lowerEdge;
+  const edgeX = edge[0];
+  // Height of the separation edge on this side: the shear layer leaves it and no line dips below it.
+  const edgeD = Math.max(0, side * edge[1]);
+  let passed = false;
   return line.map(([x, y]) => {
-    const ramp = smoothstep(le[0], le[0] + 0.6, x);
-    if (ramp === 0) return [x, y];
-    const h = wakeHalfWidth(x, te, o.alphaRad) * ramp;
-    const d = side > 0 ? Math.max(0, y) : Math.min(0, y);
-    const pushed = side * Math.sqrt(d * d + h * h);
-    const near = Math.exp(-Math.abs(Math.abs(pushed) - h) / 0.25);
+    // Once a line reaches the edge it stays clear of the dead air, even where potential flow would curl back round it.
+    passed ||= x >= edgeX - 0.02;
+    const d = side > 0 ? Math.max(0, y) : -Math.min(0, y);
+    // Lines far from the plate feel the displacement later and more gently.
+    const ramp = smoothstep(edgeX - 0.05 - 0.5 * d, edgeX + 0.3 + 0.8 * d, x);
+    if (ramp === 0 && !passed) return [x, y];
+    const h = Math.min(0.6, wakeHalfWidth(x, te, o.alphaRad)) * ramp;
+    // The dead air displaces the outer flow; the push fades with distance and keeps the lines in order (h < 0.65).
+    const pushed = d + h * Math.exp(-d / 0.65);
+    const out = passed ? Math.max(pushed, edgeD + 0.01) : pushed;
     const behind = Math.max(0, x - te[0]);
-    const wave = 0.035 * sign * near * Math.min(1, behind * 3) * (1 + behind) * Math.sin(9 * behind + (side > 0 ? 0 : Math.PI));
-    return [x, pushed + wave];
+    const near = Math.exp(-Math.max(0, out - h) / 0.3);
+    const wave = 0.035 * near * Math.min(1, behind * 3) * (1 + behind) * Math.sin(8 * behind - (side > 0 ? 0 : Math.PI / 2));
+    return [x, side * out + wave];
   });
 }
 
-/** Two rolled-up shear layers shed from the edges of a stalled plate (a schematic vortex street). */
-function shedEddies(o: FlowOptions, le: Pt, te: Pt): Pt[][] {
-  const layers: Pt[][] = [];
-  for (const [start, side] of [[le, 1], [te, -1]] as const) {
+/** A schematic vortex street behind a stalled plate: alternating spirals, clockwise on top. */
+function shedEddies(o: FlowOptions, te: Pt): Pt[][] {
+  const spirals: Pt[][] = [];
+  const turns = 1.6;
+  for (let k = 0; ; k++) {
+    const side = k % 2 === 0 ? 1 : -1;
+    const cx = te[0] + 0.12 + 0.24 * k;
+    if (cx > o.xMax) break;
+    const h = Math.min(0.6, wakeHalfWidth(cx, te, o.alphaRad));
+    const cy = side * h * 0.5;
+    const rMax = Math.min(0.12, 0.05 + 0.25 * h) * (0.8 + 0.1 * Math.min(2, k));
     const pts: Pt[] = [];
-    const phase = side > 0 ? 0 : Math.PI;
-    for (let t = 0; t <= 26; t += 0.08) {
-      const along = 0.055 * t;
-      const x = start[0] + along + 0.05 * Math.sin(t + phase) * Math.min(1, t / 3);
-      const edge = side * wakeHalfWidth(x, te, o.alphaRad) * 0.55;
-      const blend = smoothstep(0, 6, t);
-      const y = start[1] * (1 - blend) + edge * blend + 0.05 * Math.cos(t + phase) * Math.min(1, t / 3);
-      if (x > o.xMax) break;
-      pts.push([x, y]);
+    const span = turns * 2 * Math.PI;
+    for (let t = 0; t <= span; t += 0.12) {
+      const r = rMax * (1 - 0.8 * (t / span));
+      const ang = Math.PI / 2 - side * t;
+      pts.push([cx + r * Math.cos(ang), cy + r * Math.sin(ang)]);
     }
-    layers.push(pts);
+    spirals.push(pts);
   }
-  return layers;
+  return spirals;
 }
 
 /** Thin a polyline to points at least `min` apart (keeps the ends). */
@@ -215,8 +230,8 @@ export function flowPicture(o: FlowOptions): FlowPicture {
   let streamlines = o.seeds.map((y) => trace(y, o, gamma));
   if (o.stalled) streamlines = streamlines.map((l) => separate(l, o, le, te));
   return {
-    streamlines: streamlines.map((l) => thin(l, 0.012)),
-    eddies: o.stalled ? shedEddies(o, le, te) : [],
+    streamlines: streamlines.map((l) => thin(l, 0.022)),
+    eddies: o.stalled ? shedEddies(o, te) : [],
     le,
     te,
   };

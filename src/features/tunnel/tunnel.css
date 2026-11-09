@@ -67,7 +67,7 @@
 .ppl-tunnel__eddy path {
   fill: none;
   stroke: var(--sky);
-  stroke-opacity: 0.55;
+  stroke-opacity: 0.5;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
@@ -125,16 +125,16 @@
 .ppl-tunnel__cp {
   fill: var(--viz-2);
   stroke: var(--card);
-  stroke-width: 0.006;
 }
 
-.ppl-tunnel__arrow path {
+.ppl-tunnel__cp.is-off {
+  fill: var(--card);
+  stroke: var(--viz-2);
+}
+
+.ppl-tunnel__shaft {
   fill: none;
   stroke-linecap: round;
-}
-
-.ppl-tunnel__arrow .ppl-tunnel__head {
-  stroke: none;
 }
 
 .ppl-tunnel__arrow text,
@@ -151,21 +151,21 @@
   fill: var(--ink);
 }
 
-.ppl-tunnel__arrow.is-lift path {
+.ppl-tunnel__arrow.is-lift .ppl-tunnel__shaft {
   stroke: var(--viz-2);
 }
 .ppl-tunnel__arrow.is-lift .ppl-tunnel__head,
 .ppl-tunnel__arrow.is-lift text {
   fill: var(--viz-2);
 }
-.ppl-tunnel__arrow.is-drag path {
+.ppl-tunnel__arrow.is-drag .ppl-tunnel__shaft {
   stroke: var(--viz-1);
 }
 .ppl-tunnel__arrow.is-drag .ppl-tunnel__head,
 .ppl-tunnel__arrow.is-drag text {
   fill: var(--viz-1);
 }
-.ppl-tunnel__arrow.is-weight path {
+.ppl-tunnel__arrow.is-weight .ppl-tunnel__shaft {
   stroke: var(--ink);
 }
 .ppl-tunnel__arrow.is-weight .ppl-tunnel__head,
@@ -173,7 +173,7 @@
   fill: var(--ink);
 }
 
-.ppl-tunnel__moment > path {
+.ppl-tunnel__moment > path:first-child {
   fill: none;
   stroke: var(--viz-4);
   stroke-linecap: round;
@@ -184,11 +184,47 @@
 
 .ppl-tunnel__stage-note {
   display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  padding: var(--s-2) var(--s-4) var(--s-3);
+  border-top: var(--outline);
+}
+
+.ppl-tunnel__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1) var(--s-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ppl-tunnel__legend li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ppl-tunnel__key {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+.ppl-tunnel__key.is-lift {
+  background: var(--viz-2);
+}
+.ppl-tunnel__key.is-drag {
+  background: var(--viz-1);
+}
+
+.ppl-tunnel__stage-caption {
+  display: flex;
   align-items: center;
   gap: var(--s-1);
-  margin: 0;
-  padding: var(--s-2) var(--s-4);
-  border-top: var(--outline);
 }
 
 /* ---------------------------------------------------------------- controls */

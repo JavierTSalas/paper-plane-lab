@@ -47,7 +47,8 @@ describe('Joukowski flat plate', () => {
         expect(line[line.length - 1]![0]).toBeGreaterThan(1.5);
         for (const p of line) expect(Number.isFinite(p[0]) && Number.isFinite(p[1])).toBe(true);
       }
-      expect(pic.eddies.length).toBe(alphaDeg > 30 ? 2 : 0);
+      if (alphaDeg > 30) expect(pic.eddies.length).toBeGreaterThan(2);
+      else expect(pic.eddies).toHaveLength(0);
     }
   });
 

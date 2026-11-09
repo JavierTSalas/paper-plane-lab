@@ -54,6 +54,7 @@ export default function TunnelPage(): ReactElement {
   const weight = airframe.mass * STANDARD_GRAVITY;
   const stalled = alphaDeg > trim.stallAlphaDeg;
   const speedText = formatSpeed(speed, units);
+  const mN = (n: number): string => `${fixed(n * 1000, 0)} mN`;
 
   const goToTrim = (): void => {
     if (trim.alphaDeg === null || trim.speed === null) return;
@@ -75,13 +76,27 @@ export default function TunnelPage(): ReactElement {
         <div className="ppl-tunnel__main">
           <Card padding="none" className="ppl-tunnel__stage">
             <TunnelView model={model} cg={airframe.cg} reading={reading} weight={weight} stalled={stalled} speedText={speedText} />
-            <p className="ppl-caption ppl-tunnel__stage-note">
-              {stalled ? 'Stalled: the air has torn away from the top of the wing.' : 'Smoke follows the air around the plane.'}
-              <InfoDot label="About this picture" title="A picture, and the real numbers" topic="how-it-works">
-                The smoke is a two-dimensional idealisation: ideal flow past a flat plate, with its swirl scaled so it makes the lift computed for your plane. The numbers come from
-                the full 3D element model that also flies the plane. Arrows share one scale; the dot on the wing is the centre of pressure.
-              </InfoDot>
-            </p>
+            <div className="ppl-tunnel__stage-note">
+              <ul className="ppl-tunnel__legend" aria-label="Forces">
+                <li>
+                  <span className="ppl-tunnel__key is-lift" aria-hidden="true" />L Lift {mN(reading.lift)}
+                </li>
+                <li>
+                  <span className="ppl-tunnel__key is-drag" aria-hidden="true" />D Drag {mN(reading.drag)}
+                </li>
+                <li>
+                  <span className="ppl-tunnel__key" aria-hidden="true" />W Weight {mN(weight)}
+                </li>
+              </ul>
+              <div className="ppl-caption ppl-tunnel__stage-caption">
+                {stalled ? 'Stalled: the air has torn away from the top of the wing.' : 'Smoke follows the air around the plane.'}
+                <InfoDot label="About this picture" title="A picture, and the real numbers" topic="how-it-works">
+                  The smoke is a two-dimensional idealisation: ideal flow past a flat plate, with its swirl scaled so it makes the lift computed for your plane. The numbers come
+                  from the full 3D element model that also flies the plane. The arrows share one scale and start at the centre of pressure (blue dot; hollow when it lies
+                  beyond the plane).
+                </InfoDot>
+              </div>
+            </div>
           </Card>
 
           <Card className="ppl-stack ppl-tunnel__controls">

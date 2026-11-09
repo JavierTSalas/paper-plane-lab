@@ -57,14 +57,14 @@ export function StabilityCard({ model, airframe, trim, polar, units, elevatorDeg
           ]}
           label="Top view of the plane with the centre of gravity (CG) and the neutral point (NP) marked"
         />
-        <p className="ppl-small ppl-muted ppl-tunnel__topnote">
+        <div className="ppl-small ppl-muted ppl-tunnel__topnote">
           {npAheadOfCg
             ? `The NP sits ${formatLength(gap, units)} ahead of the CG: unstable.`
             : `The CG sits ${formatLength(gap, units)} ahead of the NP: it weathervanes into the glide.`}{' '}
           <InfoDot label="What are CG and NP?" title="Balance point and neutral point" topic="stability-and-trim">
             CG is where the plane balances on a fingertip. NP is the point the extra lift from a gust acts on; with the CG ahead of it, a gust that lifts the nose pushes it back down.
           </InfoDot>
-        </p>
+        </div>
       </div>
 
       <BarMeter

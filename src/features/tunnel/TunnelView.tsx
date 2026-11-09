@@ -18,12 +18,12 @@ export interface TunnelViewProps {
 }
 
 /* Picture window, in plane lengths, CG at the origin. */
-const X0 = -1.5;
-const X1 = 1.5;
-const Y0 = -0.95;
-const Y1 = 0.95;
-const WALL = 0.06;
-const SEED_GAP = 0.105;
+const X0 = -1.2;
+const X1 = 1.2;
+const Y0 = -0.8;
+const Y1 = 0.8;
+const WALL = 0.05;
+const SEED_GAP = 0.1;
 const DEG = Math.PI / 180;
 
 const svg = (p: Pt): Pt => [p[0], -p[1]];
@@ -35,7 +35,7 @@ interface ArrowSpec {
   tone: 'lift' | 'drag' | 'weight';
   label: string;
   /** Where the label sits relative to the tip. */
-  anchor: 'above' | 'right' | 'below';
+  anchor: 'left' | 'right' | 'below';
 }
 
 function Arrow({ a, unit }: { a: ArrowSpec; unit: number }): ReactElement | null {
@@ -50,13 +50,13 @@ function Arrow({ a, unit }: { a: ArrowSpec; unit: number }): ReactElement | null
   const right: Pt = [base[0] + uy * w, base[1] - ux * w];
   const [tx, ty] = svg(tip);
   const fs = 12.5 * unit;
-  const lx = a.anchor === 'right' ? tx + 6 * unit : tx;
-  const ly = a.anchor === 'above' ? ty - 7 * unit : a.anchor === 'below' ? ty + fs + 4 * unit : ty + fs * 0.35;
+  const lx = a.anchor === 'right' ? tx + 6 * unit : a.anchor === 'left' ? tx - 7 * unit : tx;
+  const ly = a.anchor === 'below' ? ty + fs + 4 * unit : ty + fs * 0.35;
   return (
     <g className={`ppl-tunnel__arrow is-${a.tone}`}>
-      {len > head * 1.05 && <path d={pathData([a.from, base], svg)} strokeWidth={3 * unit} />}
+      {len > head * 1.05 && <path d={pathData([a.from, base], svg)} strokeWidth={3 * unit} className="ppl-tunnel__shaft" />}
       <path d={pathData([tip, left, right], svg) + 'Z'} className="ppl-tunnel__head" />
-      <text x={lx} y={ly} fontSize={fs} textAnchor={a.anchor === 'right' ? 'start' : 'middle'} strokeWidth={3.5 * unit}>
+      <text x={lx} y={ly} fontSize={fs} textAnchor={a.anchor === 'right' ? 'start' : a.anchor === 'left' ? 'end' : 'middle'} strokeWidth={3.5 * unit}>
         {a.label}
       </text>
     </g>
@@ -91,15 +91,19 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
   }, [alpha, reading.cl, stalled, plateCentre]);
   const shift = (p: Pt): Pt => svg([p[0] + plateCentre[0], p[1] + plateCentre[1]]);
 
-  // One scale for every force: weight about 0.4 plane lengths, shrunk if lift or drag would leave the window.
+  // One scale for every force: weight about 0.36 plane lengths, shrunk if lift or drag would leave the window.
   const biggest = Math.max(weight, Math.abs(reading.lift), Math.abs(reading.drag), 1e-9);
-  const scale = Math.min(0.4 / weight, 0.62 / biggest);
-  const cp: Pt = reading.cpX === null ? [0, 0] : bodyToPicture([reading.cpX, cg[1]], cg, length, alpha);
+  const scale = Math.min(0.36 / weight, 0.52 / biggest);
+  // At small normal force the centre of pressure runs off far ahead or behind; the arrows then start at the
+  // nearer end of the plane and the dot is drawn hollow.
+  const cpX = reading.cpX === null ? cg[0] : Math.min(length, Math.max(0, reading.cpX));
+  const cpOff = reading.cpX !== null && cpX !== reading.cpX;
+  const cp: Pt = bodyToPicture([cpX, cg[1]], cg, length, alpha);
   const mN = (n: number): string => `${fixed(n * 1000, 0)} mN`;
   const arrows: ArrowSpec[] = [
-    { from: [0, 0], vec: [0, -weight * scale], tone: 'weight', label: `Weight ${mN(weight)}`, anchor: 'below' },
-    { from: cp, vec: [0, reading.lift * scale], tone: 'lift', label: `Lift ${mN(reading.lift)}`, anchor: reading.lift >= 0 ? 'above' : 'below' },
-    { from: cp, vec: [reading.drag * scale, 0], tone: 'drag', label: `Drag ${mN(reading.drag)}`, anchor: 'right' },
+    { from: [0, 0], vec: [0, -weight * scale], tone: 'weight', label: 'W', anchor: 'below' },
+    { from: cp, vec: [0, reading.lift * scale], tone: 'lift', label: 'L', anchor: 'left' },
+    { from: cp, vec: [reading.drag * scale, 0], tone: 'drag', label: 'D', anchor: 'right' },
   ];
 
   // Pitching moment: a curved arrow round the CG, clockwise on screen (nose-left) when nose-up.
@@ -115,6 +119,11 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
   }
   const arcEnd = arcPts[arcPts.length - 1]!;
   const arcPrev = arcPts[arcPts.length - 2]!;
+  const arcDir = Math.atan2(arcEnd[1] - arcPrev[1], arcEnd[0] - arcPrev[0]);
+  const arcHead = (k: number, side: number): Pt => [
+    arcEnd[0] - 8 * unit * k * Math.cos(arcDir) + side * 4.5 * unit * Math.sin(arcDir),
+    arcEnd[1] - 8 * unit * k * Math.sin(arcDir) - side * 4.5 * unit * Math.cos(arcDir),
+  ];
 
   const smokeDur = `${(2.6 / Math.sqrt(Math.max(1, reading.speed))).toFixed(2)}s`;
   const label = `Side view of the test section at ${speedText} and ${fixed(reading.alphaDeg, 0)} degrees angle of attack. ${
@@ -139,8 +148,8 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
           </g>
           <g
             className={reduced ? 'ppl-tunnel__smoke' : 'ppl-tunnel__smoke is-moving'}
-            strokeWidth={4 * unit}
-            strokeDasharray="0.05 0.11"
+            strokeWidth={3.2 * unit}
+            strokeDasharray="0.07 0.09"
           >
             {flow.streamlines.map((l, i) => (
               <path key={i} d={pathData(l, shift)} style={{ animationDuration: smokeDur }} strokeDashoffset={(i % 3) * 0.05} />
@@ -155,7 +164,7 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
           )}
 
           {/* Sting: a strut from the floor to the CG pivot. */}
-          <path d={`M${0.42} ${-Y0} L0 0`} className="ppl-tunnel__sting" strokeWidth={5 * unit} />
+          <path d={`M${0.36} ${-Y0} L0 0`} className="ppl-tunnel__sting" strokeWidth={5 * unit} />
 
           <g className="ppl-tunnel__plane" strokeWidth={1.2 * unit}>
             {pieces.map((p) => (
@@ -166,10 +175,7 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
           {showMoment && (
             <g className="ppl-tunnel__moment" strokeWidth={2 * unit}>
               <path d={pathData(arcPts, svg)} />
-              <Arrow
-                a={{ from: arcPrev, vec: [(arcEnd[0] - arcPrev[0]) * 1.0001, (arcEnd[1] - arcPrev[1]) * 1.0001], tone: 'weight', label: '', anchor: 'right' }}
-                unit={unit * 0.8}
-              />
+              <path d={pathData([arcEnd, arcHead(1, 1), arcHead(1, -1)], svg) + 'Z'} className="ppl-tunnel__head" />
             </g>
           )}
 
@@ -182,7 +188,7 @@ export function TunnelView({ model, cg, reading, weight, stalled, speedText }: T
             <circle cx={0} cy={0} r={6 * unit} />
             <path d={`M0 0 L${6 * unit} 0 A${6 * unit} ${6 * unit} 0 0 1 0 ${6 * unit} Z M0 0 L${-6 * unit} 0 A${6 * unit} ${6 * unit} 0 0 1 0 ${-6 * unit} Z`} />
           </g>
-          {reading.cpX !== null && <circle cx={cp[0]} cy={-cp[1]} r={3.5 * unit} className="ppl-tunnel__cp" />}
+          {reading.cpX !== null && <circle cx={cp[0]} cy={-cp[1]} r={4 * unit} strokeWidth={1.5 * unit} className={cpOff ? 'ppl-tunnel__cp is-off' : 'ppl-tunnel__cp'} />}
         </g>
 
         <rect x={X0} y={-Y1} width={X1 - X0} height={WALL} className="ppl-tunnel__wall" />
