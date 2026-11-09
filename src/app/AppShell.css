@@ -1,0 +1,293 @@
+/* App chrome. Phones: top bar + bottom tab bar. From 900 px: left rail. */
+
+.ppl-shell {
+  min-height: 100dvh;
+}
+
+.ppl-skip {
+  position: fixed;
+  top: calc(var(--safe-top) + 8px);
+  left: 8px;
+  z-index: calc(var(--z-popover) + 1);
+  padding: 10px 16px;
+  border-radius: var(--r-control);
+  background: var(--ink);
+  color: var(--card);
+  font-weight: 700;
+  transform: translateY(-200%);
+}
+
+.ppl-skip:focus {
+  transform: none;
+}
+
+/* ------------------------------------------------------------ top bar */
+
+.ppl-shell__top {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-chrome);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-height: calc(var(--topbar-h) + var(--safe-top));
+  padding: var(--safe-top) calc(var(--gutter) - 8px + var(--safe-right)) 0 calc(var(--gutter) + var(--safe-left));
+  background: rgb(247 241 229 / 0.86);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  border-bottom: 1px solid rgb(220 207 184 / 0.7);
+}
+
+.ppl-shell__title {
+  min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ppl-shell__top-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-width: 0;
+}
+
+.ppl-shell__plane {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: 180px;
+  min-height: 36px;
+  padding: 4px 12px 4px 4px;
+  border-radius: var(--r-pill);
+  background: var(--card);
+  border: var(--outline);
+  box-shadow: var(--shadow-sm);
+  color: var(--ink);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  text-decoration: none;
+  /* The visible chip is 36 px; the margin-free hit area reaches 44 px. */
+  position: relative;
+}
+
+.ppl-shell__plane::after {
+  content: '';
+  position: absolute;
+  inset: -4px 0;
+}
+
+.ppl-shell__plane:hover {
+  border-color: rgb(47 46 43 / 0.3);
+}
+
+.ppl-shell__plane-dot {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px rgb(47 46 43 / 0.16);
+}
+
+.ppl-shell__plane-name {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ------------------------------------------------------------ main */
+
+.ppl-shell__main {
+  padding-bottom: calc(var(--tabbar-h) + var(--safe-bottom));
+  padding-left: var(--safe-left);
+  padding-right: var(--safe-right);
+  outline: none;
+}
+
+.ppl-shell--immersive .ppl-shell__main {
+  min-height: 100dvh;
+}
+
+/* ------------------------------------------------------------ nav: bottom bar on phones */
+
+.ppl-shell__nav {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: var(--z-chrome);
+  padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
+  background: rgb(255 250 240 / 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  box-shadow: 0 -4px 18px rgb(60 50 30 / 0.06);
+}
+
+.ppl-shell__brand {
+  display: none;
+}
+
+.ppl-shell__tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  height: var(--tabbar-h);
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.ppl-shell__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 100%;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: var(--r-control);
+  transition: color var(--dur-1) var(--ease);
+}
+
+.ppl-shell__tab-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 30px;
+  border-radius: var(--r-pill);
+  transition: background-color var(--dur-2) var(--ease), transform var(--dur-2) var(--ease);
+}
+
+.ppl-shell__tab:hover {
+  color: var(--ink);
+}
+
+.ppl-shell__tab.is-active {
+  color: var(--accent-ink);
+}
+
+.ppl-shell__tab.is-active .ppl-shell__tab-icon {
+  background: var(--accent-wash);
+  transform: translateY(-1px);
+}
+
+.ppl-shell__tab:active .ppl-shell__tab-icon {
+  transform: scale(0.94);
+}
+
+/* ------------------------------------------------------------ rail from 900 px */
+
+@media (min-width: 900px) {
+  .ppl-shell__nav {
+    inset: 0 auto 0 0;
+    width: calc(var(--rail-w) + var(--safe-left));
+    padding: calc(var(--safe-top) + var(--s-4)) 0 var(--s-4) var(--safe-left);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-5);
+    border-top: 0;
+    border-right: 1px solid var(--line);
+    box-shadow: none;
+    background: rgb(255 250 240 / 0.7);
+  }
+
+  .ppl-shell__brand {
+    display: grid;
+    place-items: center;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: var(--r-control);
+  }
+
+  .ppl-shell__brand svg {
+    filter: drop-shadow(0 3px 6px rgb(185 83 47 / 0.3));
+  }
+
+  .ppl-shell__brand-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .ppl-shell__tabs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-2);
+    height: auto;
+    width: 100%;
+    padding: 0 var(--s-2);
+  }
+
+  .ppl-shell__tab {
+    height: 72px;
+    gap: 4px;
+  }
+
+  .ppl-shell__tab-icon {
+    width: 56px;
+    height: 36px;
+  }
+
+  .ppl-shell__top,
+  .ppl-shell__main {
+    margin-left: calc(var(--rail-w) + var(--safe-left));
+  }
+
+  .ppl-shell__main {
+    padding-bottom: var(--safe-bottom);
+    padding-left: 0;
+  }
+
+  .ppl-shell__top {
+    padding-left: var(--gutter);
+  }
+}
+
+/* ------------------------------------------------------------ route fallback */
+
+.ppl-route-loading {
+  display: grid;
+  place-items: center;
+  min-height: 50vh;
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------ settings sheet */
+
+.ppl-settings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-5);
+}
+
+.ppl-settings__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.ppl-settings__group + .ppl-settings__group {
+  padding-top: var(--s-5);
+  border-top: 1px solid var(--line);
+}
+
+.ppl-settings__confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  border-radius: var(--r-control);
+  background: var(--rose-wash);
+}

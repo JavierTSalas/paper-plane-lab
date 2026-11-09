@@ -1,0 +1,16 @@
+{
+  "name": "Paper Plane Lab",
+  "short_name": "Plane Lab",
+  "description": "Fold real paper airplanes, then test them in a physically faithful flight lab.",
+  "start_url": "./#/hangar",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f1e5",
+  "theme_color": "#f7f1e5",
+  "categories": ["education", "games"],
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
