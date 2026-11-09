@@ -196,8 +196,8 @@ export function expectValidState(state: FlatState, label: string, options: Invar
   const { width, height } = state.paper;
   expect(Math.abs(sheetArea(state) / (width * height) - 1), `${label}: sheet area conserved`).toBeLessThan(1e-12);
   state.pieces.forEach((piece) => expectPieceSound(piece, `${label}, piece ${piece.id}`));
-  const layers = state.pieces.map((p) => p.layer).sort((a, b) => a - b);
-  expect(layers, `${label}: layers are 0..n-1`).toEqual(state.pieces.map((_, i) => i));
+  // Layers are a permutation of 0..n-1; the engine also lists the pieces bottom layer first.
+  expect(state.pieces.map((p) => p.layer), `${label}: layers are 0..n-1, in order`).toEqual(state.pieces.map((_, i) => i));
   expect(new Set(state.pieces.map((p) => p.id)).size, `${label}: unique ids`).toBe(state.pieces.length);
   for (const crease of state.creases) {
     expect(Math.hypot(crease.b[0] - crease.a[0], crease.b[1] - crease.a[1]), `${label}: crease has length`).toBeGreaterThan(1e-8);
