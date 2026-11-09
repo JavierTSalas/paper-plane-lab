@@ -268,6 +268,8 @@ function applyFlip(state: FlatState, step: FoldStep, index: number): StepOutcome
  *    exist only inside that frame.
  *  - A skipped step has `after === before`, `split === before.pieces`, no moving pieces and no axis.
  *  - A fold that would leave more than MAX_PIECES pieces is skipped and reported as `nothing-moves`.
+ *  - A `sliver` warning means a corner the line clips by less than 1e-12 m² was left on its piece, uncut.
+ *    That speck then lies on the wrong side of the fold, out of line with its neighbours.
  */
 export function applyStep(state: FlatState, step: FoldStep, index: number): StepOutcome {
   switch (step?.kind) {
