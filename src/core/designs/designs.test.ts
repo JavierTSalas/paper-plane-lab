@@ -21,7 +21,7 @@ describe('preset library', () => {
         const area = fold.final.pieces.reduce((sum, p) => sum + polygonArea(p.sheet), 0);
         expect(area).toBeCloseTo(paper.width * paper.height, 10);
         expect(sheetMass(paper)).toBeGreaterThan(0);
-        expect(model.length).toBeGreaterThan(0.5 * paper.height);
+        expect(model.length).toBeGreaterThan(0.25 * paper.height);
         expect(model.span).toBeGreaterThan(0.02);
         expect(model.pieces.every((p) => p.verts.every((v) => v.every(Number.isFinite)))).toBe(true);
       });

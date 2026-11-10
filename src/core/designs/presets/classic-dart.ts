@@ -1,5 +1,6 @@
 import type { PaperSpec, Vec2 } from '../../types';
-import { creaseAlong, DEFAULT_TRIM, DEG, foldAlong, line, withMirror } from '../helpers';
+import { dartFolds } from '../families';
+import { DEFAULT_TRIM, DEG, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
 /**
@@ -7,31 +8,9 @@ import type { PlanePreset, PresetBuild } from '../types';
  * Five flat folds, then the centre fold and wings folded so the leading edge meets the keel.
  */
 function build(paper: PaperSpec): PresetBuild {
-  const W = paper.width;
   const H = paper.height;
-  const cx = W / 2;
-  const nose: Vec2 = [cx, H];
-
-  // The second fold bisects the angle between the slanted edge and the centre crease (22.5 degrees
-  // from the crease). On tall sheets it leaves through the long edge; on squarish sheets
-  // (H / W < 1.2071) it leaves through the bottom edge instead. Doc 05 section 1.2.
-  const k = (1 + Math.SQRT2) / 2;
-  const t225 = Math.SQRT2 - 1;
-  const leftExit: Vec2 = H >= k * W ? [0, H - k * W] : [cx - H * t225, 0];
-
-  const steps = [
-    creaseAlong([cx, 0], [cx, H], 'Fold the sheet in half lengthwise, then unfold. That crease is your centre line.'),
-    ...withMirror(
-      foldAlong(nose, [0, H - cx], [0, H], 'Fold the top-left corner down to the centre crease.'),
-      cx,
-      'Fold the top-right corner down to meet it.',
-    ),
-    ...withMirror(
-      foldAlong(nose, leftExit, [0, H - cx], 'Fold the slanted left edge in to the centre crease.'),
-      cx,
-      'Fold the slanted right edge in the same way.',
-    ),
-  ];
+  const cx = paper.width / 2;
+  const { steps, nose } = dartFolds(paper);
 
   // Wing fold: the leading edge is laid onto the keel, so the hinge bisects the 22.5 degree nose
   // angle: 11.25 degrees from the centre crease. Doc 05 section 1.3.
@@ -67,5 +46,9 @@ export const classicDart: PlanePreset = {
   fidelity: 'documented',
   build,
   throwHint: { speed: 9, pitchDeg: 5, note: 'A firm, level throw. Darts like speed.' },
-  sources: ['https://www.foldnfly.com/1.html', 'https://airandspace.si.edu/'],
+  sources: [
+    'https://www.foldnfly.com/1.html',
+    'https://howthingsfly.si.edu/sites/default/files/paper-airplane/NASM_paper_plane_printout_b1p3i5.pdf',
+    'https://mainestatemuseum.org/wp-content/uploads/2025/08/Basic-Dart-Guide.pdf',
+  ],
 };
