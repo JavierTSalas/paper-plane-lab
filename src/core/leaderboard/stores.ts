@@ -145,13 +145,18 @@ export class HttpLeaderboard implements LeaderboardStore {
   private async request(url: string, init: RequestInit): Promise<unknown> {
     const ctrl = new AbortController();
     let timedOut = false;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      ctrl.abort();
-    }, this.timeoutMs);
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    // Race as well as abort: a fetch implementation that ignores the signal must not hang the caller.
+    const deadline = new Promise<never>((_, reject) => {
+      timer = setTimeout(() => {
+        timedOut = true;
+        ctrl.abort();
+        reject(new Error('timeout'));
+      }, this.timeoutMs);
+    });
     let res: Response;
     try {
-      res = await this.fetchImpl(url, { ...init, signal: ctrl.signal });
+      res = await Promise.race([this.fetchImpl(url, { ...init, signal: ctrl.signal }), deadline]);
     } catch (err) {
       if (timedOut) throw new LeaderboardError('timeout', `leaderboard did not answer within ${this.timeoutMs} ms`);
       throw new LeaderboardError('network', `leaderboard unreachable: ${err instanceof Error ? err.message : String(err)}`);

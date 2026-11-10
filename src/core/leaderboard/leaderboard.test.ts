@@ -1,6 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { makeDesign, PRESETS, presetPaper } from '../designs';
-import type { FlightTicket, PlaneDesign, RankEntry } from '../types';
+import type { FlightTicket, PlaneDesign } from '../types';
 import {
   ARENAS, buildTicketResult, clearHouseCache, formatScore, getArena, groupByDesign, HOUSE_PLAYER, houseEntries, LocalLeaderboard,
   parseTicket, scoreOf, verifyTicket,
