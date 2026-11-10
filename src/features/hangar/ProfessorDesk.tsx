@@ -98,7 +98,7 @@ export function ProfessorDesk(): ReactElement {
         <span className="ppl-desk__stamps" aria-hidden="true">
           {ASSIGNMENTS.map((a, i) =>
             done.includes(a.id) ? (
-              <Stamp key={a.id} index={i} size={26} />
+              <Stamp key={a.id} index={i} size={24} />
             ) : (
               <span key={a.id} className={cx('ppl-desk__slot', current?.id === a.id && 'is-current')}>
                 {i + 1}
