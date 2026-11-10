@@ -55,7 +55,7 @@ export const skyKing: PlanePreset = {
   fidelity: 'approximate',
   fidelityNote: 'Not Takuo Toda\'s fold: his design needs reverse folds, so this is a simple-fold stand-in with wingtip fins.',
   build,
-  throwHint: { speed: 5, pitchDeg: 0, note: 'Indoors, a gentle level push. For time aloft in the hangar, throw it hard and almost straight up.' },
+  throwHint: { speed: 4.5, pitchDeg: 0, note: 'A gentle, level push. It is small and light: let it float.' },
   sources: [
     'https://www.japantimes.co.jp/news/2009/05/17/national/new-flight-record-for-paper-plane-set/',
     'https://content.time.com/time/specials/packages/article/0,28804,1934027_1934003_1933991,00.html',

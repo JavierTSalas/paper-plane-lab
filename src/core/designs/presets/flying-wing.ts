@@ -47,10 +47,11 @@ function build(paper: PaperSpec): PresetBuild {
       wingletDeg: 90,
     },
     // Factory trim: V dihedral 8 degrees, tip fins 90 degrees (doc 06 section 5). The doc asks for +10 degrees
-    // of reflex on the rear 15 %, reasoning from a fixed aerodynamic centre. With the centre of pressure moving
-    // aft with incidence (doc 01 section 6) the wing already trims flat, at 12 to 13 degrees and 2.1 m/s, and
-    // any up-bend beyond 1 degree puts it into the stall. So: no reflex.
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 0, elevatorChordFrac: 0.15 },
+    // of reflex on the rear 15 %, reasoning from a fixed aerodynamic centre. In the tunnel the centre of pressure
+    // moves aft with incidence (doc 01 section 6), which already balances this wing: flat, it trims at 12 to 13
+    // degrees, on the edge of its stall, and any up-bend stalls it. One degree of DOWN-bend sets it at 10
+    // degrees and 2.3 m/s with room to spare. The disagreement with the doc is reported, not hidden.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: -1, elevatorChordFrac: 0.15 },
   };
 }
 
@@ -62,13 +63,13 @@ export const flyingWing: PlanePreset = {
   story:
     'A generic tailless glider, folded from a sheet turned sideways. Rolling the front edge over four times makes the stiff, heavy ' +
     'leading edge that every flying wing needs, and the upturned tips keep it pointing forward. ' +
-    'It is the slowest plane in the hangar and the most sensitive to how its back edge is bent.',
+    'It is the slowest plane in the hangar and the most sensitive to how its back edge is bent: a hair up and it stalls, a hair down and it dives.',
   difficulty: 2,
   orientation: 'landscape',
   recommendedSizeId: 'a4',
   fidelity: 'approximate',
   fidelityNote: 'A generic leading-edge-roll wing defined in our research notes; it is not one published design.',
   build,
-  throwHint: { speed: 3.5, pitchDeg: 0, note: 'Hold it at the back in the middle and let it go with a soft, level push.' },
+  throwHint: { speed: 2.5, pitchDeg: 0, note: 'Hold it at the back in the middle and let it go with a soft, level push.' },
   sources: ['https://www.cambridge.org/core/journals/journal-of-fluid-mechanics/article/centre-of-mass-location-flight-modes-stability-and-dynamic-modelling-of-gliders/D4983A693B836A364D19C95B4D5FFC3B'],
 };

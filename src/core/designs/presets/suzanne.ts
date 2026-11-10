@@ -53,7 +53,7 @@ export const suzanne: PlanePreset = {
   fidelity: 'approximate',
   fidelityNote: 'Not John Collins\'s published fold: a Nakamura-style stand-in that copies the reported features of Suzanne.',
   build,
-  throwHint: { speed: 7, pitchDeg: 5, note: 'Indoors, a firm throw just above level. In the hangar, throw hard and high.' },
+  throwHint: { speed: 5, pitchDeg: 0, note: 'Indoors, a smooth level throw. Flatten nothing: it is trimmed to glide.' },
   sources: [
     'https://www.guinnessworldrecords.com/news/2012/2/video-is-this-the-farthest-ever-flight-by-a-paper-airplane',
     'https://science.howstuffworks.com/innovation/everyday-innovations/paper-airplane-guy-john-collins-world-record.htm',

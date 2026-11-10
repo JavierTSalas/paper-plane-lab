@@ -1,13 +1,25 @@
 import { makePaper } from '../paper';
 import type { PaperPatternId } from '../paper';
-import type { PaperSpec, PlaneDesign, ShapeSpec, TrimSpec } from '../types';
+import type { PaperSpec, PlaneCategory, PlaneDesign, ShapeSpec, TrimSpec } from '../types';
 import { PRESET_LIST } from './presets';
 import type { PlanePreset } from './types';
 
 export type { PlanePreset, PresetBuild } from './types';
-export { creaseAlong, DEFAULT_TRIM, foldAlong, sideOf, withMirror } from './helpers';
+export { bySheet, clipLine, creaseAlong, DEFAULT_TRIM, foldAlong, line, sideOf, withMirror } from './helpers';
+export { dartFolds, lockFolds } from './families';
+export type { DartFolds, LockFolds, LockOptions } from './families';
 
+/** Every preset airplane, in hangar order (darts first, then gliders, then the flying wing). */
 export const PRESETS: readonly PlanePreset[] = PRESET_LIST;
+
+/** Categories that have presets, in hangar order, for section headers and filters. */
+export const PRESET_CATEGORIES: readonly PlaneCategory[] = PRESET_LIST.reduce<PlaneCategory[]>(
+  (seen, p) => (seen.includes(p.category) ? seen : [...seen, p.category]),
+  [],
+);
+
+/** The presets of one category, in hangar order. */
+export const presetsIn = (category: PlaneCategory): PlanePreset[] => PRESET_LIST.filter((p) => p.category === category);
 
 export const DEFAULT_PRESET_ID = 'classic-dart';
 
