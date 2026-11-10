@@ -446,8 +446,25 @@
   min-width: 0;
 }
 
+/* Three buttons share one row: on narrow phones the default side padding would cut their labels short. */
+.ppl-fly-result__actions > .ppl-btn:not(.ppl-fly-result__again) {
+  padding-inline: var(--s-2);
+}
+
 .ppl-fly-result__again {
   grid-column: 1 / -1;
+}
+
+/* Phones: the actions stay in reach at the bottom of the card while a long diagnosis scrolls behind them. */
+@media (max-width: 899px) {
+  .ppl-fly-result__actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin-block: calc(-1 * var(--s-2));
+    padding-block: var(--s-2);
+    background: linear-gradient(to bottom, rgb(255 250 240 / 0), var(--card) 8px);
+  }
 }
 
 .ppl-fly-result__actions.is-replay {
