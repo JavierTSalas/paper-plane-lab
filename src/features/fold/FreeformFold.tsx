@@ -37,7 +37,9 @@ export function issueText(issue: FoldIssue): string {
     case 'degenerate-line':
       return 'Pick two different points.';
     case 'nothing-moves':
-      return 'Nothing would fold there: all of the paper is on one side of the line, or the model has too many pieces.';
+      return 'Nothing would fold there: all of the paper is on one side of the line.';
+    case 'too-many-layers':
+      return 'That is more layers than paper can take. Undo a fold or two, then try again.';
     case 'flap-blocked':
       return 'Some layers lying on top of that flap had to come along too.';
     case 'not-symmetric':

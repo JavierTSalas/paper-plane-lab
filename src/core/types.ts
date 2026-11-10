@@ -221,6 +221,8 @@ export interface FoldIssue {
     | 'line-misses-paper'
     | 'degenerate-line'
     | 'nothing-moves'
+    /** The fold would cut the model into more pieces than the engine allows (core/fold MAX_PIECES). */
+    | 'too-many-layers'
     | 'flap-blocked'
     | 'not-symmetric'
     | 'shape-line-invalid'

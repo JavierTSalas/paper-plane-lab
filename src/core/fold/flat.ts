@@ -156,7 +156,7 @@ function applyFold(state: FlatState, step: FoldStepFold, index: number): StepOut
   const newPieces = cuts.filter((c, i) => folds[i] && c.cut !== null).length;
   if (state.pieces.length + newPieces > MAX_PIECES) {
     // The contract has no code of its own for this; nothing can move because the stack is too thick.
-    return skipped(state, step, index, 'nothing-moves', 'That would make more layers than paper can be folded into. Unfold something first.');
+    return skipped(state, step, index, 'too-many-layers', 'That would make more layers than paper can be folded into. Unfold something first.');
   }
 
   let nextId = nextPieceId(state.pieces);
@@ -267,7 +267,7 @@ function applyFlip(state: FlatState, step: FoldStep, index: number): StepOutcome
  *    uncut `before` state plus the new reference creases, so the ids of the cut-off halves in `split`
  *    exist only inside that frame.
  *  - A skipped step has `after === before`, `split === before.pieces`, no moving pieces and no axis.
- *  - A fold that would leave more than MAX_PIECES pieces is skipped and reported as `nothing-moves`.
+ *  - A fold that would leave more than MAX_PIECES pieces is skipped and reported as `too-many-layers`.
  *  - A `sliver` warning means a corner the line clips by less than 1e-12 m² was left on its piece, uncut.
  *    That speck then lies on the wrong side of the fold, out of line with its neighbours.
  */

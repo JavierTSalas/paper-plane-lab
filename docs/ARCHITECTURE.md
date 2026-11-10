@@ -89,7 +89,7 @@ A **fold step** reflects the moving part across a line:
 `flip` mirrors every piece about the centreline, toggles `flipped`, and reverses the stack.
 
 Validation: a fold line must cut the model (`line-misses-paper`), endpoints must differ (`degenerate-line`),
-something must move and something must stay (`nothing-moves`). Invalid steps are skipped with an `error` issue; folding never throws on user input.
+something must move and something must stay (`nothing-moves`), and the fold must not cut the model into more pieces than the engine allows (`too-many-layers`, `MAX_PIECES`). Invalid steps are skipped with an `error` issue; folding never throws on user input.
 
 ### 5.2 Opening to 3D (`poseModel`)
 

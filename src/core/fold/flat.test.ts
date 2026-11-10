@@ -622,7 +622,7 @@ describe('layer limit', () => {
 
     const ten = foldFlat(A4, halvings(10));
     expect(ten.issues).toHaveLength(1);
-    expect(ten.issues[0]).toMatchObject({ step: 9, severity: 'error', code: 'nothing-moves' });
+    expect(ten.issues[0]).toMatchObject({ step: 9, severity: 'error', code: 'too-many-layers' });
     expect(ten.issues[0].message).toMatch(/layers/);
     expect(ten.final.pieces).toEqual(nine.final.pieces);
     expect(ten.frames[9].after).toBe(ten.frames[9].before);
