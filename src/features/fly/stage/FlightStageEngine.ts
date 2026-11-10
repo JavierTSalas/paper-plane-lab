@@ -95,7 +95,7 @@ export class FlightStageEngine {
   private userMode: CameraMode = 'chase';
   private orbitEnabled = false;
   private running = false;
-  private visible = true;
+  private visible = typeof document === 'undefined' || document.visibilityState !== 'hidden';
   private contextLost = false;
   private lastNow = 0;
   private wall = 0;
@@ -333,6 +333,7 @@ export class FlightStageEngine {
     if (this.scenery) this.scenery.dispose();
     this.particles.dispose();
     this.setGhosts([]);
+    this.ghostMaterial.dispose();
     disposeTree(this.scene);
     this.material.dispose();
     this.renderer.dispose();

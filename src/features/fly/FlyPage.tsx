@@ -136,13 +136,19 @@ export default function FlyPage(): ReactElement {
     time: useRef<HTMLElement>(null),
   };
   const lastTimeState = useRef(0);
+  const recordRef = useRef<ThrowRecord | null>(null);
+  recordRef.current = record;
   const onFrame = useCallback(
     (s: LiveSample) => {
       const l = env.launch;
       const set = (el: HTMLElement | null, text: string): void => {
         if (el && el.textContent !== text) el.textContent = text;
       };
-      const d = lengthParts(Math.hypot(s.pos[0] - l[0], s.pos[2] - l[2]), units, { digits: 1, unit: units === 'imperial' ? 'ft' : 'm' });
+      // At touchdown show the competition distance (to the point that touched), as the result card does.
+      const r = recordRef.current?.result;
+      const end = r && r.samples.length > 0 && s.t >= r.samples[r.samples.length - 1].t - 1e-6;
+      const dist = end ? r.metrics.distance : Math.hypot(s.pos[0] - l[0], s.pos[2] - l[2]);
+      const d = lengthParts(dist, units, { digits: 1, unit: units === 'imperial' ? 'ft' : 'm' });
       const h = lengthParts(Math.max(0, s.pos[1] - groundHeight(env, s.pos[0], s.pos[2])), units, { digits: 1, unit: units === 'imperial' ? 'ft' : 'm' });
       const v = speedParts(s.airspeed, units);
       const t = timeParts(s.t);
@@ -245,7 +251,7 @@ export default function FlyPage(): ReactElement {
   };
 
   const rank = (arena: Arena): void => {
-    toast({ title: `Flight eligible for ${arena.name}`, body: 'Open Ranks to compare it with the lab benchmarks.', tone: 'success' });
+    toast({ title: `This throw meets the ${arena.name} rules`, body: 'Compare it with the lab benchmarks in Ranks.', tone: 'success' });
     window.location.hash = `#/ranks`;
   };
 

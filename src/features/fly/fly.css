@@ -399,7 +399,15 @@
 }
 
 .ppl-fly-result__rank {
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--s-2);
+}
+
+.ppl-fly-result__rank-note {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
 }
 
 @keyframes ppl-fly-rise {

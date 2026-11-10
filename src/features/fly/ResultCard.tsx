@@ -108,11 +108,10 @@ export function ResultCard({ record, units, personalBest, arenas, onAgain, onRep
       )}
       {arenas.length > 0 && (
         <div className="ppl-fly-result__rank">
-          {arenas.map((a) => (
-            <Button key={a.id} variant="ghost" icon="ranks" onClick={() => onRank(a)}>
-              Enter ranking: {a.name}
-            </Button>
-          ))}
+          <Button variant="ghost" icon="ranks" onClick={() => onRank(arenas[0])}>
+            Enter ranking
+          </Button>
+          <span className="ppl-fly-result__rank-note">Fair conditions for {arenas.map((a) => a.name).join(' and ')}.</span>
         </div>
       )}
     </section>
