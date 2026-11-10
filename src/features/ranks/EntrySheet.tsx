@@ -129,7 +129,7 @@ export function EntrySheet({ entry, board, onClose }: EntrySheetProps): ReactEle
           <section className="ppl-stack ppl-rentry__similar" aria-label="Similar planes">
             <h3 className="ppl-h3">
               Similar planes{' '}
-              <InfoDot label="How is similarity measured?" title="Similar planes" topic="similarity">
+              <InfoDot label="How is similarity measured?" title="Similar planes">
                 The shape seen from above and its proportions, compared with the library and the other planes on this board.
               </InfoDot>
             </h3>

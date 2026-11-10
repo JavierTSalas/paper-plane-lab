@@ -39,7 +39,7 @@ export function StabilityStrip({ analysis, units, className }: StabilityStripPro
         label={
           <span className="ppl-stab__label">
             Static margin
-            <InfoDot label="What is static margin?" title="Static margin" topic="stability-and-trim~cg-np">
+            <InfoDot label="What is static margin?" title="Static margin" topic="stability-and-trim~static-margin">
               How far the balance point (CG) sits ahead of the neutral point, the point the lift pivots about, as a share of the wing's mean
               chord. Ahead means the plane noses back down by itself after a bump.
             </InfoDot>

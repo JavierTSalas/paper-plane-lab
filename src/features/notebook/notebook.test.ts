@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DIAGRAM_IDS } from './diagrams';
 import { TOPIC_IDS, isTopicId, notebookLink, notebookTopicParam, parseTopicParam } from './ids';
@@ -128,5 +130,33 @@ describe('notebook links', () => {
     expect(parseTopicParam('nope')).toBeNull();
     expect(parseTopicParam(undefined)).toBeNull();
     expect(isTopicId('records')).toBe(true);
+  });
+});
+
+describe('links into the notebook from other screens', () => {
+  /** Every `topic="..."` of an info popover and every literal `#/notebook/...` href in the UI sources. */
+  function linksIn(dir: string, found: { file: string; param: string }[] = []): { file: string; param: string }[] {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const file = join(dir, entry.name);
+      if (entry.isDirectory()) linksIn(file, found);
+      else if (/\.tsx$/.test(entry.name)) {
+        const text = readFileSync(file, 'utf8');
+        for (const m of text.matchAll(/\btopic="([^"]+)"/g)) found.push({ file, param: m[1]! });
+        for (const m of text.matchAll(/#\/notebook\/([a-z0-9~-]+)/g)) found.push({ file, param: m[1]! });
+      }
+    }
+    return found;
+  }
+
+  it('point at topics and sections that exist', () => {
+    const links = linksIn('src');
+    expect(links.length).toBeGreaterThan(20);
+    for (const { file, param } of links) {
+      const parsed = parseTopicParam(param);
+      expect(parsed, `${file}: unknown notebook topic "${param}"`).not.toBeNull();
+      if (!parsed?.anchor) continue;
+      const topic = TOPICS.find((t) => t.id === parsed.topic);
+      expect(topic?.sections.some((sec) => sec.id === parsed.anchor), `${file}: "${param}" names no section of ${parsed.topic}`).toBe(true);
+    }
   });
 });

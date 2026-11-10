@@ -102,7 +102,7 @@ function LooksLike({ plane }: { plane: PlaneDesign }): ReactElement {
         title={
           <>
             Looks like{' '}
-            <InfoDot label="How is this measured?" title="Looks like" topic="similarity">
+            <InfoDot label="How is this measured?" title="Looks like">
               The lab lays the folded plane flat from above and compares its outline and proportions with every plane in the library. 100 % means the same fold.
             </InfoDot>
           </>
@@ -305,13 +305,13 @@ export default function PlaneDetailPage(): ReactElement {
             <Stat label="Aspect ratio" value={fixed(ref.aspectRatio, 1)} info={<InfoDot label="About aspect ratio" title="Aspect ratio" topic="lift-and-drag">Span squared divided by wing area. Long, slender wings (high numbers) waste less energy on wingtip vortices and glide flatter.</InfoDot>} />
             <Stat label="Wing loading" value={load.value} unit={load.unit} info={<InfoDot label="About wing loading" title="Wing loading" topic="lift-and-drag">Weight per wing area. Lower means a slower, floatier flight; higher means fast and dart-like.</InfoDot>} />
             <Stat label="Layers at the nose" value={String(airframe.maxLayers)} info={<InfoDot label="About layers" title="Paper layers">The most sheets stacked in one place, usually the nose. Stacked paper puts weight up front, which keeps the plane pointing where it flies.</InfoDot>} />
-            <Stat label="Centre of gravity" value={formatPercent(airframe.cgFromNose)} hint="of length, from the nose" info={<InfoDot label="About the centre of gravity" title="Centre of gravity" topic="stability">The balance point. Paper planes fly best when it sits ahead of the middle of the wing.</InfoDot>} />
+            <Stat label="Centre of gravity" value={formatPercent(airframe.cgFromNose)} hint="of length, from the nose" info={<InfoDot label="About the centre of gravity" title="Centre of gravity" topic="stability-and-trim~static-margin">The balance point. Paper planes fly best when it sits ahead of the middle of the wing.</InfoDot>} />
             <Stat
               label="Static margin"
               value={trim ? `${fixed(trim.staticMarginPct, 0)}` : DASH}
               unit={trim ? '%' : undefined}
               hint={trim ? (trim.pitchStable ? 'stable' : 'unstable in pitch') : undefined}
-              info={<InfoDot label="About the static margin" title="Static margin" topic="stability">How far the centre of gravity sits ahead of the neutral point, as a share of the wing chord. Positive means the plane noses back to its glide after a bump; about 5 to 20 % feels right.</InfoDot>}
+              info={<InfoDot label="About the static margin" title="Static margin" topic="stability-and-trim~static-margin">How far the centre of gravity sits ahead of the neutral point, as a share of the wing chord. Positive means the plane noses back to its glide after a bump; about 5 to 20 % feels right.</InfoDot>}
             />
             <Stat
               label="Glide ratio"
@@ -325,7 +325,7 @@ export default function PlaneDetailPage(): ReactElement {
               value={glideSpeed ? glideSpeed.value : DASH}
               unit={glideSpeed?.unit}
               hint={trim?.trimmable ? 'predicted' : 'no steady glide'}
-              info={<InfoDot label="About the glide speed" title="Predicted glide speed" topic="stability">The speed at which lift balances weight with this trim. Throw near this speed for the smoothest flight.</InfoDot>}
+              info={<InfoDot label="About the glide speed" title="Predicted glide speed" topic="stability-and-trim~trimming">The speed at which lift balances weight with this trim. Throw near this speed for the smoothest flight.</InfoDot>}
             />
           </StatGrid>
         </div>

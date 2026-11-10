@@ -204,7 +204,7 @@ export default function KitPage(): ReactElement {
           <Slider
             label="Elevator"
             info={
-              <InfoDot label="What is the elevator?" title="Elevator" topic="trim">
+              <InfoDot label="What is the elevator?" title="Elevator" topic="stability-and-trim">
                 Bending the trailing edges up pushes the tail down, so the nose rises.
               </InfoDot>
             }
@@ -256,7 +256,7 @@ export default function KitPage(): ReactElement {
             value={load.value}
             unit={load.unit}
             info={
-              <InfoDot label="What is wing loading?" title="Wing loading" topic="lift">
+              <InfoDot label="What is wing loading?" title="Wing loading" topic="lift-and-drag">
                 Weight per wing area. Lower means slower, floatier flight.
               </InfoDot>
             }
