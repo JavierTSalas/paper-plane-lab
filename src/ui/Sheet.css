@@ -10,7 +10,10 @@
   border: 0;
   background: transparent;
   color: var(--ink);
+  /* The dialog itself must never scroll (only the sheet body does). `hidden` alone can still be scrolled by
+     focus() or scrollIntoView(), which slides the whole sheet up and bares the tab bar under it. */
   overflow: hidden;
+  overflow: clip;
   overscroll-behavior: contain;
 }
 
@@ -83,6 +86,9 @@
 }
 
 .ppl-sheet__body {
+  /* Containing block of absolutely positioned content (screen-reader text of charts, grabbers), so it scrolls
+     and clips with the body and cannot stretch the dialog's own scroll area. */
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;

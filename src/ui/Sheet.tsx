@@ -129,7 +129,9 @@ function SheetDialog({
       initialFocus?.current ??
       bodyRef.current?.querySelector<HTMLElement>('input, select, textarea, button, a[href], [tabindex]:not([tabindex="-1"])') ??
       closeRef.current;
-    target?.focus();
+    // No scrolling for the focus: the panel is still sliding in, and scrolling the dialog would shift it for good.
+    target?.focus({ preventScroll: true });
+    dialog.scrollTop = 0;
     return () => {
       if (dialog.open) dialog.close();
       previous?.focus();
@@ -184,6 +186,10 @@ function SheetDialog({
         if (dismissible) onClose();
       }}
       onKeyDown={onKeyDown}
+      onScroll={(e) => {
+        // Belt and braces where `overflow: clip` is not supported: undo any scroll of the dialog itself.
+        if (e.target === e.currentTarget && e.currentTarget.scrollTop !== 0) e.currentTarget.scrollTop = 0;
+      }}
       onPointerDown={onPointerDown}
       onClick={onBackdropClick}
     >
