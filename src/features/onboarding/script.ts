@@ -47,6 +47,8 @@ export const YOUR_FOLD = {
     'One more. Then we give it shape.',
   ],
   shaping: 'That is a Classic Dart. In half, wings down, and open.',
+  /** Closing line of the guided fold: in the intro the next step is the throw, not the shape stage. */
+  folded: 'Next, throw it across the classroom.',
 };
 
 export const YOUR_THROW = {

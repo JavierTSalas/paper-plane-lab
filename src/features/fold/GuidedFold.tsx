@@ -23,6 +23,11 @@ export interface GuidedFoldProps {
   onDoneChange?: (done: number) => void;
   /** Label of the finish button. Default "Continue". */
   finishLabel?: string;
+  /**
+   * What comes after folding, said once the plane is folded: "Your Classic Dart is folded. <closingLine>".
+   * Default "Next, fine-tune its shape." (the workbench goes on to the shape stage).
+   */
+  closingLine?: string;
 }
 
 /** Drag release counts when the corner is this close to its target, screen px. */
@@ -52,7 +57,7 @@ function finishLegs(frame: StepFrame, from: number): TweenLeg[] {
  * pulsing corner to the target dot, or lets the lab fold it. After the flat steps the plane is folded
  * in half and opened, then `onComplete` is offered.
  */
-export function GuidedFold({ design, onComplete, compact = false, done: doneProp, onDoneChange, finishLabel = 'Continue' }: GuidedFoldProps): ReactElement {
+export function GuidedFold({ design, onComplete, compact = false, done: doneProp, onDoneChange, finishLabel = 'Continue', closingLine = 'Next, fine-tune its shape.' }: GuidedFoldProps): ReactElement {
   const build = usePlaneBuild(design)!;
   const frames = build.fold.frames;
   const count = frames.length;
@@ -279,7 +284,9 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
           <div className="ppl-guided__panel">
             {shaped && (
               <div className="ppl-guided__caption" aria-live="polite">
-                <p className="ppl-guided__text">Your {design.name || 'plane'} is folded. Next, fine-tune its shape.</p>
+                <p className="ppl-guided__text">
+                  Your {design.name || 'plane'} is folded. {closingLine}
+                </p>
               </div>
             )}
             <div className="ppl-guided__actions">
