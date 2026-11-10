@@ -33,9 +33,12 @@ export const WREN_LAUNCH: Launch = {
   aoaDeg: 0,
 };
 
-/** Where the player's throw controls start. */
+/**
+ * Where the player's throw controls start: as firm as the Professor's throw and a touch upward. Untouched, it
+ * glides cleanly and lands just short of his dart; half a metre per second more reaches the far wall.
+ */
 export const PLAYER_START_LAUNCH: Launch = {
-  speed: 6.5,
+  speed: 6,
   pitchDeg: 2,
   yawDeg: 0,
   rollDeg: 0,

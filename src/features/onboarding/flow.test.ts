@@ -69,9 +69,12 @@ describe('the darts and throws', () => {
     expect(a.metrics.distance).toBe(b.metrics.distance);
   });
 
-  it('starts the player on a throw that flies', () => {
+  it('starts the player on a throw that glides cleanly to the classroom floor, not into the far wall', () => {
     const { airframe } = getPlaneBuild(makePlayerDesign('p', 'sky'));
-    expect(flyIntro(airframe, PLAYER_START_LAUNCH).metrics.distance).toBeGreaterThan(3);
+    const r = flyIntro(airframe, PLAYER_START_LAUNCH);
+    expect(r.outcome).toBe('ground');
+    expect(r.diagnosis[0]?.code).toBe('clean-glide');
+    expect(r.metrics.distance).toBeGreaterThan(3);
   });
 });
 
