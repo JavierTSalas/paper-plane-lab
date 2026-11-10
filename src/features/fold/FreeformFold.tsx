@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent, type ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactElement } from 'react';
 import { foldFlat, isSymmetric, snapPoints, tableBounds } from '../../core/fold';
 import type { FoldIssue, FoldLine, FoldStep, PlaneDesign, Vec2 } from '../../core/types';
 import { Button, IconButton } from '../../ui/Button';
@@ -206,7 +206,7 @@ export function FreeformFold({ design, onSteps, canUndo, canRedo, onUndo, onRedo
   return (
     <div className="ppl-free">
       <div className="ppl-free__stagewrap">
-        <div className="ppl-free__stage" style={{ width: `min(100%, calc((100dvh - 450px) * ${aspect.toFixed(3)}))` }} onPointerCancel={() => setDrag(null)}>
+        <div className="ppl-free__stage" style={{ '--ppl-aspect': aspect.toFixed(3) } as CSSProperties} onPointerCancel={() => setDrag(null)}>
           <PaperCanvas
             paper={paper}
             state={flat}

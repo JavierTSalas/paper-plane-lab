@@ -133,9 +133,17 @@
   min-width: 0;
 }
 .ppl-guided__stage {
+  --ppl-reserve: 440px;
+  width: min(100%, calc((100dvh - var(--ppl-reserve)) * var(--ppl-aspect, 0.7)));
   align-self: center;
   max-width: 100%;
   min-width: min(100%, 220px);
+}
+.ppl-guided--compact .ppl-guided__stage {
+  --ppl-reserve: 470px;
+}
+.ppl-guided__stage--player {
+  --ppl-reserve: 300px;
 }
 .ppl-guided__stage .ppl-player__stage {
   border-radius: var(--r-card);
@@ -273,6 +281,9 @@
 }
 
 @media (min-width: 900px) {
+  .ppl-guided__stage {
+    --ppl-reserve: 290px;
+  }
   .ppl-guided:not(.ppl-guided--compact) {
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
@@ -299,6 +310,7 @@
   min-width: 0;
 }
 .ppl-free__stage {
+  width: min(100%, calc((100dvh - 450px) * var(--ppl-aspect, 0.7)));
   align-self: center;
   max-width: 100%;
   min-width: min(100%, 220px);
@@ -402,6 +414,9 @@
   flex: 1 1 12em;
 }
 @media (min-width: 900px) {
+  .ppl-free__stage {
+    width: min(100%, calc((100dvh - 260px) * var(--ppl-aspect, 0.7)));
+  }
   .ppl-free {
     display: grid;
     grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
@@ -541,11 +556,6 @@
 
 /* ------------------------------------------------------------------ trim */
 
-.ppl-trimstage {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-4);
-}
 .ppl-trimstage__view {
   display: flex;
   flex-direction: column;

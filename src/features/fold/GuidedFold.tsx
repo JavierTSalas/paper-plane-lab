@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent, type ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type PointerEvent, type ReactElement } from 'react';
 import { usePlaneBuild } from '../../app/hooks';
 import type { PlaneDesign, StepFrame, Vec2 } from '../../core/types';
 import { Button, IconButton } from '../../ui/Button';
@@ -195,7 +195,7 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
         <>
           <div
             className="ppl-guided__stage"
-            style={{ width: `min(100%, calc((100dvh - ${compact ? 460 : 440}px) * ${aspect.toFixed(3)}))` }}
+            style={{ '--ppl-aspect': aspect.toFixed(3) } as CSSProperties}
             onPointerCancel={(e) => release(e, true)}
           >
             <PaperCanvas
@@ -273,7 +273,7 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
         </>
       ) : (
         <>
-          <div className="ppl-guided__stage" style={{ width: `min(100%, calc((100dvh - ${compact ? 360 : 330}px) * 1.333))` }}>
+          <div className="ppl-guided__stage ppl-guided__stage--player" style={{ '--ppl-aspect': '1.333' } as CSSProperties}>
             <FoldPlayer key={`${build.geometryKey}`} design={design} mode="auto" defaultStep={count} autoPlay showControls={false} onComplete={() => setShaped(true)} />
           </div>
           <div className="ppl-guided__panel">

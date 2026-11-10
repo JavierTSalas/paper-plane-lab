@@ -17,7 +17,7 @@ export function stabilityAdvice(t: TrimAnalysis): string | null {
   if (t.staticMarginPct > GOOD_MARGIN[1])
     return 'The balance point sits far ahead of the neutral point, so it will want to dive. Bend some up-elevator in Trim.';
   if (!t.trimmable) return 'There is no steady glide yet, so it will nose down. Bend the trailing edges up a little in Trim.';
-  if (!t.rollStable) return 'The wings droop at the tips, so it will roll off into a spiral. Give the wings more dihedral, tips up.';
+  if (!t.rollStable) return 'The wings sit too flat to level themselves, so it may slowly roll into a spiral. A few more degrees of dihedral, tips up, will help.';
   if (t.cnBetaDynamic < 0) return 'It can slip sideways and curl into a spiral. Close the keel a little or turn winglets up.';
   return null;
 }
