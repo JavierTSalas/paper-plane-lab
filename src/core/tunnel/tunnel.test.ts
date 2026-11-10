@@ -440,7 +440,12 @@ describe('lateral stability signs in this body frame (+x nose, +y up, +z right)'
     expect(t.yawStable).toBe(false);
     // ... but the dihedral effect of a slender plane (yaw inertia >> roll inertia) more than makes up for it.
     expect(t.cnBetaDynamic).toBeGreaterThan(0);
+    // Without dihedral the sweep still gives a dihedral effect (slender-wing sideslip loading, core/aero):
+    // weaker, but enough to hold the heading. Plain strip theory had none, and this dart slewed off.
     const flat = analyzeTrim(buildAirframe(dartFixture(), DART_TRIM), AIR);
-    expect(flat.cnBetaDynamic).toBeLessThan(0);
+    expect(flat.rollStable).toBe(true);
+    expect(flat.clBeta).toBeGreaterThan(t.clBeta);
+    expect(flat.cnBetaDynamic).toBeGreaterThan(0);
+    expect(flat.cnBetaDynamic).toBeLessThan(t.cnBetaDynamic);
   });
 });

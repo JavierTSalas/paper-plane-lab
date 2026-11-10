@@ -65,6 +65,8 @@ interface Reading {
   maxBank: number;
   endBank: number;
   looped: boolean;
+  /** It was on its back at some point (by a loop, a roll or a stall that flipped it over). */
+  inverted: boolean;
   tumbled: boolean;
   /** Horizontal distance the air itself moved during the flight, metres, and how far it rose. */
   windDrift: number;
@@ -91,6 +93,7 @@ function read(result: FlightResult, airframe: Airframe, stallAngle: number, rho:
   let pitch = 0;
   let roll = 0;
   let looped = false;
+  let inverted = false;
   let driftX = 0;
   let driftZ = 0;
   let windLift = 0;
@@ -103,8 +106,11 @@ function read(result: FlightResult, airframe: Airframe, stallAngle: number, rho:
   let high = first.pos[1];
   let rising = false;
 
+  // Bank = how far the wing line is tilted out of the horizontal (right wing down positive), -90 to 90 degrees.
+  // The Euler bank angle atan2(-right.y, up.y) reads 180 degrees for a plane that pitched over onto its back
+  // with level wings, and anything at all near the vertical: a whip stall was diagnosed as a roll-off.
   const bankOf = (q: readonly number[]): number =>
-    Math.atan2(-2 * (q[1] * q[2] - q[3] * q[0]), 1 - 2 * (q[0] * q[0] + q[2] * q[2]));
+    Math.asin(Math.max(-1, Math.min(1, -2 * (q[1] * q[2] - q[3] * q[0]))));
 
   for (let i = 0; i < n; i++) {
     const s = samples[i];
@@ -120,6 +126,7 @@ function read(result: FlightResult, airframe: Airframe, stallAngle: number, rho:
       windTime += 0.5 * (Math.hypot(p.wind[0], p.wind[2]) + Math.hypot(s.wind[0], s.wind[2])) * dt;
     }
     const upY = 1 - 2 * (s.quat[0] * s.quat[0] + s.quat[2] * s.quat[2]);
+    if (upY < INVERTED_BELOW) inverted = true;
     if (upY < INVERTED_BELOW && pitch > LOOP_MIN_PITCH && Math.abs(roll) < LOOP_MAX_ROLL) looped = true;
     const bank = bankOf(s.quat);
     if (Math.abs(bank) > Math.abs(maxBank)) maxBank = bank;
@@ -170,6 +177,7 @@ function read(result: FlightResult, airframe: Airframe, stallAngle: number, rho:
     maxBank,
     endBank: bankOf(last.quat),
     looped,
+    inverted,
     tumbled: result.events.some((e) => e.kind === 'tumble'),
     windDrift: Math.hypot(driftX, driftZ),
     windLift,
@@ -509,9 +517,11 @@ export function diagnose(result: FlightResult, airframe: Airframe, launch: Launc
   // 3. Pitch behaviour, unless the attitude was lost anyway.
   if (codes.length === 0 || codes[0] === 'spiral' || codes[0] === 'roll-off') {
     const slow = trim.trimmable && trim.speed !== null && r.launchAirspeed < TOO_SLOW_RATIO * trim.speed;
-    // Mushing, or a stall that the flight never got over: one stall and a drop back to the ground.
+    // Mushing, or a stall that the flight never got over: one stall and a drop back to the ground, or a
+    // whip stall that threw the plane onto its back (it may well fly out of the dive afterwards).
     const stalledOut =
-      r.stalledFraction >= MUSH_FRACTION || (m.stallCount >= 1 && (r.endsStalled || r.support < UNSUPPORTED_BELOW));
+      r.stalledFraction >= MUSH_FRACTION ||
+      (m.stallCount >= 1 && (r.endsStalled || r.support < UNSUPPORTED_BELOW || r.inverted));
     const lateralFault = codes.length > 0;
     if (slow && !hitCeiling && (m.stallCount >= 1 || r.support < 0.8)) codes.push('too-slow');
     else if (!lateralFault && (m.stallCount >= 2 || r.humps >= 2)) codes.push('porpoise');

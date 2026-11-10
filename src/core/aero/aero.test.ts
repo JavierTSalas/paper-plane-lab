@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { buildAirframe } from '../airframe';
 import { DEG } from '../math';
 import {
-  a4AreaPlate, dartFixture, DART_TRIM, dihedralPlateModel, flatPlateModel, gliderFixture, NEUTRAL_TRIM, TEST_AIR,
-  trimOf,
+  a4AreaDelta, a4AreaPlate, dartFixture, DART_TRIM, dihedralPlateModel, flatDeltaModel, flatPlateModel, gliderFixture,
+  NEUTRAL_TRIM, TEST_AIR, trimOf,
 } from '../testing/fixtures';
 import type { Airframe, Vec3 } from '../types';
 import { flapCmDelta, flapTau } from './flap';
-import { aeroLoads, aeroLoadsDetailed, bendTerms, createAeroLoads } from './loads';
+import { aeroLoads, aeroLoadsDetailed, bendTerms, createAeroLoads, slipLoadingWeight } from './loads';
 
 const AIR = TEST_AIR;
 const NU = AIR.mu / AIR.rho;
@@ -334,6 +334,66 @@ describe('trailing-edge bends', () => {
     const eff = a - shift;
     const expected = (clean.surfaces[0].cd90 * Math.sin(eff)) / (0.56 + 0.44 * Math.sin(eff));
     expect(loadsAt(bent, windVelocity(speed, a)).force[1] / qS(bent, speed)).toBeCloseTo(expected, 9);
+  });
+});
+
+describe('sideslip loading of slender wings (roll due to sideslip without dihedral)', () => {
+  const rollCoefficient = (af: Airframe, alpha: number, beta: number): number =>
+    loadsAt(af, windVelocity(5, alpha, beta)).moment[0] / (qS(af, 5) * af.ref.span);
+
+  it('a flat delta gets the slender-wing value Cl = -(pi / 3) sin a sin b times its finite-AR weight', () => {
+    for (const model of [a4AreaDelta(0.5), a4AreaDelta(1), a4AreaDelta(2), flatDeltaModel(0.05, 0.3)]) {
+      const af = buildAirframe(model, NEUTRAL_TRIM);
+      const s = af.surfaces[0];
+      const weight = slipLoadingWeight(s);
+      expect(s.deltaness).toBeCloseTo(1, 6);
+      // The weight is the lift slope over the slender-wing slope pi AR / 2: near 0.8 for these deltas, at most 1.
+      expect(weight).toBeCloseTo(s.kp / (0.5 * Math.PI * s.aspectRatio), 12);
+      expect(weight).toBeGreaterThan(0.7);
+      expect(weight).toBeLessThanOrEqual(1);
+      for (const [a, b] of [[5, 5], [10, 5], [5, -5], [8, 3]]) {
+        const theory = -(Math.PI / 3) * Math.sin(a * DEG) * Math.sin(b * DEG) * weight;
+        expect(rollCoefficient(af, a * DEG, b * DEG) / theory).toBeCloseTo(1, 2);
+      }
+    }
+  });
+
+  it('wind from the right raises the right wing; no slip or no lift, no roll; the lift itself is unchanged', () => {
+    const af = buildAirframe(a4AreaDelta(1), NEUTRAL_TRIM);
+    expect(loadsAt(af, windVelocity(5, 8 * DEG, 5 * DEG)).moment[0]).toBeLessThan(0);
+    expect(loadsAt(af, windVelocity(5, 8 * DEG, -5 * DEG)).moment[0]).toBeGreaterThan(0);
+    // Upside down the windward wing is pushed down harder: the roll changes sign with the lift.
+    expect(loadsAt(af, windVelocity(5, -8 * DEG, 5 * DEG)).moment[0]).toBeGreaterThan(0);
+    expect(Math.abs(rollCoefficient(af, 0, 5 * DEG))).toBeLessThan(1e-12);
+    expect(Math.abs(rollCoefficient(af, 8 * DEG, 0))).toBeLessThan(1e-12);
+    // An antisymmetric load: the normal force is that of the same wing at the same incidence without slip.
+    const slipping = loadsAt(af, windVelocity(5, 8 * DEG, 5 * DEG)).force[1];
+    const speed = 5 * Math.hypot(Math.cos(8 * DEG) * Math.cos(5 * DEG), Math.sin(8 * DEG) * Math.cos(5 * DEG), Math.sin(5 * DEG));
+    const incidence = Math.asin((5 * Math.sin(8 * DEG) * Math.cos(5 * DEG)) / speed);
+    const straight = loadsAt(af, windVelocity(speed, incidence, 0)).force[1];
+    expect(slipping / straight).toBeCloseTo(1, 6);
+  });
+
+  it('unswept wings are left alone, and a slip never pushes a strip below zero load', () => {
+    for (const model of [a4AreaPlate(1), a4AreaPlate(3), flatPlateModel(0.6, 0.1)]) {
+      const af = buildAirframe(model, NEUTRAL_TRIM);
+      expect(slipLoadingWeight(af.surfaces[0])).toBe(0);
+      expect(Math.abs(rollCoefficient(af, 8 * DEG, 10 * DEG))).toBeLessThan(1e-12);
+    }
+    const delta = buildAirframe(a4AreaDelta(1), NEUTRAL_TRIM);
+    for (const [a, b] of [[10, 30], [5, 60], [20, 45], [30, -40]]) {
+      const detail = aeroLoadsDetailed(delta, windVelocity(5, a * DEG, b * DEG), STILL, AIR);
+      for (const e of detail.elements) expect(e.normalForce[1]).toBeGreaterThanOrEqual(-1e-12);
+    }
+    // Past the stall the wing is a bluff plate and the term is gone.
+    expect(Math.abs(rollCoefficient(delta, 80 * DEG, 10 * DEG))).toBeLessThan(1e-9);
+  });
+
+  it('gives the flat-winged fixture dart the dihedral effect strip theory lacks', () => {
+    const af = buildAirframe(dartFixture(), DART_TRIM);
+    // The keel alone rolls the plane INTO the slip (it hangs below the roll axis); the wing now outweighs it.
+    expect(loadsAt(af, windVelocity(5, 8 * DEG, 5 * DEG)).moment[0]).toBeLessThan(0);
+    expect(loadsAt(af, windVelocity(5, 8 * DEG, -5 * DEG)).moment[0]).toBeGreaterThan(0);
   });
 });
 

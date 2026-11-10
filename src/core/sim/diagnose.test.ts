@@ -86,6 +86,18 @@ describe('diagnosis: each reading is reachable', () => {
     expect(overTrimmed.diagnosis.find((x) => x.code === 'stall-mush')!.fix).toMatch(/Flatten the up-bend/);
   });
 
+  it('a whip stall that throws the plane onto its back with level wings is a stall, not a roll-off', () => {
+    // Regression: the Euler bank angle reads 180 degrees for a plane that pitched over, so these flights were
+    // called roll-offs ("it rolled to the right") although the wings never left the horizontal.
+    for (const seed of [1, 2, 3]) {
+      const r = simulateFlight(simDart({ elevatorDeg: 12 }), throwOf(6, 10), gym, { envId: 'gym' }, seed);
+      expect(Math.abs(r.metrics.lateral)).toBeLessThan(0.5);
+      expect(codes(r)).toContain('stall-mush');
+      expect(codes(r)).not.toContain('roll-off');
+      expect(codes(r)).not.toContain('clean-glide');
+    }
+  });
+
   it('porpoise: a glider thrown at more than twice its glide speed', () => {
     const r = simulateFlight(glider, throwOf(7, 10), releasedAt(hangar, 6), { envId: 'hangar' }, 1);
     const d = check(r, 'porpoise');

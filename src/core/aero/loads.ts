@@ -57,11 +57,42 @@ const K0 = 25;
 const VORTEX_CP = 26; // chord fraction where the vortex lift acts
 const BEND_COS_LESS_ONE = 27; // cos(incidence shift of the bend) - 1
 const RXN = 28; // mid-chord point x normal (3): moment of a unit normal force at mid-chord
-const STRIDE = 31;
+const SLIP = 31; // sideslip loading factor: 2 pi x slender weight, signed by the side of the plane (0 off the wings)
+const STRIDE = 32;
 
 interface Compiled {
   count: number;
   data: Float64Array;
+}
+
+/**
+ * Sideslip loading of a slender wing (roll due to sideslip, the "dihedral effect" of sweep).
+ *
+ * Slender-wing theory (R. T. Jones' cross-flow argument, the theory `slenderCpFraction` already uses for the
+ * centre of pressure) treats every cross-section as a flat plate of semi-span s(x) in a cross-flow with the
+ * normal speed w = V sin(alpha) and the lateral speed v = V sin(beta). Because the two edges of a swept wing
+ * then grow at unequal rates, the plate carries, besides its lift, an antisymmetric load
+ *   dp(eta) = -2 rho w v eta / sqrt(s^2 - eta^2)          (eta: lateral position, positive to leeward)
+ * with no net force and the rolling couple pi rho w v s(x)^2 per unit length, which raises the WINDWARD wing.
+ * Over the planform that is M = pi rho w v * integral of s^2 dx, and since the integral of s^2 dx equals the
+ * sum of |z| dA over the planform, the same couple comes from a uniform extra pressure of +-pi rho w v on the
+ * windward / leeward half. For a delta: Cl_beta = -(pi / 3) alpha, the classical slender-delta result.
+ *
+ * Plain strip theory has none of this (doc 01 "Open questions": sideslip roll), so a flat-winged dart had no
+ * dihedral effect at all and could not hold its heading. The term is applied
+ *  - to wing strips only, as an extra normal force at the strip's centre of pressure, faded out by the stall;
+ *  - weighted by the surface's `deltaness` (it is established for swept, delta-like planforms; the weaker
+ *    tip-vortex effect of unswept low-AR plates stays unmodelled) and by Kp / (pi AR / 2), the ratio of the
+ *    surface's lift slope to the slender-wing slope, i.e. the finite-AR correction the lift itself gets;
+ *  - never larger than the strip's own attached normal force: a slip can at most move the load to one side.
+ */
+const SLIP_LOADING = 2 * Math.PI;
+
+/** Slender-wing weight of the sideslip loading for one surface, 0 to 1. */
+export function slipLoadingWeight(surface: Pick<LiftingSurface, 'deltaness' | 'kp' | 'aspectRatio'>): number {
+  const slenderSlope = 0.5 * Math.PI * surface.aspectRatio;
+  if (!(slenderSlope > 0)) return 0;
+  return Math.max(0, Math.min(1, surface.deltaness)) * Math.min(1, surface.kp / slenderSlope);
 }
 
 /** Largest incidence shift a bend may produce, radians: keeps the shifted angle inside the model's range. */
@@ -139,6 +170,12 @@ function compile(airframe: Airframe): Compiled {
     data[o + AX] = ey * nz - ez * ny;
     data[o + AX + 1] = ez * nx - ex * nz;
     data[o + AX + 2] = ex * ny - ey * nx;
+    if (e.role === 'wing' || e.role === 'center') {
+      // Signed so that the factor is positive on the side the span axis (chord x normal) points to.
+      const spanZ = data[o + AX + 2];
+      const side = rz * spanZ > 0 ? 1 : rz * spanZ < 0 ? -1 : 0;
+      data[o + SLIP] = SLIP_LOADING * slipLoadingWeight(s) * side;
+    }
     data[o + KP] = s.kp;
     data[o + KV] = s.kv;
     data[o + SIN_STALL] = Math.sin(s.alphaStall);
@@ -350,10 +387,24 @@ function accumulate(
     const exposure = d[o + EXPOSURE];
     const q = 0.5 * rho * u2;
     const pressure = -sign * q * area * exposure;
-    const fn = pressure * cn;
     // The normal force acts x_cp chords behind the upstream edge: (0.5 - x_cp) c cx ahead of mid-chord.
     const lever = chord * cx;
-    const fnLever = pressure * (0.5 * cn - cnx) * lever;
+    let fn = pressure * cn;
+    let fnLever = pressure * (0.5 * cn - cnx) * lever;
+
+    // Sideslip loading of a slender wing (see SLIP_LOADING): the windward half is loaded up, the leeward
+    // half unloaded, by at most the strip's own attached normal force.
+    const slip = d[o + SLIP];
+    if (slip !== 0 && sep < 1) {
+      const us = (ux * d[o + AX] + uy * d[o + AX + 1] + uz * d[o + AX + 2]) * invSpeed;
+      const attached = cnPotential + cnVortex;
+      let extra = -slip * sinA * us;
+      if (extra > attached) extra = attached;
+      else if (extra < -attached) extra = -attached;
+      const fSlip = q * area * exposure * extra * (1 - sep);
+      fn += fSlip;
+      fnLever += fSlip * (0.5 - xp) * lever;
+    }
 
     // Skin friction on the in-plane velocity, at mid-chord.
     const re = rhoOverMu * speed * chord;
