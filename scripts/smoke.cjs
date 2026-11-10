@@ -83,6 +83,22 @@ async function shot(page, name) {
   return file;
 }
 
+/**
+ * A screenshot with motion reduced for the moment of capture. Needed on the tunnel page: under the software
+ * GL of headless Chromium (SwiftShader) its endless smoke animation starves the screenshot capture, which then
+ * takes seconds or never returns (and later captures on the same page hang too). The checks themselves run
+ * with the animation on.
+ */
+async function shotStill(page, name) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await sleep(250);
+  try {
+    return await shot(page, name);
+  } finally {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+  }
+}
+
 /** The persisted lab state. */
 const labState = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('ppl-state') || '{"state":{}}').state);
 
@@ -480,7 +496,7 @@ async function main() {
     await page.locator('.ppl-tunnel').waitFor({ timeout: 20_000 });
     await sleep(600);
     const lift = () => page.locator('.ppl-tunnel__legend').innerText();
-    const angle = page.getByLabel('Angle of attack', { exact: true });
+    const angle = page.locator('.ppl-tunnel__controls .ppl-slider', { hasText: 'Angle of attack' }).locator('input[type=range]');
     await setRange(angle, 2);
     await sleep(300);
     const at2 = await lift();
@@ -489,7 +505,7 @@ async function main() {
     const at12 = await lift();
     expect(at2 !== at12, `the readouts did not change with the angle of attack ("${at2.replace(/\s+/g, ' ')}")`);
     expect((await page.locator('.ppl-tunnel__side').innerText()).length > 100, 'the tunnel readouts are empty');
-    await shot(page, 'f1-tunnel');
+    await shotStill(page, 'f1-tunnel');
     const trimBtn = page.locator('.ppl-tunnel__trimrow .ppl-btn');
     await trimBtn.scrollIntoViewIfNeeded();
     expect((await trimBtn.innerText()).trim() === 'Go to trim', `expected "Go to trim", found "${(await trimBtn.innerText()).trim()}"`);
@@ -500,7 +516,7 @@ async function main() {
     expect(m, `no trim angle in "${note}"`);
     const shown = Number(await angle.inputValue());
     expect(Math.abs(shown - Number(m[1])) <= 0.5, `the angle slider (${shown}) did not go to the trim angle (${m[1]})`);
-    await shot(page, 'f2-at-trim');
+    await shotStill(page, 'f2-at-trim');
     expect((await labState(page)).assignmentsDone.includes('try-tunnel'), 'the wind-tunnel assignment was not marked');
   });
 
@@ -511,7 +527,7 @@ async function main() {
     await page.locator('.ppl-detail').waitFor({ timeout: 20_000 });
     await sleep(600);
     const stats = await page.locator('.ppl-detail__stats').innerText();
-    for (const word of ['Mass', 'Span', 'Wing area', 'Static margin']) expect(stats.includes(word), `the stats lack "${word}"`);
+    for (const word of ['Mass', 'Wingspan', 'Wing area', 'Static margin', 'Glide ratio']) expect(stats.includes(word), `the stats lack "${word}"`);
     expect(/\d/.test(stats) && !/NaN|undefined|Infinity/.test(stats), `the stats hold bad numbers: ${stats.replace(/\s+/g, ' ')}`);
     await shot(page, 'g1-detail');
     const looks = page.locator('.ppl-looks__item');
@@ -617,7 +633,8 @@ async function main() {
       await sleep(900);
       const overflow = await overflowOf(wide);
       expect(overflow <= 1, `horizontal overflow of ${overflow}px on ${route} at 1280 px`);
-      await shot(wide, `w-${name}`);
+      if (name === 'tunnel') await shotStill(wide, `w-${name}`);
+      else await shot(wide, `w-${name}`);
     }
     // One throw on the wide layout: the result card sits beside the scene.
     await goto(wide, '/fly');
