@@ -56,6 +56,8 @@ export interface LineChartProps {
 }
 
 const PAD = { top: 12, right: 12, bottom: 34, left: 44 };
+/** Top padding with a y-axis label: the label gets its own band above the plot, clear of the top tick label. */
+const PAD_TOP_LABELLED = 28;
 
 interface Extent {
   x: NiceAxis;
@@ -136,10 +138,11 @@ export function LineChart({
   const fy = formatY ?? ((v: number) => tickLabel(v, ext.y.step));
   // Readouts are finer than the axis: one more decimal than the tick step.
   const fyValue = formatY ?? ((v: number) => tickLabel(v, ext.y.step / 10));
+  const padTop = yLabel ? PAD_TOP_LABELLED : PAD.top;
   const plotW = Math.max(40, width - PAD.left - PAD.right);
-  const plotH = Math.max(40, height - PAD.top - PAD.bottom);
+  const plotH = Math.max(40, height - padTop - PAD.bottom);
   const sx = linearScale([ext.x.min, ext.x.max], [PAD.left, PAD.left + plotW]);
-  const sy = linearScale([ext.y.min, ext.y.max], [PAD.top + plotH, PAD.top]);
+  const sy = linearScale([ext.y.min, ext.y.max], [padTop + plotH, padTop]);
   const invX = linearScale([PAD.left, PAD.left + plotW], [ext.x.min, ext.x.max]);
 
   // Thin x ticks so labels never collide (about 56 px per label).
@@ -236,7 +239,7 @@ export function LineChart({
               </g>
             ))}
             {xTicks.map((t) => (
-              <text key={`x${t}`} x={sx(t)} y={PAD.top + plotH + 18} textAnchor="middle" className="ppl-chart__tick">
+              <text key={`x${t}`} x={sx(t)} y={padTop + plotH + 18} textAnchor="middle" className="ppl-chart__tick">
                 {fx(t)}
               </text>
             ))}
@@ -246,7 +249,7 @@ export function LineChart({
               </text>
             )}
             {yLabel && (
-              <text x={4} y={PAD.top - 2} className="ppl-chart__axis-label" dy="0.7em">
+              <text x={4} y={12} className="ppl-chart__axis-label">
                 {yLabel}
               </text>
             )}
@@ -270,8 +273,8 @@ export function LineChart({
               if (m.y === undefined) {
                 return (
                   <g key={`${m.label}${m.x}`} className="ppl-chart__guide">
-                    <line x1={x} x2={x} y1={PAD.top} y2={PAD.top + plotH} />
-                    <text x={x + 4} y={PAD.top + 10} className="ppl-chart__marker-label">
+                    <line x1={x} x2={x} y1={padTop} y2={padTop + plotH} />
+                    <text x={x + 4} y={padTop + 10} className="ppl-chart__marker-label">
                       {m.label}
                     </text>
                   </g>
@@ -293,7 +296,7 @@ export function LineChart({
 
           {activeX !== null && (
             <g aria-hidden="true">
-              <line x1={cursorPx} x2={cursorPx} y1={PAD.top} y2={PAD.top + plotH} className="ppl-chart__cursor" />
+              <line x1={cursorPx} x2={cursorPx} y1={padTop} y2={padTop + plotH} className="ppl-chart__cursor" />
               {readout.map(({ s, slot, v }) => (
                 <circle key={s.id} cx={cursorPx} cy={sy(v!)} r="4.5" className={cx('ppl-chart__dot', `ppl-viz-fill-${slot}`)} />
               ))}
@@ -301,7 +304,7 @@ export function LineChart({
           )}
         </svg>
         {hoverX !== null && readout.length > 0 && (
-          <div className="ppl-chart__tip" style={{ ...tipStyle, top: PAD.top }} role="status">
+          <div className="ppl-chart__tip" style={{ ...tipStyle, top: padTop }} role="status">
             <div className="ppl-chart__tip-x">
               {xLabel ? `${xLabel} ` : ''}
               {fx(hoverX)}

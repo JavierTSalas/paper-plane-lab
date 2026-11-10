@@ -272,6 +272,7 @@ export default function KitPage(): ReactElement {
             description="Height peaks early, then the plane settles into a steady glide while airspeed falls to about 4 metres per second."
             series={series}
             xLabel="Time (s)"
+            yLabel="m and m/s"
             markers={[
               { x: apex[0], y: apex[1], label: 'Apex', seriesId: 'h' },
               { x: 2.2, label: 'Stall' },
