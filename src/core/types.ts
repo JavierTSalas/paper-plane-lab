@@ -556,7 +556,7 @@ export interface Conditions {
 /* ------------------------------------------------------------------ */
 
 export interface Launch {
-  /** Release speed, m/s. */
+  /** Release speed over the ground, m/s. */
   speed: number;
   /** Elevation of the velocity vector above the horizon, degrees. */
   pitchDeg: number;
@@ -564,7 +564,7 @@ export interface Launch {
   yawDeg: number;
   /** Bank at release, degrees. Positive = right wing down. */
   rollDeg: number;
-  /** Angle of attack at release, degrees (nose above the velocity vector). */
+  /** Angle of attack at release, degrees (nose above the velocity vector, in the plane's own plane of symmetry). */
   aoaDeg: number;
 }
 
@@ -581,23 +581,34 @@ export interface FlightSample {
   /** Radians. */
   alpha: number;
   beta: number;
-  /** Whole-plane coefficients at this instant (reference area = airframe.ref.area). */
+  /**
+   * Whole-plane coefficients at this instant (reference area = airframe.ref.area): drag along the relative
+   * wind, lift perpendicular to it in the plane of symmetry (the wind tunnel's axes). Zero below 0.2 m/s airspeed.
+   */
   cl: number;
   cd: number;
   /** Local wind at the CG, world frame, m/s. */
   wind: Vec3;
 }
 
+/**
+ *  launch   release, t = 0.
+ *  apex     highest point of the centre of gravity (only when the plane climbed after release).
+ *  stall    the whole-plane angle of attack rose past the wing's stall angle; `recover` when it fell 3 degrees below it.
+ *  tumble   a full turn in roll, or a full turn in pitch during which the air came from behind (a loop is not a tumble).
+ *  ground / wall / ceiling   first touch: the end of the flight. `timeout`: still airborne at the time limit.
+ */
 export type FlightEventKind = 'launch' | 'apex' | 'stall' | 'recover' | 'tumble' | 'ground' | 'wall' | 'ceiling' | 'timeout';
 
 export interface FlightEvent {
   t: number;
   kind: FlightEventKind;
+  /** Centre of gravity at that instant. For ground / wall / ceiling: the point of the plane that touched. */
   pos: Vec3;
 }
 
 export interface FlightMetrics {
-  /** Horizontal straight-line distance from the release point to the landing point, metres. */
+  /** Horizontal straight-line distance from the release point to the point of first touch, metres. */
   distance: number;
   /** Component of that distance along the throw line (+x), metres. */
   downrange: number;
@@ -605,14 +616,20 @@ export interface FlightMetrics {
   lateral: number;
   /** Time from release to first contact, seconds. */
   airtime: number;
+  /** Highest world y of the centre of gravity, metres (the ground under the thrower is y = 0). */
   maxHeight: number;
+  /** Highest speed over the ground, m/s. */
   maxSpeed: number;
+  /** Time average of the speed through the air, m/s. */
   meanAirspeed: number;
   /** Length of the flight path, metres. */
   pathLength: number;
-  /** Horizontal distance / height lost over the steadiest glide segment; null if no steady glide. */
+  /**
+   * Horizontal distance / height lost, both through the air, over the longest steady stretch of the flight
+   * (at least 0.5 s with airspeed and flight-path angle nearly constant); null if there is none.
+   */
   glideRatio: number | null;
-  /** Mean sink rate over that segment, m/s; null if none. */
+  /** Mean sink rate through the air over that stretch, m/s; null if none. */
   sinkRate: number | null;
   /** Mean angle of attack over that segment, radians. */
   glideAlpha: number | null;
@@ -653,8 +670,9 @@ export interface FlightResult {
   seed: number;
   /** Integration step, seconds. */
   dt: number;
-  /** Samples at a fixed output rate (`sampleHz`). */
+  /** Output rate of `samples`, Hz. */
   sampleHz: number;
+  /** One sample every 1 / sampleHz seconds from t = 0, plus a last one at the exact instant the flight ended. */
   samples: FlightSample[];
   events: FlightEvent[];
   metrics: FlightMetrics;

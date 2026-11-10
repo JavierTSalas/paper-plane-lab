@@ -76,7 +76,7 @@ interface Reading {
   peakLoad: number;
 }
 
-function read(result: FlightResult, airframe: Airframe, stallAngle: number): Reading {
+function read(result: FlightResult, airframe: Airframe, stallAngle: number, rho: number): Reading {
   const samples = result.samples;
   const n = samples.length;
   const first = samples[0];
@@ -140,9 +140,7 @@ function read(result: FlightResult, airframe: Airframe, stallAngle: number): Rea
     }
 
     if (s.t <= 1) {
-      const lift = 0.5 * airframe.ref.area * s.airspeed * s.airspeed * s.cl;
-      // Density cancels to within a few percent between environments; 1.2 kg/m³ is enough for a ratio in a sentence.
-      peakLoad = Math.max(peakLoad, (1.2 * lift) / weight);
+      peakLoad = Math.max(peakLoad, (0.5 * rho * airframe.ref.area * s.airspeed * s.airspeed * s.cl) / weight);
     }
 
     const y = s.pos[1];
@@ -489,7 +487,7 @@ export function diagnose(result: FlightResult, airframe: Airframe, launch: Launc
   const trim = analyzeTrim(airframe, air);
   const wing = airframe.surfaces.find((s) => s.role === 'wing' || s.role === 'center') ?? airframe.surfaces[0];
   const stallAngle = wing ? wing.alphaStall : Math.PI / 2;
-  const r = read(result, airframe, stallAngle);
+  const r = read(result, airframe, stallAngle, air.rho);
   const c: Context = { result, airframe, launch, env, trim, r, stallDeg: stallAngle / DEG, bends: bendsOf(airframe) };
   const m = result.metrics;
   const codes: DiagnosisCode[] = [];

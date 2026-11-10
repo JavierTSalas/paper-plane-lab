@@ -337,10 +337,12 @@ export function createWindField(spec: WindSpec, seed: number, env: Environment):
           stepDryden(state, 1, tauH, noise.gauss(), noise.gauss());
           stepDryden(state, 3, ds / h, noise.gauss(), noise.gauss());
         } else {
-          const step = ds / ouLength;
-          state[0] = stepOu(state[0], step, noise.gauss());
-          state[1] = stepOu(state[1], step, noise.gauss());
-          state[2] = stepOu(state[2], step, noise.gauss());
+          // Three Ornstein-Uhlenbeck steps (`stepOu`) with one shared decay factor.
+          const keep = Math.exp(-ds / ouLength);
+          const fresh = Math.sqrt(1 - keep * keep);
+          state[0] = keep * state[0] + fresh * noise.gauss();
+          state[1] = keep * state[1] + fresh * noise.gauss();
+          state[2] = keep * state[2] + fresh * noise.gauss();
         }
         lastT = t;
         lastX = x;

@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { aeroLoads, createAeroLoads } from '../aero';
 import { STANDARD_GRAVITY } from '../airframe';
 import { getEnvironment } from '../env';
-import { DEG, mat3MulVec, quatRotate, quatRotateInv } from '../math';
+import { DEG, mat3Inverse, mat3MulVec, quatRotate, quatRotateInv } from '../math';
 import { analyzeTrim } from '../tunnel';
 import { airFrom, createWindField, resolveWind } from '../wind';
 import type { Airframe, Environment, FlightResult, FlightSample, Launch, Mat3, Vec3, WindField } from '../types';
@@ -516,6 +516,41 @@ describe('wind', () => {
       }
       expect(moving.metrics.downrange - still.metrics.downrange).toBeCloseTo(wind * still.metrics.airtime, 4);
     }
+  });
+
+  it('a sudden gust pushes the plane at once through the apparent mass of the air around it', () => {
+    const env = tower(8);
+    const launch = trimmedLaunch(glider, env);
+    const gustAt = 0.1;
+    const gust: Vec3 = [0, 0.5, 0];
+    const stepWind: WindField = {
+      sample: (_p, t, out = [0, 0, 0]) => {
+        out[0] = 0;
+        out[1] = t >= gustAt - 1e-9 ? gust[1] : 0;
+        out[2] = 0;
+        return out;
+      },
+      mean: (_p, _t, out = [0, 0, 0]) => out,
+    };
+    const options = { sampleHz: 1000, maxTime: 0.3 };
+    const calm = simulateFlight(glider, launch, env, { envId: env.id }, 1, options);
+    const hit = simulateFlight(glider, launch, env, { envId: env.id }, 1, { ...options, wind: stepWind });
+    const i = Math.round(gustAt * 1000);
+    // Identical until the step in which the gust arrives.
+    expect(hit.samples[i - 1].vel).toEqual(calm.samples[i - 1].vel);
+    // In that one millisecond the velocity jumps by (m + A)^-1 A times the gust (body axes); the aerodynamic
+    // response has hardly begun (its time constant is tens of milliseconds).
+    const q = calm.samples[i].quat;
+    const M = addM([glider.mass, 0, 0, 0, glider.mass, 0, 0, 0, glider.mass], glider.apparentMass);
+    const expected = quatRotate(q, mat3MulVec(mat3Inverse(M), mat3MulVec(glider.apparentMass, quatRotateInv(q, gust))));
+    expect(expected[1]).toBeGreaterThan(0.1 * gust[1]);
+    const jump = [0, 1, 2].map((k) => hit.samples[i].vel[k] - calm.samples[i].vel[k]);
+    within(jump[1], expected[1], 0.1);
+    expect(Math.abs(jump[0] - expected[0])).toBeLessThan(0.1 * expected[1]);
+    // Then the wing's lift takes over and carries the plane on up with the rising air.
+    const later = hit.samples[hit.samples.length - 1].vel[1] - calm.samples[calm.samples.length - 1].vel[1];
+    expect(later).toBeGreaterThan(1.5 * jump[1]);
+    expect(later).toBeLessThan(1.3 * gust[1]);
   });
 
   it('a headwind shortens and a tailwind lengthens a glide over the ground', () => {

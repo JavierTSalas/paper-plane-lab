@@ -54,6 +54,8 @@ const RECOVER_BELOW_STALL = 3 * DEG;
 const MIN_AIRSPEED = 0.2;
 /** The apex is reported when the plane climbed at least this far above the release point, metres (design choice). */
 const MIN_APEX_RISE = 0.01;
+/** A state whose position (m) plus rotation rate (rad/s) passes this has diverged numerically; real flights stay below 1e4. */
+const DIVERGED = 1e9;
 const TWO_PI = 2 * Math.PI;
 /** Time tolerance when comparing step and sample times, seconds: far below any step. */
 const TIME_EPS = 1e-9;
@@ -559,6 +561,17 @@ export function simulateFlight(
     }
     step++;
     const tNow = step * dt;
+    if (!(Math.abs(s[PX]) + Math.abs(s[PX + 1]) + Math.abs(s[PX + 2]) + Math.abs(s[OX]) + Math.abs(s[OX + 1]) + Math.abs(s[OX + 2]) < DIVERGED)) {
+      // The numbers have run away (an airframe far outside what the model was built for). End the flight at
+      // the last good state instead of handing out NaN.
+      s.set(before);
+      step--;
+      tEnd = tBefore;
+      outcome = 'ground';
+      touch = [s[PX], s[PX + 1], s[PX + 2]];
+      ended = true;
+      break;
+    }
 
     // First touch inside this step: the earliest crossing of any contact point through any surface,
     // interpolated linearly between the two step states (doc 02 section 7).
