@@ -231,6 +231,7 @@ export class FlightStageEngine {
     for (let i = 0; i < AIM_POINTS; i++) {
       const t = (i / (AIM_POINTS - 1)) * span;
       arr[i * 3] = this.launchPos.x + v[0] * t;
+      // Gravity eased off: a paper plane is held up by its wings, so a pure ballistic arc would mislead.
       arr[i * 3 + 1] = this.launchPos.y + v[1] * t - 0.5 * 9.81 * t * t * 0.35;
       arr[i * 3 + 2] = this.launchPos.z + v[2] * t;
     }

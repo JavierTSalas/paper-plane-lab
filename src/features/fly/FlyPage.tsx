@@ -130,16 +130,16 @@ export default function FlyPage(): ReactElement {
   /* ------------------------------------------------------------ live HUD (written straight to the DOM) */
 
   const hud = {
-    dist: useRef<HTMLSpanElement>(null),
-    height: useRef<HTMLSpanElement>(null),
-    speed: useRef<HTMLSpanElement>(null),
-    time: useRef<HTMLSpanElement>(null),
+    dist: useRef<HTMLElement>(null),
+    height: useRef<HTMLElement>(null),
+    speed: useRef<HTMLElement>(null),
+    time: useRef<HTMLElement>(null),
   };
   const lastTimeState = useRef(0);
   const onFrame = useCallback(
     (s: LiveSample) => {
       const l = env.launch;
-      const set = (el: HTMLSpanElement | null, text: string): void => {
+      const set = (el: HTMLElement | null, text: string): void => {
         if (el && el.textContent !== text) el.textContent = text;
       };
       const d = lengthParts(Math.hypot(s.pos[0] - l[0], s.pos[2] - l[2]), units, { digits: 1, unit: units === 'imperial' ? 'ft' : 'm' });
