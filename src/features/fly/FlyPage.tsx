@@ -23,7 +23,7 @@ import { TrimPanel } from '../fold';
 import { clearReplayState, readReplay, type ReplayRequest } from '../ranks';
 import { DetailsSheet } from './DetailsSheet';
 import { defaultWind, EnvironmentSheet, placeSummary, type WindSetting } from './EnvironmentSheet';
-import { clampLaunch, conditionsFor, nextSeed, pushGhost, swipeToThrow, trailOf } from './flight';
+import { clampLaunch, conditionsFor, FLY_SESSION_KEY, nextSeed, pushGhost, swipeToThrow, trailOf } from './flight';
 import { PlaneSheet } from './PlaneSheet';
 import { checkRanking, ticketOf, type RankingCheck } from './ranking';
 import { RankSheet } from './RankSheet';
@@ -47,7 +47,7 @@ const CAMERA_HINT: Record<CameraMode, string> = {
   orbit: 'Drag to look around',
 };
 
-const SESSION_KEY = 'ppl-fly';
+const SESSION_KEY = FLY_SESSION_KEY;
 /** Where the onboarding throws happen (features/onboarding/flow.ts: INTRO_ENV_ID). */
 const INTRO_ENVIRONMENT_ID = 'classroom';
 

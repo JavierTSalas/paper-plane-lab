@@ -1,11 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { makePaper } from '../core/paper';
+import { LOCAL_STORAGE_KEY } from '../core/leaderboard';
 import type { FlightMetrics, PlaneDesign } from '../core/types';
+import { FLY_SESSION_KEY } from '../features/fly/flight';
+import { DRAFT_KEY } from '../features/fold/draft';
+import { PROGRESS_KEY } from '../features/onboarding/progress';
 import {
   FLIGHT_CAP,
+  SIDE_LOCAL_KEYS,
+  SIDE_SESSION_KEYS,
   STORAGE_KEY,
   STORE_VERSION,
   bestFlightsByPlane,
+  clearSideStorage,
   createLabStore,
   initialData,
   memoryStorage,
@@ -169,5 +176,36 @@ describe('persistence', () => {
     const store = createLabStore(storage);
     expect(store.getState().profile).toEqual({ name: 'Old', onboarded: true });
     expect(store.getState().settings.units).toBe('metric');
+  });
+});
+
+describe('reset progress', () => {
+  it('knows the keys the features keep outside the store', () => {
+    expect([...SIDE_LOCAL_KEYS].sort()).toEqual([PROGRESS_KEY, LOCAL_STORAGE_KEY].sort());
+    expect([...SIDE_SESSION_KEYS].sort()).toEqual([DRAFT_KEY, FLY_SESSION_KEY].sort());
+  });
+
+  it('clears the intro progress, the local leaderboard and the session drafts, and nothing else', () => {
+    const local = memoryStorage();
+    const session = memoryStorage();
+    for (const k of [PROGRESS_KEY, LOCAL_STORAGE_KEY, 'unrelated']) local.setItem(k, '1');
+    for (const k of [DRAFT_KEY, FLY_SESSION_KEY, 'unrelated']) session.setItem(k, '1');
+    clearSideStorage(local, session);
+    expect(local.dump()).toEqual({ unrelated: '1' });
+    expect(session.dump()).toEqual({ unrelated: '1' });
+  });
+
+  it('survives blocked or missing storage', () => {
+    const blocked = {
+      removeItem: () => {
+        throw new Error('blocked');
+      },
+    };
+    expect(() => clearSideStorage(blocked, null)).not.toThrow();
+    // No window in this test environment: resetAll still resets the store.
+    const store = createLabStore(memoryStorage());
+    store.getState().savePlane(plane('a'));
+    expect(() => store.getState().resetAll()).not.toThrow();
+    expect(store.getState().planes).toEqual({});
   });
 });

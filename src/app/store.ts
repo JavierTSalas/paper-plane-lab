@@ -36,7 +36,7 @@ export interface LabActions {
   resetOnboarding: () => void;
   setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
   markAssignment: (id: string) => void;
-  /** Back to a first visit: planes, flights, profile and settings. */
+  /** Back to a first visit: planes, flights, profile and settings, plus the intro progress, the ranked flights kept on this device and the Fold and Fly drafts. */
   resetAll: () => void;
 }
 
@@ -58,6 +58,44 @@ export function initialData(): LabData {
     settings: { ...DEFAULT_SETTINGS },
     assignmentsDone: [],
   };
+}
+
+/* ------------------------------------------------------------------ storage outside this store */
+
+/**
+ * Keys other parts of the app keep outside this store. "Reset progress" clears them too, so the lab is a
+ * first visit again. The owners define the names (store.test.ts checks they agree):
+ * the intro's resumable progress (features/onboarding/progress.ts: PROGRESS_KEY) and the ranked flights kept on
+ * this device (core/leaderboard: LOCAL_STORAGE_KEY) in localStorage; the Fold tab's draft
+ * (features/fold/draft.ts: DRAFT_KEY) and the Fly tab's place and camera (features/fly/flight.ts:
+ * FLY_SESSION_KEY) in sessionStorage.
+ */
+export const SIDE_LOCAL_KEYS = ['ppl-onboarding', 'ppl-leaderboard'] as const;
+export const SIDE_SESSION_KEYS = ['ppl-fold-draft', 'ppl-fly'] as const;
+
+type Removable = Pick<Storage, 'removeItem'>;
+
+function webStorage(kind: 'localStorage' | 'sessionStorage'): Removable | null {
+  try {
+    return typeof window !== 'undefined' ? window[kind] : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Remove everything the app stores outside the lab store. Blocked or missing storage is skipped. */
+export function clearSideStorage(local: Removable | null = webStorage('localStorage'), session: Removable | null = webStorage('sessionStorage')): void {
+  const drop = (storage: Removable | null, keys: readonly string[]): void => {
+    for (const key of keys) {
+      try {
+        storage?.removeItem(key);
+      } catch {
+        // Blocked storage: nothing was kept there either.
+      }
+    }
+  };
+  drop(local, SIDE_LOCAL_KEYS);
+  drop(session, SIDE_SESSION_KEYS);
 }
 
 /* ------------------------------------------------------------------ pure reducers */
@@ -222,7 +260,10 @@ export function createLabStore(storage: StateStorage = browserStorage()): LabSto
           resetOnboarding: () => apply(reduce.resetOnboarding),
           setSetting: (key, value) => apply((d) => reduce.setSetting(d, key, value)),
           markAssignment: (id) => apply((d) => reduce.markAssignment(d, id)),
-          resetAll: () => apply(initialData),
+          resetAll: () => {
+            apply(initialData);
+            clearSideStorage();
+          },
         };
       },
       {

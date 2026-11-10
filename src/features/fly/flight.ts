@@ -4,6 +4,9 @@
 import { THROW_LIMITS } from '../../core/sim';
 import type { Conditions, Environment, FlightResult, Launch, Vec3 } from '../../core/types';
 
+/** sessionStorage key of the Fly screen's place, camera and wind settings. Cleared by "reset progress" (app/store.ts). */
+export const FLY_SESSION_KEY = 'ppl-fly';
+
 export type ArmStrength = 'gentle' | 'firm' | 'hard' | 'athlete';
 
 /** Words for the release speed (bands from THROW_LIMITS: casual 5-11 m/s, strong 15, elite 27). */
