@@ -94,8 +94,7 @@
 
 .ppl-onb__actions > .ppl-btn:has(+ .ppl-btn),
 .ppl-onb__actions > .ppl-btn + .ppl-btn {
-  flex: 1 1 0;
-  white-space: nowrap;
+  flex: 1 1 auto;
 }
 
 .ppl-onb__note {
@@ -174,7 +173,6 @@
   .ppl-onb__step--hello .ppl-onb__stage {
     max-height: 640px;
   }
-
 }
 
 /* ------------------------------------------------------------ fold */
@@ -357,75 +355,46 @@
 /* ------------------------------------------------------------ graduation */
 
 .ppl-onb__cert {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 150px) minmax(0, 1fr);
+  grid-template-areas:
+    'plane eyebrow'
+    'plane name'
+    'plane best';
+  align-content: center;
   align-items: center;
-  gap: var(--s-2);
-  padding: var(--s-4);
+  column-gap: var(--s-3);
+  row-gap: var(--s-1);
+  padding: var(--s-3);
   background: var(--card);
   border: var(--outline);
   border-radius: var(--r-card);
   box-shadow: var(--shadow);
-  text-align: center;
+}
+
+.ppl-onb__cert > .ppl-eyebrow {
+  grid-area: eyebrow;
+  align-self: end;
 }
 
 .ppl-onb__cert-name {
+  grid-area: name;
   margin: 0;
   font-family: var(--font-display);
-  font-size: var(--fs-xl);
+  font-size: var(--fs-lg);
   line-height: var(--lh-tight);
   overflow-wrap: anywhere;
 }
 
-.ppl-onb__cert-plane {
+.ppl-onb__cert-plane,
+.ppl-onb__cert > .ppl-onb__note {
+  grid-area: plane;
   width: 100%;
-  max-width: 260px;
-}
-
-@media (min-width: 900px) {
-  .ppl-onb__cert-plane {
-    max-width: 420px;
-  }
-
-  /* Graduation: name under the Professor, the certificate beside him, the three doors in a row underneath. */
-  .ppl-onb__step--graduate {
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      'says stage'
-      'extra stage'
-      'actions actions';
-    row-gap: var(--s-4);
-    align-content: center;
-  }
-
-  .ppl-onb__step--graduate .ppl-onb__side {
-    display: contents;
-  }
-
-  .ppl-onb__step--graduate .ppl-onb__says {
-    grid-area: says;
-    align-self: end;
-  }
-
-  .ppl-onb__step--graduate .ppl-onb__extra {
-    grid-area: extra;
-    align-self: start;
-  }
-
-  .ppl-onb__step--graduate .ppl-onb__actions {
-    grid-area: actions;
-  }
-
-  .ppl-onb__step--graduate .ppl-onb__doors {
-    flex-direction: row;
-  }
-
-  .ppl-onb__step--graduate .ppl-onb__door {
-    flex: 1 1 0;
-  }
 }
 
 .ppl-onb__cert-best {
+  grid-area: best;
+  align-self: start;
   display: inline-flex;
   align-items: center;
   gap: var(--s-1);

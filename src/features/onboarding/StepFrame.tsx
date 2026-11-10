@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { cx } from '../../ui/cx';
 import { useMediaQuery } from '../../ui/hooks';
 import { ProfessorSays, type ProfessorPose } from '../../ui/Professor';
-import type { Progress } from './flow';
+import type { Progress } from './progress';
 
 /** What every step screen receives from the page. */
 export interface StepProps {

@@ -67,7 +67,7 @@ export function GraduateStep({ progress, update, finish }: StepProps): ReactElem
       title={GRADUATE.title}
       stage={
         <div className="ppl-onb__cert">
-          <span className="ppl-eyebrow">Paper Plane Lab · member</span>
+          <span className="ppl-eyebrow">Lab member</span>
           <p className="ppl-onb__cert-name">{name || 'New lab member'}</p>
           {progress.color ? (
             <PlaneView model={build.model} paper={design.paper} yaw={35} pitch={24} backdrop className="ppl-onb__cert-plane" label="Your first dart" />
@@ -107,14 +107,16 @@ export function GraduateStep({ progress, update, finish }: StepProps): ReactElem
         <nav className="ppl-onb__doors" aria-label="Where to next">
           {DOORS.map((d) => (
             <CardLink key={d.path} href={`#${d.path}`} padding="sm" className="ppl-onb__door" onClick={(e) => go(e, d.path)}>
-              <span className="ppl-onb__door-row"><span className="ppl-onb__door-icon" aria-hidden="true">
-                <Icon name={d.icon} size={24} />
+              <span className="ppl-onb__door-row">
+                <span className="ppl-onb__door-icon" aria-hidden="true">
+                  <Icon name={d.icon} size={24} />
+                </span>
+                <span className="ppl-onb__door-text">
+                  <span className="ppl-onb__door-title">{d.title}</span>
+                  <span className="ppl-onb__door-sub">{d.sub}</span>
+                </span>
+                <Icon name="next" size={20} />
               </span>
-              <span className="ppl-onb__door-text">
-                <span className="ppl-onb__door-title">{d.title}</span>
-                <span className="ppl-onb__door-sub">{d.sub}</span>
-              </span>
-              <Icon name="next" size={20} /></span>
             </CardLink>
           ))}
         </nav>

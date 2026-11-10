@@ -1,24 +1,10 @@
-import { lazy, Suspense, useCallback, useEffect, useState, type ComponentType, type ReactElement } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ComponentType, type ReactElement } from 'react';
 import { useLocation } from 'wouter';
-import { getPlaneBuild } from '../../app/hooks';
-import { labStore, useLab } from '../../app/store';
-import type { FlightSummary } from '../../app/types';
+import { useLab } from '../../app/store';
 import { Button } from '../../ui/Button';
 import { Spinner } from '../../ui/Spinner';
 import { Stepper } from '../../ui/Stepper';
-import {
-  clearProgress,
-  flyIntro,
-  INTRO_CONDITIONS,
-  INTRO_ENV_ID,
-  loadProgress,
-  makePlayerDesign,
-  saveProgress,
-  STEP_IDS,
-  STEP_LABELS,
-  type Progress,
-  type StepId,
-} from './flow';
+import { clearProgress, loadProgress, saveProgress, STEP_IDS, STEP_LABELS, type Progress, type StepId } from './progress';
 import { HelloStep } from './HelloStep';
 import { SKIP_LABEL } from './script';
 import type { StepProps } from './StepFrame';
@@ -51,34 +37,6 @@ const PREFETCH: Partial<Record<StepId, () => Promise<unknown>>> = {
   'your-throw': loadGraduate,
 };
 
-/** Save the player's dart and log their intro throws (re-simulated: still air, fixed seed). */
-function keepPlayerWork(p: Progress, name: string): void {
-  if (!p.color) return;
-  const s = labStore.getState();
-  const design = makePlayerDesign(p.planeId, p.color, name || undefined);
-  s.savePlane(design);
-  s.selectPlane(design.id);
-  if (p.throws.length === 0) return;
-  const build = getPlaneBuild(design);
-  const now = Date.now();
-  p.throws.forEach((launch, i) => {
-    const result = flyIntro(build.airframe, launch);
-    const summary: FlightSummary = {
-      id: `${p.planeId}-intro-${i}`,
-      planeId: design.id,
-      planeName: design.name,
-      envId: INTRO_ENV_ID,
-      conditions: INTRO_CONDITIONS,
-      launch,
-      seed: result.seed,
-      metrics: result.metrics,
-      diagnosisCodes: result.diagnosis.map((d) => d.code),
-      at: new Date(now - (p.throws.length - 1 - i) * 1000).toISOString(),
-    };
-    s.logFlight(summary);
-  });
-}
-
 /** Professor Wren's intro: hello, watch him fold and throw, fold and throw your own, graduate. */
 export default function WelcomePage(): ReactElement {
   const completeOnboarding = useLab((s) => s.completeOnboarding);
@@ -94,13 +52,26 @@ export default function WelcomePage(): ReactElement {
   }, []);
   const next = useCallback(() => go(Math.min(STEP_IDS.length - 1, progress.step + 1)), [go, progress.step]);
 
+  const leaving = useRef(false);
   const finish = useCallback(
     (path: string, name?: string) => {
+      if (leaving.current) return;
+      leaving.current = true;
       const clean = (name ?? progress.name).trim();
-      keepPlayerWork(progress, clean);
-      completeOnboarding(clean || undefined);
-      clearProgress();
-      navigate(path);
+      const done = (): void => {
+        completeOnboarding(clean || undefined);
+        clearProgress();
+        navigate(path);
+      };
+      if (!progress.color) {
+        done();
+        return;
+      }
+      // Saving needs the fold engine and the simulator: load them only on the way out.
+      import('./keep')
+        .then((m) => m.keepPlayerWork(progress, clean))
+        .catch(() => undefined)
+        .finally(done);
     },
     [progress, completeOnboarding, navigate],
   );

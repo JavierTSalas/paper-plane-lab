@@ -2,18 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { getPlaneBuild } from '../../app/hooks';
 import { PAPER_COLORS } from '../../core/paper';
 import { buildTimeline } from '../fold/view';
-import {
-  flyIntro,
-  freshProgress,
-  getWrenDesign,
-  makePlayerDesign,
-  PLAYER_COLORS,
-  PLAYER_START_LAUNCH,
-  sanitizeProgress,
-  STEP_IDS,
-  WREN_COLOR,
-  WREN_LAUNCH,
-} from './flow';
+import { flyIntro, getWrenDesign, makePlayerDesign, PLAYER_START_LAUNCH, WREN_COLOR, WREN_LAUNCH } from './flow';
+import { freshProgress, PLAYER_COLORS, sanitizeProgress, STEP_IDS } from './progress';
 import * as script from './script';
 
 function allLines(): string[] {

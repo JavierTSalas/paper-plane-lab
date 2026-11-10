@@ -10,7 +10,8 @@ import { InfoDot } from '../../ui/InfoDot';
 import { useReducedMotion } from '../../ui/motion';
 import { FlightStage, swipeToThrow, ThrowPad, trailOf, type FlightStagePlane } from '../fly';
 import { clamp, clampLaunch } from '../fly/flight';
-import { flyIntro, getWrenDesign, INTRO_MAX_SPEED, introEnv, makePlayerDesign, MAX_THROWS, PLAYER_START_LAUNCH, WREN_LAUNCH } from './flow';
+import { flyIntro, getWrenDesign, introEnv, makePlayerDesign, PLAYER_START_LAUNCH, WREN_LAUNCH } from './flow';
+import { INTRO_MAX_SPEED, MAX_THROWS } from './progress';
 import { compareLine, DIAGNOSIS_HEADLINE, WATCH_THROW, YOUR_THROW } from './script';
 import { StepFrame, type StepProps } from './StepFrame';
 
@@ -286,7 +287,13 @@ export function YourThrow({ progress, update, next }: StepProps): ReactElement {
       extra={
         landed ? (
           <div className="ppl-onb__compare">
-            <FlightTable rows={[{ who: 'Wren', result: wren.result }, { who: 'You', result, mine: true }]} units={units} />
+            <FlightTable
+              rows={[
+                { who: 'Wren', result: wren.result },
+                { who: 'You', result, mine: true },
+              ]}
+              units={units}
+            />
             {diag && diag.code !== 'clean-glide' && (diag.fix || diag.why) && (
               <div className="ppl-onb__note">
                 {diag.fix || diag.why}{' '}

@@ -5,7 +5,8 @@ import { Button } from '../../ui/Button';
 import { PaperPreview, PaperSwatch } from '../../ui/paper';
 import { GuidedFold } from '../fold';
 import { FoldPlayer } from '../fold/view';
-import { getWrenDesign, makePlayerDesign, PLAYER_COLORS } from './flow';
+import { getWrenDesign, makePlayerDesign } from './flow';
+import { PLAYER_COLORS } from './progress';
 import { WATCH_FOLD, YOUR_FOLD } from './script';
 import { StepFrame, type StepProps } from './StepFrame';
 

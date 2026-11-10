@@ -40,7 +40,7 @@ export const YOUR_FOLD = {
   pick: 'Pick your paper. Any colour flies the same, but this one is yours.',
   /** Indexed by flat folds finished. */
   progress: [
-    'Drag the pulsing corner onto the dot. I’ll fold along with you.',
+    'The centre crease first, like I did. Take your time; paper is patient.',
     'Good crease. Now the corners.',
     'Neatly done. Keep the edges right on the centre line.',
     'Halfway. You fold like you have done this before.',
