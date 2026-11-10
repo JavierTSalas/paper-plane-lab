@@ -1,6 +1,7 @@
 import { makePaper } from '../paper';
 import type { PaperPatternId } from '../paper';
-import type { PaperSpec, PlaneCategory, PlaneDesign, ShapeSpec, TrimSpec } from '../types';
+import { defaultLaunch } from '../sim/throw';
+import type { Launch, PaperSpec, PlaneCategory, PlaneDesign, ShapeSpec, TrimSpec } from '../types';
 import { PRESET_LIST } from './presets';
 import type { PlanePreset } from './types';
 
@@ -25,6 +26,14 @@ export const DEFAULT_PRESET_ID = 'classic-dart';
 
 export function getPreset(id: string): PlanePreset | undefined {
   return PRESETS.find((p) => p.id === id);
+}
+
+/**
+ * A preset's recommended throw as a launch: the hint's speed and angle, wings level, nose along the throw.
+ * This is the first throw the Fly screen offers for the plane.
+ */
+export function hintLaunch(preset: PlanePreset): Launch {
+  return { ...defaultLaunch(preset.category), speed: preset.throwHint.speed, pitchDeg: preset.throwHint.pitchDeg };
 }
 
 export interface DesignOverrides {

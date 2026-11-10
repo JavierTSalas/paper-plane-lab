@@ -162,7 +162,11 @@ export const ENVIRONMENTS: readonly Environment[] = [
   },
 ];
 
-export const DEFAULT_ENVIRONMENT_ID = 'classroom';
+/**
+ * Where the Fly screen opens: the gymnasium, whose 8 m ceiling leaves room for a firm throw. (The classroom's
+ * 3 m ceiling catches a dart thrown at its recommended 9 m/s; the intro uses the classroom with gentle throws.)
+ */
+export const DEFAULT_ENVIRONMENT_ID = 'gym';
 
 /** The environment with the given id; the classroom when the id is unknown (stored data may be stale). */
 export function getEnvironment(id: string): Environment {

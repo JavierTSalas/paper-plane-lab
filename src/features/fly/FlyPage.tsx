@@ -3,7 +3,7 @@ import { useLocation } from 'wouter';
 import { getPlaneBuild, usePlaneBuild, useCurrentDesign } from '../../app/hooks';
 import { useLab } from '../../app/store';
 import type { FlightSummary } from '../../app/types';
-import { getPreset } from '../../core/designs';
+import { getPreset, hintLaunch } from '../../core/designs';
 import { DEFAULT_ENVIRONMENT_ID, ENVIRONMENTS, getEnvironment, groundHeight } from '../../core/env';
 import { defaultLaunch, simulateFlight, THROW_LIMITS } from '../../core/sim';
 import type { Launch, PlaneDesign, RankCategory, TrimSpec, Vec3 } from '../../core/types';
@@ -48,6 +48,8 @@ const CAMERA_HINT: Record<CameraMode, string> = {
 };
 
 const SESSION_KEY = 'ppl-fly';
+/** Where the onboarding throws happen (features/onboarding/flow.ts: INTRO_ENV_ID). */
+const INTRO_ENVIRONMENT_ID = 'classroom';
 
 const NO_RANKING: RankingCheck = { inArenaPlace: false, boards: [], refused: [] };
 
@@ -68,9 +70,8 @@ function loadSaved(): Partial<Saved> {
 
 /** The preset's own recommended throw, else a sensible one for the kind of plane. */
 function firstThrow(presetId: string | undefined, category: PlaneDesign['category']): Launch {
-  const base = defaultLaunch(category);
-  const hint = presetId ? getPreset(presetId)?.throwHint : undefined;
-  return hint ? { ...base, speed: hint.speed, pitchDeg: hint.pitchDeg } : base;
+  const preset = presetId ? getPreset(presetId) : undefined;
+  return preset ? hintLaunch(preset) : defaultLaunch(category);
 }
 
 let throwCounter = 0;
@@ -116,7 +117,9 @@ export default function FlyPage(): ReactElement {
 
   const saved = useMemo(loadSaved, []);
   const [envId, setEnvId] = useState<string>(() => {
-    const id = saved.envId ?? flights[0]?.envId ?? DEFAULT_ENVIRONMENT_ID;
+    // This session's place, else the last place the player chose to fly in, else the gym. Intro throws do
+    // not count: they happen in the classroom, whose low ceiling catches a firm first throw.
+    const id = saved.envId ?? flights.find((f) => f.envId !== INTRO_ENVIRONMENT_ID)?.envId ?? DEFAULT_ENVIRONMENT_ID;
     return ENVIRONMENTS.some((e) => e.id === id) ? id : DEFAULT_ENVIRONMENT_ID;
   });
   const env = replay ? replay.record.env : getEnvironment(envId);

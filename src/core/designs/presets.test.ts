@@ -5,17 +5,18 @@
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { getEnvironment } from '../env';
-import { isSymmetric, piecePolygon, SHAPE_STEP, snapPoints } from '../fold';
+import { buildAirframe } from '../airframe';
+import { DEFAULT_ENVIRONMENT_ID, getEnvironment } from '../env';
+import { buildPlane, isSymmetric, piecePolygon, SHAPE_STEP, snapPoints } from '../fold';
 import { DEG, quatRotate } from '../math';
-import { makePaper, sheetMass } from '../paper';
+import { makePaper, PAPER_SIZES, sheetMass } from '../paper';
 import { simulateFlight } from '../sim';
 import { releasedAt, stillAir } from '../sim/simFixtures';
 import { analyzeTrim } from '../tunnel';
 import type { DiagnosisCode, FlatState, PlaneCategory, TrimAnalysis, Vec2 } from '../types';
 import { airOf, buildPreset, throwAt } from './calibrate';
 import type { BuiltPreset } from './calibrate';
-import { getPreset, makeDesign, PRESET_CATEGORIES, PRESETS, presetsIn } from './index';
+import { getPreset, hintLaunch, makeDesign, PRESET_CATEGORIES, PRESETS, presetPaper, presetsIn } from './index';
 import type { PlanePreset } from './index';
 
 const gym = getEnvironment('gym');
@@ -303,6 +304,35 @@ describe('preset library: model, trim and the recommended throw', () => {
         expect(Math.abs(r.metrics.lateral)).toBeLessThan(0.25 * r.metrics.distance);
       });
     }
+  }
+
+  // The Fly screen opens in the default place with the preset's hinted throw (still indoor air: seed 1).
+  // A new player's first throw must show the plane flying, not a wall or the ceiling.
+  const firstPlace = getEnvironment(DEFAULT_ENVIRONMENT_ID);
+  for (const p of PRESETS) {
+    it(`${p.id}: the first throw of the Fly screen (hinted throw, ${firstPlace.name}) glides to the floor`, () => {
+      expect(firstPlace.id).toBe('gym');
+      const design = makeDesign(p, presetPaper(p));
+      const { model } = buildPlane(design);
+      const r = simulateFlight(buildAirframe(model, design.trim), hintLaunch(p), firstPlace, { envId: firstPlace.id }, 1);
+      expect(r.outcome).toBe('ground');
+      expect(r.diagnosis.map((d) => d.code).filter((c) => !MILD.includes(c))).toEqual([]);
+      // Well clear of the ceiling and the far wall.
+      const room = firstPlace.bounds;
+      expect(room).not.toBeNull();
+      if (!room) return;
+      expect(r.metrics.maxHeight).toBeLessThan(room.ceiling - 2);
+      expect(r.metrics.distance).toBeLessThan(0.5 * (room.xMax - firstPlace.launch[0]));
+    });
+
+    it(`${p.id}: the hinted throw never reaches a wall or the ceiling of the ${firstPlace.name} on any sheet size`, () => {
+      for (const size of PAPER_SIZES) {
+        const design = makeDesign(p, presetPaper(p, { sizeId: size.id }));
+        const { model } = buildPlane(design);
+        const r = simulateFlight(buildAirframe(model, design.trim), hintLaunch(p), firstPlace, { envId: firstPlace.id }, 1);
+        expect(`${size.id}: ${r.outcome}`).toBe(`${size.id}: ground`);
+      }
+    });
   }
 
   it('darts are the fast planes, gliders the slow floaters (docs 05 and 06 trim-speed tables)', () => {
