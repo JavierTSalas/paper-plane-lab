@@ -118,6 +118,12 @@ export default function RanksPage(): ReactElement {
     const c = query.get('rank');
     return isRankCategory(c) ? c : 'distance';
   });
+  // The link has done its work: drop the query, so it does not ride along to the other tabs.
+  useEffect(() => {
+    if (search) navigate('/ranks?', { replace: true });
+    // Once, on arrival.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [view, setView] = useState<View>('design');
   const [board, setBoard] = useState<BoardState>({ key: '', entries: null, error: null });
   const [selected, setSelected] = useState<RankEntry | null>(null);

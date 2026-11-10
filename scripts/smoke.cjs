@@ -175,6 +175,9 @@ async function setRange(loc, value) {
   }, value);
 }
 
+/** The slider (its wrapper) whose label is exactly `label`, inside `scope`. */
+const slider = (scope, label) => scope.locator('.ppl-slider').filter({ has: scope.page().locator('.ppl-slider__label', { hasText: new RegExp(`^${label}$`) }) });
+
 /** What lies at the centre of an element: itself (or a child), or the thing covering it. */
 async function coveredBy(loc) {
   return loc.first().evaluate((el) => {
@@ -216,8 +219,11 @@ async function throwWithButton(page) {
   await page.locator('.ppl-fly-result').waitFor({ timeout: LAND_TIMEOUT });
 }
 
-/** A real finger drag (touch events through the DevTools protocol), in viewport pixels. */
-async function fingerDrag(page, from, to, steps = 12) {
+/**
+ * A real finger drag (touch events through the DevTools protocol), in viewport pixels. `hold` is the pause
+ * before the finger lifts: a fold is placed and then let go, a throwing swipe is released while still moving.
+ */
+async function fingerDrag(page, from, to, steps = 12, hold = 120) {
   const cdp = await page.context().newCDPSession(page);
   const point = (x, y) => [{ x: Math.round(x), y: Math.round(y), radiusX: 6, radiusY: 6, force: 1, id: 1 }];
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: point(from.x, from.y) });
@@ -226,7 +232,7 @@ async function fingerDrag(page, from, to, steps = 12) {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: point(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t) });
     await sleep(25);
   }
-  await sleep(120);
+  if (hold > 0) await sleep(hold);
   await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
   await cdp.detach();
 }
@@ -421,10 +427,13 @@ async function main() {
     await sleep(500);
     const area = await page.locator('.ppl-fly__swipe').boundingBox();
     const x = area.x + area.width / 2;
-    await fingerDrag(page, { x, y: area.y + 330 }, { x, y: area.y + 150 }, 6);
+    await fingerDrag(page, { x, y: area.y + 330 }, { x, y: area.y + 150 }, 6, 0);
     await page.locator('.ppl-fly--flying, .ppl-fly--landed').first().waitFor({ timeout: 5000 });
     await page.locator('.ppl-fly-result').waitFor({ timeout: LAND_TIMEOUT });
-    expect((await labState(page)).flights.length === before + 2, 'the swipe throw was not logged');
+    const swiped = await labState(page);
+    expect(swiped.flights.length === before + 2, 'the swipe throw was not logged');
+    const swipeSpeed = swiped.flights[0].launch.speed;
+    expect(swipeSpeed > 3 && swipeSpeed <= 30, `a brisk swipe should make a real throw, it gave ${swipeSpeed} m/s`);
     await shot(page, 'c5-swipe-result');
   });
 
@@ -435,7 +444,17 @@ async function main() {
     if (await button(page, 'Throw again').isVisible()) await tap(button(page, 'Throw again'));
     await page.locator('.ppl-fly--ready').waitFor();
     await choosePlace(page, 'Record Hangar');
+    // The plane's recommended throw, set with the sliders (the swipe before left its own speed and angle).
+    const pad = page.locator('.ppl-fly__panel .ppl-throwpad');
+    await setRange(slider(pad, 'Speed').locator('input[type=range]'), 5);
+    await setRange(slider(pad, 'Angle').locator('input[type=range]'), 0);
+    await sleep(200);
+    const shown = (await slider(pad, 'Speed').locator('output').innerText()).trim();
+    expect(/^5\.0\s*m\/s/.test(shown), `the speed slider should read 5.0 m/s, it reads "${shown}"`);
     await throwWithButton(page);
+    const ranked = (await labState(page)).flights[0];
+    expect(ranked.envId === 'hangar' && ranked.launch.speed === 5 && ranked.launch.pitchDeg === 0, `the hangar throw was logged as ${JSON.stringify(ranked.launch)} in ${ranked.envId}`);
+    expect(ranked.metrics.distance > 4, `the Nakamura Lock's recommended throw flew only ${ranked.metrics.distance.toFixed(2)} m in the hangar`);
     await sleep(400);
     await shot(page, 'd1-result');
     await tap(button(page, 'Enter ranking'));
@@ -513,7 +532,7 @@ async function main() {
     await page.locator('.ppl-tunnel').waitFor({ timeout: 20_000 });
     await sleep(600);
     const lift = () => page.locator('.ppl-tunnel__legend').innerText();
-    const angle = page.locator('.ppl-tunnel__controls .ppl-slider', { hasText: 'Angle of attack' }).locator('input[type=range]');
+    const angle = slider(page.locator('.ppl-tunnel__controls'), 'Angle of attack').locator('input[type=range]');
     await setRange(angle, 2);
     await sleep(300);
     const at2 = await lift();
