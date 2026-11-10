@@ -98,24 +98,6 @@ export function ResultCard({ record, units, personalBest, ranking, ranked = fals
           Details
         </Button>
       </div>
-      {wide && (
-        <>
-          <StatGrid minWidth={100} boxed={false}>
-            <Stat label="Max height" size="sm" value={maxH.value} unit={maxH.unit} />
-            <Stat label="Glide ratio" size="sm" value={formatRatio(m.glideRatio)} />
-            <Stat label="Top speed" size="sm" value={vmax.value} unit={vmax.unit} />
-          </StatGrid>
-          <LineChart
-            title={`Flight path (${lu})`}
-            description="Height over distance, seen from the side."
-            series={[{ id: 'h', label: 'Height', points: path }]}
-            xLabel={`Distance (${lu})`}
-            formatX={(v) => fixed(v, 0)}
-            formatY={(v) => fixed(v, 1)}
-            height={150}
-          />
-        </>
-      )}
       {ranking.boards.length > 0 ? (
         <div className="ppl-fly-result__rank">
           <Button variant="ghost" icon={ranked ? 'check' : 'ranks'} onClick={onRank}>
@@ -134,6 +116,24 @@ export function ResultCard({ record, units, personalBest, ranking, ranked = fals
             </span>
           </p>
         )
+      )}
+      {wide && (
+        <>
+          <StatGrid minWidth={100} boxed={false}>
+            <Stat label="Max height" size="sm" value={maxH.value} unit={maxH.unit} />
+            <Stat label="Glide ratio" size="sm" value={formatRatio(m.glideRatio)} />
+            <Stat label="Top speed" size="sm" value={vmax.value} unit={vmax.unit} />
+          </StatGrid>
+          <LineChart
+            title={`Flight path (${lu})`}
+            description="Height over distance, seen from the side."
+            series={[{ id: 'h', label: 'Height', points: path }]}
+            xLabel={`Distance (${lu})`}
+            formatX={(v) => fixed(v, 0)}
+            formatY={(v) => fixed(v, 1)}
+            height={150}
+          />
+        </>
       )}
     </section>
   );

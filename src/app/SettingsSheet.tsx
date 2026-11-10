@@ -76,7 +76,7 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps): ReactEleme
           </h3>
           {confirming ? (
             <div className="ppl-settings__confirm" role="alert">
-              <p className="ppl-small">This deletes your planes, flights and settings on this device. It cannot be undone.</p>
+              <p className="ppl-small">This deletes your planes, flights, ranked entries, unfinished folds and settings on this device. It cannot be undone.</p>
               <div className="ppl-row">
                 <Button variant="danger" icon="trash" onClick={reset}>
                   Yes, reset everything

@@ -23,6 +23,7 @@
  *   h  freeform: blank sheet, one fold by a pointer drag between two snap points, shape, save
  *   i  notebook index and one topic; settings sheet
  *   w  the main routes once at 1280 x 800 (screenshots for a layout check)
+ *   r  settings: reset progress, back to a first visit with nothing left in storage
  * Every step collects console errors and page errors, checks for horizontal overflow and saves screenshots.
  * It prints one PASS / FAIL line per step and exits non-zero when any step failed.
  *
@@ -300,6 +301,8 @@ async function main() {
     expect(cover === null, `the intro's Throw button is covered by ${cover}`);
     await tap(throwBtn);
     await button(page, 'Continue').waitFor({ timeout: LAND_TIMEOUT });
+    const verdict = (await page.locator('.ppl-onb__step--your-throw').innerText()).replace(/\s+/g, ' ');
+    expect(!/far wall|ceiling/i.test(verdict), `the untouched first throw of the intro should land on the floor: "${verdict.slice(0, 160)}"`);
     await shot(page, 'a5-your-throw');
     await tap(button(page, 'Continue'));
 
@@ -353,6 +356,8 @@ async function main() {
 
     await button(page, 'Save to the hangar').waitFor({ timeout: 15_000 });
     await sleep(500);
+    const scrolled = await page.evaluate(() => window.scrollY);
+    expect(scrolled < 5, `the trim stage should open at its top, the page is scrolled by ${scrolled}px`);
     await shot(page, 'b4-trim');
     await tap(button(page, 'Save to the hangar'));
     await sheet(page).waitFor();
@@ -409,6 +414,18 @@ async function main() {
     await shot(page, 'c4-details-end');
     await closeSheet(page);
     await page.locator('.ppl-fly-result').waitFor();
+
+    // The other way to throw: a finger swipe up over the scene.
+    await tap(button(page, 'Throw again'));
+    await page.locator('.ppl-fly--ready').waitFor();
+    await sleep(500);
+    const area = await page.locator('.ppl-fly__swipe').boundingBox();
+    const x = area.x + area.width / 2;
+    await fingerDrag(page, { x, y: area.y + 330 }, { x, y: area.y + 150 }, 6);
+    await page.locator('.ppl-fly--flying, .ppl-fly--landed').first().waitFor({ timeout: 5000 });
+    await page.locator('.ppl-fly-result').waitFor({ timeout: LAND_TIMEOUT });
+    expect((await labState(page)).flights.length === before + 2, 'the swipe throw was not logged');
+    await shot(page, 'c5-swipe-result');
   });
 
   /* d ---------------------------------------------------------------- ranked throw */
@@ -647,6 +664,44 @@ async function main() {
     await shot(wide, 'w-fly-result');
   });
   await wideCtx.close();
+
+  /* r ---------------------------------------------------------------- reset progress */
+  await runStep('r', 'settings: reset progress clears the lab, the intro progress, the local board and the drafts', page, async () => {
+    await goto(page, '/hangar');
+    await page.locator('.ppl-hangar').waitFor();
+    const keys = () =>
+      page.evaluate(() => ({
+        state: JSON.parse(localStorage.getItem('ppl-state') || '{"state":{"planes":{}}}').state,
+        board: localStorage.getItem('ppl-leaderboard'),
+        intro: localStorage.getItem('ppl-onboarding'),
+        draft: sessionStorage.getItem('ppl-fold-draft'),
+        fly: sessionStorage.getItem('ppl-fly'),
+      }));
+    const before = await keys();
+    if (!only) {
+      expect(before.board !== null, 'expected ranked flights on this device before the reset');
+      expect(before.draft !== null && before.fly !== null, 'expected a fold draft and the Fly place in session storage before the reset');
+    }
+    await tap(page.getByRole('button', { name: 'More' }));
+    await tap(page.getByRole('menuitem', { name: /Settings/ }));
+    await sheet(page).waitFor();
+    await sleep(300);
+    const reset = sheet(page).getByRole('button', { name: /^Reset progress/ });
+    await reset.scrollIntoViewIfNeeded();
+    await tap(reset);
+    await tap(sheet(page).getByRole('button', { name: 'Yes, reset everything' }));
+    await page.waitForURL(/#\/welcome/, { timeout: 10_000 });
+    await page.locator('.ppl-onb[data-step="hello"]').waitFor({ timeout: 15_000 });
+    await sleep(500);
+    const after = await keys();
+    expect(Object.keys(after.state.planes).length === 0 && after.state.flights.length === 0 && after.state.profile.onboarded === false, 'the lab state was not reset');
+    expect(after.board === null, 'the local leaderboard survived the reset');
+    expect(after.draft === null, 'the fold draft survived the reset');
+    expect(after.fly === null, 'the Fly place survived the reset');
+    const intro = after.intro ? JSON.parse(after.intro) : null;
+    expect(intro === null || (intro.step === 0 && intro.throws.length === 0), 'the intro progress survived the reset');
+    await shot(page, 'r1-fresh-again');
+  });
 
   await browser.close();
   const failed = results.filter((r) => !r.ok);

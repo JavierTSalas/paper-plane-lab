@@ -112,6 +112,10 @@ export default function FoldPage(): ReactElement {
   const build = usePlaneBuild(design);
   const analysis = useTrimAnalysis(draft && (draft.stage === 'trim' || draft.stage === 'shape') ? build : null);
   const stage: Stage = draft?.stage ?? 'choose';
+  // A new stage starts at its top: the button that leads on sits at the bottom of the previous one.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [stage]);
   const folded = useMemo(() => {
     if (!draft || !build) return false;
     return draft.mode === 'guided' ? draft.guidedDone >= draft.design.steps.length : isSymmetric(build.fold.final);
