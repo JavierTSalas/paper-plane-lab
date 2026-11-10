@@ -3,8 +3,10 @@
  * Pure apart from the storage helpers, which never throw.
  */
 import { getPreset, makeDesign, presetPaper, DEFAULT_PRESET_ID } from '../../core/designs';
-import { THROW_LIMITS } from '../../core/sim';
-import type { Launch, PlaneDesign } from '../../core/types';
+import { getEnvironment } from '../../core/env';
+import { simulateFlight, THROW_LIMITS } from '../../core/sim';
+import type { Airframe, Conditions, Environment, FlightResult, Launch, PlaneDesign } from '../../core/types';
+import { STILL_AIR_SEED } from '../fly/flight';
 
 export const STEP_IDS = ['hello', 'watch-fold', 'watch-throw', 'your-fold', 'your-throw', 'graduate'] as const;
 export type StepId = (typeof STEP_IDS)[number];
@@ -20,6 +22,14 @@ export const STEP_LABELS: Record<StepId, string> = {
 
 /** The intro happens in the classroom: still air, so the same throw always flies the same way. */
 export const INTRO_ENV_ID = 'classroom';
+
+export const introEnv = (): Environment => getEnvironment(INTRO_ENV_ID);
+export const INTRO_CONDITIONS: Conditions = { envId: INTRO_ENV_ID };
+
+/** A throw in the intro classroom. Still air and a fixed seed: the same throw always flies the same way. */
+export function flyIntro(airframe: Airframe, launch: Launch): FlightResult {
+  return simulateFlight(airframe, launch, introEnv(), INTRO_CONDITIONS, STILL_AIR_SEED);
+}
 
 /** Paper colour of the Professor's own dart (a PAPER_COLORS id). */
 export const WREN_COLOR = 'kraft';
