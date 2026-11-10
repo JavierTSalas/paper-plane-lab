@@ -69,11 +69,33 @@ type Mode = 'loading' | 'webgl' | 'fallback';
 
 export function FlightStage(props: FlightStageProps): ReactElement {
   const [mode, setMode] = useState<Mode>(() => (props.forceFallback ? 'fallback' : 'loading'));
+  // A lost GPU context is recovered by building a fresh canvas and engine at the same play-head time.
+  const [generation, setGeneration] = useState(0);
+  const resumeAt = useRef<number | null>(null);
   if (mode === 'fallback') return <FallbackStage {...props} />;
-  return <WebGLStage {...props} onUnavailable={() => setMode('fallback')} onLoaded={() => setMode('webgl')} />;
+  return (
+    <WebGLStage
+      key={generation}
+      {...props}
+      resumeAt={resumeAt}
+      onRestart={(t) => {
+        resumeAt.current = t;
+        setGeneration((g) => g + 1);
+      }}
+      onUnavailable={() => setMode('fallback')}
+      onLoaded={() => setMode('webgl')}
+    />
+  );
 }
 
-function WebGLStage(props: FlightStageProps & { onUnavailable: () => void; onLoaded: () => void }): ReactElement {
+interface WebGLStageExtra {
+  onUnavailable: () => void;
+  onLoaded: () => void;
+  onRestart: (time: number) => void;
+  resumeAt: { current: number | null };
+}
+
+function WebGLStage(props: FlightStageProps & WebGLStageExtra): ReactElement {
   const { env, conditions, plane, flight = null, launch, aim = null, camera = 'chase', ghosts, rate = 1, autoPlay = false, orbit = false, insets, units = 'metric', reducedMotion = false, className, label, ref } = props;
   const hostRef = useRef<HTMLDivElement>(null);
   const [engine, setEngine] = useState<FlightStageEngine | null>(null);
@@ -125,7 +147,12 @@ function WebGLStage(props: FlightStageProps & { onUnavailable: () => void; onLoa
   useEffect(() => {
     if (!engine) return;
     engine.setFlight(flight);
-    if (flight && autoPlay) engine.play();
+    const resume = props.resumeAt.current;
+    props.resumeAt.current = null;
+    if (flight && resume !== null) engine.setTime(resume);
+    else if (flight && autoPlay) engine.play();
+    // resumeAt is a ref.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, flight, autoPlay]);
   useEffect(() => {
     if (engine && launch) engine.setLaunch(launch);
@@ -177,7 +204,7 @@ function WebGLStage(props: FlightStageProps & { onUnavailable: () => void; onLoa
       {lost && (
         <div className="ppl-stage__lost">
           <p>The 3D view paused to save memory.</p>
-          <Button variant="primary" onClick={() => engine?.restoreContext()}>
+          <Button variant="primary" onClick={() => props.onRestart(engine?.getTime() ?? 0)}>
             Restore view
           </Button>
         </div>

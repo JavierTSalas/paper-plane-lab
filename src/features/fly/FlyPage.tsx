@@ -83,7 +83,8 @@ export default function FlyPage(): ReactElement {
   const savePlane = useLab((s) => s.savePlane);
   const reducedMotion = useReducedMotion();
   const wide = useMediaQuery('(min-width: 900px)');
-  const forceFallback = typeof window !== 'undefined' && /[?&]nogl\b/.test(window.location.hash);
+  // `?nogl` before the hash shows the SVG fallback even with WebGL (testing).
+  const forceFallback = typeof window !== 'undefined' && /[?&]nogl\b/.test(window.location.search);
 
   const saved = useMemo(loadSaved, []);
   const [envId, setEnvId] = useState<string>(() => {

@@ -318,11 +318,6 @@ export class FlightStageEngine {
     this.reduced = on;
   }
 
-  /** Try to get the GPU context back after a loss. */
-  restoreContext(): void {
-    this.renderer.forceContextRestore();
-  }
-
   dispose(): void {
     this.stop();
     this.resizeObserver.disconnect();

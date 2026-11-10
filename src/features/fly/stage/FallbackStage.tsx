@@ -19,17 +19,23 @@ interface View {
 }
 
 function viewFor(env: Environment, flight: FlightResult | null): View {
-  let x1 = env.bounds ? env.bounds.xMax : 30;
-  let y1 = env.bounds ? env.bounds.ceiling : 6;
+  // Frame the flight (or the first ten metres), never more than the room.
+  const b = env.bounds;
+  let x0 = b ? b.xMin : -2;
+  let x1 = 10;
   let y0 = 0;
-  let x0 = env.bounds ? env.bounds.xMin : -3;
+  let y1 = 4;
   if (flight) {
     for (const s of flight.samples) {
-      if (!env.bounds) x1 = Math.max(x1, s.pos[0] + 2);
+      x1 = Math.max(x1, s.pos[0] + 2);
+      x0 = Math.min(x0, s.pos[0] - 1);
       y1 = Math.max(y1, s.pos[1] + 1);
       y0 = Math.min(y0, s.pos[1] - 1);
-      x0 = Math.min(x0, s.pos[0] - 1);
     }
+  }
+  if (b) {
+    x1 = Math.min(x1, b.xMax + 0.3);
+    y1 = Math.min(y1, b.ceiling + 0.3);
   }
   for (let x = x0; x <= x1; x += (x1 - x0) / 40) y0 = Math.min(y0, terrainHeight(env.terrain, x) - 0.5);
   // Keep metres square.
@@ -40,7 +46,7 @@ function viewFor(env: Environment, flight: FlightResult | null): View {
   return { x0, x1, y0, y1 };
 }
 
-export function FallbackStage({ env, flight = null, rate = 1, autoPlay = false, onFrame, onEnd, className, label, ref }: FlightStageProps): ReactElement {
+export function FallbackStage({ env, flight = null, rate = 1, autoPlay = false, insets, onFrame, onEnd, className, label, ref }: FlightStageProps): ReactElement {
   const clock = useRef(new PlaybackClock());
   const sample = useRef(createLiveSample());
   const planeRef = useRef<SVGGElement>(null);
@@ -120,10 +126,24 @@ export function FallbackStage({ env, flight = null, rate = 1, autoPlay = false, 
   for (let x = 0; x <= view.x1; x += step) ticks.push(x);
 
   return (
-    <div className={['ppl-stage', 'ppl-stage--fallback', className].filter(Boolean).join(' ')} role="img" aria-label={label ?? `Side view of the flight in the ${env.name}`}>
+    <div
+      className={['ppl-stage', 'ppl-stage--fallback', className].filter(Boolean).join(' ')}
+      role="img"
+      aria-label={label ?? `Side view of the flight in the ${env.name}`}
+      style={{ padding: `${insets?.top ?? 0}px ${insets?.right ?? 0}px ${insets?.bottom ?? 0}px ${insets?.left ?? 0}px` }}
+    >
       <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid meet" className="ppl-stage__svg">
         <rect x="0" y="0" width={W} height={H} fill={env.indoor ? '#efe2c8' : '#dfeaf3'} />
         <polygon points={ground} fill={env.indoor ? '#d3a777' : '#9fc27c'} />
+        {env.bounds && (
+          <path
+            d={`M${sx(env.bounds.xMin)} ${sy(0)} V${sy(env.bounds.ceiling)} H${sx(env.bounds.xMax)} V${sy(0)}`}
+            fill="none"
+            stroke="#6b665c"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        )}
         {ticks.map((x) => (
           <g key={x}>
             <line x1={sx(x)} x2={sx(x)} y1={sy(terrainHeight(env.terrain, x))} y2={sy(terrainHeight(env.terrain, x)) + 4} stroke="#2f2e2b" strokeWidth="1" />
