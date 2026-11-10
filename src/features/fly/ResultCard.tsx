@@ -19,6 +19,8 @@ export interface ResultCardProps {
   ranking: RankingCheck;
   /** The throw is already on a board. */
   ranked?: boolean;
+  /** A replay of someone's ranked flight: nothing to trim or enter, and "again" goes back to the player's plane. */
+  replay?: boolean;
   onAgain: () => void;
   onReplay: () => void;
   onTrim: () => void;
@@ -38,7 +40,7 @@ export function professorPose(d: Diagnosis | undefined): 'cheer' | 'think' | 'po
   return d.fix ? 'point' : 'think';
 }
 
-export function ResultCard({ record, units, personalBest, ranking, ranked = false, onAgain, onReplay, onTrim, onDetails, onRank, wide = false, className, ref }: ResultCardProps): ReactElement {
+export function ResultCard({ record, units, personalBest, ranking, ranked = false, replay = false, onAgain, onReplay, onTrim, onDetails, onRank, wide = false, className, ref }: ResultCardProps): ReactElement {
   const m = record.result.metrics;
   const dist = lengthParts(m.distance, units, { digits: 1 });
   const air = timeParts(m.airtime);
@@ -80,16 +82,18 @@ export function ResultCard({ record, units, personalBest, ranking, ranked = fals
           )}
         </ProfessorSays>
       )}
-      <div className="ppl-fly-result__actions">
-        <Button variant="primary" icon="fly" onClick={onAgain} className="ppl-fly-result__again">
-          Throw again
+      <div className={cx('ppl-fly-result__actions', replay && 'is-replay')}>
+        <Button variant="primary" icon={replay ? 'back' : 'fly'} onClick={onAgain} className="ppl-fly-result__again">
+          {replay ? 'Back to my plane' : 'Throw again'}
         </Button>
         <Button variant="secondary" onClick={onReplay}>
-          Replay
+          {replay ? 'Watch again' : 'Replay'}
         </Button>
-        <Button variant="secondary" onClick={onTrim}>
-          Trim
-        </Button>
+        {!replay && (
+          <Button variant="secondary" onClick={onTrim}>
+            Trim
+          </Button>
+        )}
         <Button variant="secondary" onClick={onDetails}>
           Details
         </Button>

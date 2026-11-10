@@ -127,6 +127,45 @@
   }
 }
 
+/* ------------------------------------------------------------ replay banner */
+
+.ppl-fly__replay {
+  flex: 1 1 auto;
+  display: grid;
+  gap: var(--s-1);
+  min-width: 0;
+  padding: var(--s-2) var(--s-2) var(--s-2) var(--s-3);
+  background: rgb(255 250 240 / 0.96);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--r-control);
+  box-shadow: var(--shadow-sm);
+}
+
+.ppl-fly__replay-title {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.ppl-fly__replay-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-1) var(--s-2);
+}
+
+.ppl-fly__replay-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.ppl-fly--replay .ppl-fly__top {
+  align-items: flex-start;
+}
+
 /* ------------------------------------------------------------ live readouts */
 
 .ppl-fly__readouts {
@@ -163,6 +202,19 @@
   font-variant-numeric: tabular-nums;
   color: var(--ink);
   min-width: 6ch;
+}
+
+@media (max-width: 899px) {
+  .ppl-fly--replay .ppl-fly__readouts {
+    top: calc(var(--safe-top) + var(--s-3) + var(--fly-banner-h, 88px) + var(--s-2));
+  }
+  /* The result card reaches up to the banner; it shows the numbers itself. */
+  .ppl-fly--replay.ppl-fly--landed .ppl-fly__readouts {
+    display: none;
+  }
+  .ppl-fly--replay .ppl-fly__result {
+    max-height: calc(100% - var(--safe-top) - var(--fly-banner-h, 88px) - var(--s-3) - var(--s-4));
+  }
 }
 
 @media (max-width: 380px) {
@@ -396,6 +448,10 @@
 
 .ppl-fly-result__again {
   grid-column: 1 / -1;
+}
+
+.ppl-fly-result__actions.is-replay {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .ppl-fly-result__rank {

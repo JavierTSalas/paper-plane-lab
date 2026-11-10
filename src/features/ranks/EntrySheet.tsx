@@ -15,7 +15,7 @@ import { Stat, StatGrid } from '../../ui/Stat';
 import { toast } from '../../ui/Toast';
 import { PlaneThumb, PlaneView } from '../fold/view';
 import { copyName, designFingerprint, getPresetCandidates, MATCH_WORD, newPlaneId, presetDesign } from '../hangar/catalog';
-import { REPLAY_STATE_KEY } from './replay';
+import { replayState } from './replay';
 
 const SHOWN = new Set(['identical', 'near-identical', 'similar']);
 
@@ -91,7 +91,7 @@ export function EntrySheet({ entry, board, onClose }: EntrySheetProps): ReactEle
       footer={
         entry && (
           <div className="ppl-rentry__actions">
-            <Button variant="secondary" icon="replay" onClick={() => navigate('/fly', { state: { [REPLAY_STATE_KEY]: entry.ticket } })}>
+            <Button variant="secondary" icon="replay" onClick={() => navigate('/fly', { state: replayState(entry) })}>
               Watch replay
             </Button>
             <Button variant="primary" icon="fold" onClick={foldIt}>

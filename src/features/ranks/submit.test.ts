@@ -3,7 +3,7 @@ import { defaultDesign } from '../../core/designs';
 import { buildTicketResult, LocalLeaderboard, scoreOf } from '../../core/leaderboard';
 import { defaultLaunch } from '../../core/sim';
 import type { FlightTicket, RankEntry } from '../../core/types';
-import { readReplayTicket, REPLAY_STATE_KEY } from './replay';
+import { readReplay, readReplayTicket, REPLAY_STATE_KEY, replayState } from './replay';
 import { submitFlight, type SubmitDeps } from './submit';
 
 function memory(): { getItem: (k: string) => string | null; setItem: (k: string, v: string) => void } {
@@ -63,5 +63,15 @@ describe('submitFlight', () => {
     expect(readReplayTicket({ [REPLAY_STATE_KEY]: JSON.parse(JSON.stringify(t)) })?.seed).toBe(7);
     expect(readReplayTicket({ other: 1 })).toBeNull();
     expect(readReplayTicket(null)).toBeNull();
+  });
+
+  it('hands a board entry to the Fly screen with the name to show', () => {
+    const t = ticket();
+    const entry = { origin: 'local', player: 'Ada', ticket: t } as RankEntry;
+    const viaHistory: unknown = JSON.parse(JSON.stringify(replayState(entry)));
+    expect(readReplay(viaHistory)).toMatchObject({ player: 'Ada', ticket: { seed: 7 } });
+    expect(readReplay(JSON.parse(JSON.stringify(replayState({ ...entry, origin: 'house' }))))?.player).toBe('Lab benchmark');
+    expect(readReplay({ [REPLAY_STATE_KEY]: JSON.parse(JSON.stringify(t)) })?.player).toBe('A pilot');
+    expect(readReplay({ other: 1 })).toBeNull();
   });
 });

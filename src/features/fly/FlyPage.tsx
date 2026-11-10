@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactElement } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactElement } from 'react';
 import { useLocation } from 'wouter';
-import { usePlaneBuild, useCurrentDesign } from '../../app/hooks';
+import { getPlaneBuild, usePlaneBuild, useCurrentDesign } from '../../app/hooks';
 import { useLab } from '../../app/store';
 import type { FlightSummary } from '../../app/types';
 import { getPreset } from '../../core/designs';
@@ -20,11 +20,12 @@ import { Sheet } from '../../ui/Sheet';
 import { Slider } from '../../ui/Slider';
 import { toast } from '../../ui/Toast';
 import { TrimPanel } from '../fold';
+import { clearReplayState, readReplay, type ReplayRequest } from '../ranks';
 import { DetailsSheet } from './DetailsSheet';
 import { defaultWind, EnvironmentSheet, placeSummary, type WindSetting } from './EnvironmentSheet';
 import { clampLaunch, conditionsFor, nextSeed, pushGhost, swipeToThrow, trailOf } from './flight';
 import { PlaneSheet } from './PlaneSheet';
-import { checkRanking, ticketOf } from './ranking';
+import { checkRanking, ticketOf, type RankingCheck } from './ranking';
 import { RankSheet } from './RankSheet';
 import { ResultCard } from './ResultCard';
 import { FlightStage, type FlightStageHandle } from './stage/FlightStage';
@@ -47,6 +48,8 @@ const CAMERA_HINT: Record<CameraMode, string> = {
 };
 
 const SESSION_KEY = 'ppl-fly';
+
+const NO_RANKING: RankingCheck = { inArenaPlace: false, boards: [], refused: [] };
 
 interface Saved {
   envId: string;
@@ -73,9 +76,32 @@ function firstThrow(presetId: string | undefined, category: PlaneDesign['categor
 let throwCounter = 0;
 const newId = (): string => `f-${Date.now().toString(36)}-${(throwCounter++).toString(36)}`;
 
+/** A ranked flight handed over by Ranks ("Watch replay"), re-flown from its ticket. */
+interface Replay extends ReplayRequest {
+  record: ThrowRecord;
+}
+
+/** Re-fly the replay request of this history entry, if there is one. Never logged, never saved. */
+function initReplay(): Replay | null {
+  const request = readReplay();
+  if (!request) return null;
+  const { ticket } = request;
+  try {
+    const build = getPlaneBuild(ticket.design);
+    const env = getEnvironment(ticket.conditions.envId);
+    const result = simulateFlight(build.airframe, ticket.launch, env, ticket.conditions, ticket.seed);
+    return { ...request, record: { id: newId(), result, launch: ticket.launch, conditions: ticket.conditions, seed: ticket.seed, env, build } };
+  } catch {
+    return null;
+  }
+}
+
 export default function FlyPage(): ReactElement {
+  // `design` is always the player's own plane; a replay shows the ticket's plane instead without touching it.
   const design = useCurrentDesign();
-  const build = usePlaneBuild(design);
+  const [replay, setReplay] = useState<Replay | null>(initReplay);
+  const shownDesign = replay ? replay.ticket.design : design;
+  const build = usePlaneBuild(shownDesign);
   const units = useLab((s) => s.settings.units);
   const showTrails = useLab((s) => s.settings.showTrails);
   const planes = useLab((s) => s.planes);
@@ -93,15 +119,15 @@ export default function FlyPage(): ReactElement {
     const id = saved.envId ?? flights[0]?.envId ?? DEFAULT_ENVIRONMENT_ID;
     return ENVIRONMENTS.some((e) => e.id === id) ? id : DEFAULT_ENVIRONMENT_ID;
   });
-  const env = getEnvironment(envId);
+  const env = replay ? replay.record.env : getEnvironment(envId);
   const [winds, setWinds] = useState<Record<string, WindSetting>>(() => saved.winds ?? {});
   const wind = winds[envId] ?? defaultWind(env);
-  const conditions = useMemo(() => conditionsFor(env, wind), [env, wind]);
+  const conditions = useMemo(() => (replay ? replay.ticket.conditions : conditionsFor(env, wind)), [replay, env, wind]);
   const [camera, setCamera] = useState<CameraMode>(() => saved.camera ?? 'chase');
   const [launch, setLaunch] = useState<Launch>(() => firstThrow(design.presetId, design.category));
   const [advanced, setAdvanced] = useState(false);
-  const [phase, setPhase] = useState<Phase>('ready');
-  const [record, setRecord] = useState<ThrowRecord | null>(null);
+  const [phase, setPhase] = useState<Phase>(replay ? 'flying' : 'ready');
+  const [record, setRecord] = useState<ThrowRecord | null>(replay ? replay.record : null);
   const [ghosts, setGhosts] = useState<Vec3[][]>([]);
   const [rate, setRate] = useState(1);
   const [paused, setPaused] = useState(false);
@@ -214,13 +240,29 @@ export default function FlyPage(): ReactElement {
     setPaused(false);
   }, []);
 
+  /** Leave a replay: back to the player's own plane and place, ready to throw. */
+  const exitReplay = (): void => {
+    clearReplayState();
+    setReplay(null);
+    setRecord(null);
+    setGhosts([]);
+    setPhase('ready');
+    setPaused(false);
+    setRate(1);
+    setSheet(null);
+  };
+
   const again = (): void => {
+    if (replay) {
+      exitReplay();
+      return;
+    }
     setPhase('ready');
     if (record && showTrails) setGhosts((g) => pushGhost(g, trailOf(record.result)));
     setRecord(null);
   };
 
-  const replay = (): void => {
+  const watchAgain = (): void => {
     setPhase('flying');
     setPaused(false);
     stage.current?.seek(0);
@@ -303,21 +345,39 @@ export default function FlyPage(): ReactElement {
 
   /* ------------------------------------------------------------ derived bits */
 
-  const plane = useMemo(() => (build ? { model: build.model, paper: design.paper, airframe: build.airframe } : null), [build, design.paper]);
+  const plane = useMemo(() => (build ? { model: build.model, paper: shownDesign.paper, airframe: build.airframe } : null), [build, shownDesign.paper]);
   const ghostTrails = showTrails ? ghosts : [];
-  const ranking = useMemo(() => (record ? checkRanking(ticketOf(record), record.result.metrics, units) : null), [record, units]);
+  const ranking = useMemo(
+    () => (record ? (replay ? NO_RANKING : checkRanking(ticketOf(record), record.result.metrics, units)) : null),
+    [record, replay, units],
+  );
   const personalBest = useMemo(() => {
-    if (!record) return false;
+    if (!record || replay) return false;
     const others = flights.filter((f) => f.id !== record.id && f.planeId === record.build.design.id && f.envId === record.env.id);
     return others.length > 0 && others.every((f) => f.metrics.distance < record.result.metrics.distance);
-  }, [flights, record]);
+  }, [flights, record, replay]);
   const showResult = phase === 'landed' && record !== null;
   const flying = phase === 'flying';
   const overlay = useOverlayInsets(pageRef, [panelRef, resultRef], `${phase}|${showResult}`);
+  // The replay banner is taller than the chips: the live readouts sit right under it.
+  const bannerRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const page = pageRef.current;
+    const banner = bannerRef.current;
+    if (!page || !banner) return;
+    const measure = (): void => page.style.setProperty('--fly-banner-h', `${Math.round(banner.getBoundingClientRect().height)}px`);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(banner);
+    return () => {
+      ro.disconnect();
+      page.style.removeProperty('--fly-banner-h');
+    };
+  }, [replay]);
   const insets = useMemo(() => ({ ...overlay, top: overlay.top + 64 }), [overlay]);
 
   return (
-    <div ref={pageRef} className={cx('ppl-fly', `ppl-fly--${phase}`)}>
+    <div ref={pageRef} className={cx('ppl-fly', `ppl-fly--${phase}`, replay && 'ppl-fly--replay')}>
       <h1 className="ppl-sr-only">Fly</h1>
       <FlightStage
         ref={stage}
@@ -326,7 +386,7 @@ export default function FlyPage(): ReactElement {
         conditions={conditions}
         plane={plane}
         flight={record?.result ?? null}
-        launch={launch}
+        launch={replay ? replay.ticket.launch : launch}
         aim={aim}
         camera={camera}
         ghosts={ghostTrails}
@@ -339,7 +399,7 @@ export default function FlyPage(): ReactElement {
         onFrame={onFrame}
         onEnd={onEnd}
         forceFallback={forceFallback}
-        label={`${env.name}: ${phase === 'ready' ? 'the plane is ready to throw' : phase === 'flying' ? 'the plane is flying' : 'the plane has landed'}`}
+        label={`${replay ? `Replay of the ${shownDesign.name}, ` : ''}${env.name}: ${phase === 'ready' ? 'the plane is ready to throw' : phase === 'flying' ? 'the plane is flying' : 'the plane has landed'}`}
       />
 
       {phase === 'ready' && (
@@ -369,14 +429,32 @@ export default function FlyPage(): ReactElement {
       )}
 
       <header className="ppl-fly__top">
-        <Chip icon={env.indoor ? 'hangar' : 'wind'} onClick={() => setSheet('env')} aria-label={`Place: ${env.name}. ${placeSummary(env, wind, units)}. Change`} className="ppl-fly__chip ppl-fly__chip--env">
-          <span className="ppl-fly__chip-main">{env.name}</span>
-          <span className="ppl-fly__chip-sub">{placeSummary(env, wind, units)}</span>
-        </Chip>
-        <Chip onClick={() => setSheet('plane')} aria-label={`Plane: ${design.name}. Change`} className="ppl-fly__chip ppl-fly__chip--plane">
-          <span className="ppl-fly__dot" style={{ background: design.paper.front }} aria-hidden="true" />
-          <span className="ppl-fly__chip-main">{design.name}</span>
-        </Chip>
+        {replay ? (
+          <div ref={bannerRef} className="ppl-fly__replay" role="status">
+            <p className="ppl-fly__replay-title">
+              Replay: {replay.player} - {shownDesign.name}
+            </p>
+            <div className="ppl-fly__replay-row">
+              <span className="ppl-fly__replay-sub">
+                {env.name} · {formatSpeed(replay.ticket.launch.speed, units)} at {signedDeg(replay.ticket.launch.pitchDeg)}
+              </span>
+              <Button size="sm" variant="secondary" icon="back" onClick={exitReplay}>
+                Back to my plane
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <Chip icon={env.indoor ? 'hangar' : 'wind'} onClick={() => setSheet('env')} aria-label={`Place: ${env.name}. ${placeSummary(env, wind, units)}. Change`} className="ppl-fly__chip ppl-fly__chip--env">
+              <span className="ppl-fly__chip-main">{env.name}</span>
+              <span className="ppl-fly__chip-sub">{placeSummary(env, wind, units)}</span>
+            </Chip>
+            <Chip onClick={() => setSheet('plane')} aria-label={`Plane: ${design.name}. Change`} className="ppl-fly__chip ppl-fly__chip--plane">
+              <span className="ppl-fly__dot" style={{ background: design.paper.front }} aria-hidden="true" />
+              <span className="ppl-fly__chip-main">{design.name}</span>
+            </Chip>
+          </>
+        )}
         <Menu
           label={`Camera: ${CAMERA_LABEL[camera]}`}
           icon="camera"
@@ -485,8 +563,9 @@ export default function FlyPage(): ReactElement {
           wide={wide}
           ranking={ranking}
           ranked={rankedId === record.id}
+          replay={replay !== null}
           onAgain={again}
-          onReplay={replay}
+          onReplay={watchAgain}
           onTrim={() => setSheet('trim')}
           onDetails={() => setSheet('details')}
           onRank={() => setSheet('rank')}

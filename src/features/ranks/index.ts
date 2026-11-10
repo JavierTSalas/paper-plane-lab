@@ -2,4 +2,5 @@
 export { submitFlight } from './submit';
 export type { SubmitDeps, SubmitOutcome } from './submit';
 export { getLeaderboard, houseFor, isOnline, loadBoard } from './leaderboard';
-export { REPLAY_STATE_KEY, readReplayTicket } from './replay';
+export { clearReplayState, readReplay, readReplayTicket, REPLAY_PLAYER_KEY, REPLAY_STATE_KEY, replayState } from './replay';
+export type { ReplayRequest } from './replay';
