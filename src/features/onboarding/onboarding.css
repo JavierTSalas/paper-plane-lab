@@ -1,0 +1,458 @@
+/* ------------------------------------------------------------ page */
+
+.ppl-onb {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  padding: calc(var(--safe-top) + var(--s-2)) calc(var(--safe-right) + var(--gutter)) calc(var(--safe-bottom) + var(--s-3)) calc(var(--safe-left) + var(--gutter));
+  overflow-x: clip;
+}
+
+.ppl-onb__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  margin-bottom: var(--s-2);
+}
+
+.ppl-onb__dots {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.ppl-onb__skip {
+  flex: none;
+  margin-right: calc(-1 * var(--s-2));
+}
+
+.ppl-onb__loading {
+  flex: 1;
+  display: grid;
+  place-items: center;
+}
+
+/* ------------------------------------------------------------ step frame */
+
+/* Phones: says / stage / extra / actions in one column; the side column dissolves into the grid. */
+.ppl-onb__step {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'says'
+    'stage'
+    'extra'
+    'actions';
+  gap: var(--s-3);
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.ppl-onb__side {
+  display: contents;
+}
+
+.ppl-onb__says {
+  grid-area: says;
+}
+
+.ppl-onb__says .ppl-says__bubble {
+  margin-bottom: var(--s-2);
+  padding: var(--s-3) var(--s-4);
+}
+
+.ppl-onb__stage {
+  grid-area: stage;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+.ppl-onb__extra {
+  grid-area: extra;
+}
+
+.ppl-onb__actions {
+  grid-area: actions;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.ppl-onb__note {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  text-wrap: pretty;
+}
+
+@media (min-width: 900px) {
+  .ppl-onb__top {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto var(--s-3);
+  }
+
+  .ppl-onb__step {
+    max-width: 1180px;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    grid-template-areas: 'side stage';
+    gap: var(--s-6);
+    align-items: center;
+  }
+
+  .ppl-onb__side {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-4);
+    align-self: center;
+  }
+
+  .ppl-onb__says .ppl-says__bubble {
+    margin-bottom: 0;
+  }
+
+  .ppl-onb__actions {
+    justify-content: flex-start;
+  }
+
+  .ppl-onb__stage {
+    align-self: stretch;
+  }
+}
+
+/* ------------------------------------------------------------ hello */
+
+.ppl-onb__scene {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 220px;
+  max-height: 520px;
+  border-radius: var(--r-card);
+  border: var(--outline);
+  box-shadow: var(--shadow);
+  background: #f3e2c4;
+}
+
+.ppl-scene__glider {
+  animation: ppl-onb-glide 7s ease-in-out infinite;
+}
+
+@keyframes ppl-onb-glide {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: -12px 6px;
+  }
+}
+
+@media (min-width: 900px) {
+  .ppl-onb__step--hello .ppl-onb__stage {
+    max-height: 640px;
+  }
+  .ppl-onb__scene {
+    max-height: none;
+  }
+}
+
+/* ------------------------------------------------------------ fold */
+
+.ppl-onb__player {
+  width: 100%;
+}
+
+/* The Professor's bubble narrates the steps; the player's own caption would repeat it. */
+.ppl-onb__player .ppl-player__caption {
+  display: none;
+}
+
+.ppl-onb__player .ppl-player__stage {
+  border-radius: var(--r-card);
+}
+
+.ppl-onb__step--watch-fold .ppl-onb__stage,
+.ppl-onb__step--your-fold .ppl-onb__stage {
+  justify-content: flex-start;
+}
+
+@media (min-width: 900px) {
+  .ppl-onb__step--watch-fold .ppl-onb__stage,
+  .ppl-onb__step--your-fold .ppl-onb__stage {
+    justify-content: center;
+  }
+  .ppl-onb__player {
+    max-width: 760px;
+    margin: 0 auto;
+  }
+}
+
+.ppl-onb__sheet {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  padding: var(--s-4);
+  background: var(--paper-2);
+  border-radius: var(--r-card);
+}
+
+.ppl-onb__pick {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.ppl-onb__pick-name {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.ppl-onb__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+/* ------------------------------------------------------------ fly */
+
+.ppl-onb__fly {
+  position: relative;
+  flex: 1;
+  min-height: 240px;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  border: var(--outline);
+  box-shadow: var(--shadow);
+  isolation: isolate;
+}
+
+.ppl-onb__flystage {
+  position: absolute;
+  inset: 0;
+}
+
+@media (min-width: 900px) {
+  .ppl-onb__fly {
+    min-height: 460px;
+  }
+}
+
+.ppl-onb__swipe {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  cursor: grab;
+}
+
+.ppl-onb__swipe-hint {
+  position: absolute;
+  left: 50%;
+  bottom: var(--s-3);
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: rgb(47 46 43 / 0.6);
+  color: var(--card);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ppl-onb__swipe-hint.is-aiming {
+  background: rgb(185 83 47 / 0.88);
+}
+
+.ppl-onb__pad {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--s-1);
+}
+
+.ppl-onb__numbers {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+}
+
+.ppl-onb__numbers > .ppl-stat {
+  flex: 1;
+  min-width: 0;
+}
+
+.ppl-onb__who {
+  flex: none;
+  width: 44px;
+  font-size: var(--fs-xs);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.ppl-onb__compare {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-3);
+  background: var(--card);
+  border: var(--outline);
+  border-radius: var(--r-card);
+}
+
+.ppl-onb__compare .ppl-onb__numbers + .ppl-onb__numbers {
+  padding-top: var(--s-2);
+  border-top: var(--stroke) solid var(--line);
+}
+
+.ppl-onb__compare .ppl-onb__numbers:nth-child(2) .ppl-onb__who {
+  color: var(--accent-ink);
+}
+
+/* ------------------------------------------------------------ graduation */
+
+.ppl-onb__cert {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  background: var(--card);
+  border: var(--outline);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.ppl-onb__cert-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  line-height: var(--lh-tight);
+  overflow-wrap: anywhere;
+}
+
+.ppl-onb__cert-plane {
+  width: 100%;
+  max-width: 420px;
+}
+
+.ppl-onb__cert-best {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  margin: 0;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.ppl-onb__name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.ppl-onb__name-label {
+  font-size: var(--fs-sm);
+  font-weight: 700;
+}
+
+.ppl-onb__name-hint {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
+.ppl-onb__input {
+  min-height: var(--tap);
+  padding: 0 var(--s-3);
+  font: inherit;
+  font-size: var(--fs-md);
+  color: var(--ink);
+  background: var(--card);
+  border: var(--outline);
+  border-radius: var(--r-control);
+}
+
+.ppl-onb__input:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.ppl-onb__doors {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  width: 100%;
+}
+
+.ppl-onb__door {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 60px;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.ppl-onb__door-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--r-control);
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+}
+
+.ppl-onb__door-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ppl-onb__door-title {
+  font-weight: 700;
+}
+
+.ppl-onb__door-sub {
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
+/* ------------------------------------------------------------ motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .ppl-scene__glider {
+    animation: none;
+  }
+}
+
+[data-reduced-motion] .ppl-scene__glider {
+  animation: none;
+}
