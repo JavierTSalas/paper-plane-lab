@@ -51,11 +51,11 @@ export const YOUR_FOLD = {
 
 export const YOUR_THROW = {
   title: 'Throw it.',
-  ready: 'Swipe up on the room to throw, or set speed and angle below. Gentle is fine.',
+  ready: 'Swipe up on the room, or set speed and angle below. Gentle is fine.',
   flying: 'Watch the nose…',
-  beat: 'Further than mine. I will pretend I let you win.',
-  close: 'Almost exactly my throw. Same plane, same air, same result.',
-  short: 'Shorter than mine, and that is useful. Here is what I saw.',
+  beat: 'Further than mine. I may have let you win.',
+  close: 'Neck and neck with mine.',
+  short: 'Shorter than mine. That is useful.',
   again: 'Try a different speed or angle and compare.',
 };
 

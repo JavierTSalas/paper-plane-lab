@@ -41,10 +41,22 @@ export const PLAYER_COLORS = ['white', 'butter', 'peach', 'coral', 'sky', 'mint'
  * The Professor's gentle demonstration throw: a level push at 6 m/s, inside the casual 5-11 m/s band of
  * THROW_LIMITS. In the classroom it glides cleanly and lands short of the far wall.
  */
-export const WREN_LAUNCH: Launch = { speed: 6, pitchDeg: 0, yawDeg: 0, rollDeg: 0, aoaDeg: 0 };
+export const WREN_LAUNCH: Launch = {
+  speed: 6,
+  pitchDeg: 0,
+  yawDeg: 0,
+  rollDeg: 0,
+  aoaDeg: 0,
+};
 
 /** Where the player's throw controls start. */
-export const PLAYER_START_LAUNCH: Launch = { speed: 6.5, pitchDeg: 2, yawDeg: 0, rollDeg: 0, aoaDeg: 0 };
+export const PLAYER_START_LAUNCH: Launch = {
+  speed: 6.5,
+  pitchDeg: 2,
+  yawDeg: 0,
+  rollDeg: 0,
+  aoaDeg: 0,
+};
 
 /** The intro keeps throws gentle: above about 8 m/s a dart reaches the classroom ceiling. */
 export const INTRO_MAX_SPEED = 12;
@@ -72,7 +84,11 @@ export function getWrenDesign(): PlaneDesign {
 /** The player's first dart: the same Classic Dart on the paper they chose. */
 export function makePlayerDesign(planeId: string, colorId: string, author?: string): PlaneDesign {
   const preset = dartPreset();
-  return makeDesign(preset, presetPaper(preset, { front: colorId }), { id: planeId, name: 'My first dart', author: author || undefined });
+  return makeDesign(preset, presetPaper(preset, { front: colorId }), {
+    id: planeId,
+    name: 'My first dart',
+    author: author || undefined,
+  });
 }
 
 /* ------------------------------------------------------------------ progress */
@@ -98,7 +114,16 @@ export interface Progress {
 export const PROGRESS_KEY = 'ppl-onboarding';
 
 export function freshProgress(planeId: string): Progress {
-  return { v: 1, step: 0, reached: 0, color: null, foldDone: 0, planeId, throws: [], name: '' };
+  return {
+    v: 1,
+    step: 0,
+    reached: 0,
+    color: null,
+    foldDone: 0,
+    planeId,
+    throws: [],
+    name: '',
+  };
 }
 
 export function newPlaneId(): string {
@@ -131,7 +156,12 @@ export function sanitizeProgress(raw: unknown, planeId: string): Progress {
   const last = STEP_IDS.length - 1;
   const step = clampInt(raw.step, 0, last, 0);
   const color = typeof raw.color === 'string' && (PLAYER_COLORS as readonly string[]).includes(raw.color) ? raw.color : null;
-  const throws = Array.isArray(raw.throws) ? raw.throws.map(readLaunch).filter((l): l is Launch => l !== null).slice(-MAX_THROWS) : [];
+  const throws = Array.isArray(raw.throws)
+    ? raw.throws
+        .map(readLaunch)
+        .filter((l): l is Launch => l !== null)
+        .slice(-MAX_THROWS)
+    : [];
   return {
     v: 1,
     // Never resume past a step whose input is missing.

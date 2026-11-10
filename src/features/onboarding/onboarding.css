@@ -1,11 +1,14 @@
 /* ------------------------------------------------------------ page */
 
 .ppl-onb {
-  min-height: 100dvh;
+  /* A definite height lets the stage take exactly the room that is left; taller content scrolls. */
+  height: 100dvh;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   background: var(--paper);
-  padding: calc(var(--safe-top) + var(--s-2)) calc(var(--safe-right) + var(--gutter)) calc(var(--safe-bottom) + var(--s-3)) calc(var(--safe-left) + var(--gutter));
+  padding: calc(var(--safe-top) + var(--s-2)) calc(var(--safe-right) + var(--gutter)) calc(var(--safe-bottom) + var(--s-3))
+    calc(var(--safe-left) + var(--gutter));
   overflow-x: clip;
 }
 
@@ -19,7 +22,8 @@
 }
 
 .ppl-onb__dots {
-  flex: 0 1 auto;
+  /* The stepper measures its container (container queries): give it the free width. */
+  flex: 1 1 0;
   min-width: 0;
 }
 
@@ -41,7 +45,7 @@
   flex: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  grid-template-rows: auto minmax(min-content, 1fr) auto auto;
   grid-template-areas:
     'says'
     'stage'
@@ -88,6 +92,12 @@
   gap: var(--s-2);
 }
 
+.ppl-onb__actions > .ppl-btn:has(+ .ppl-btn),
+.ppl-onb__actions > .ppl-btn + .ppl-btn {
+  flex: 1 1 0;
+  white-space: nowrap;
+}
+
 .ppl-onb__note {
   margin: 0;
   color: var(--ink-2);
@@ -106,7 +116,7 @@
   .ppl-onb__step {
     max-width: 1180px;
     grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
-    grid-template-rows: minmax(0, 1fr);
+    grid-template-rows: minmax(min-content, 1fr);
     grid-template-areas: 'side stage';
     gap: var(--s-6);
     align-items: center;
@@ -137,10 +147,9 @@
 
 .ppl-onb__scene {
   display: block;
+  flex: 1 1 0;
   width: 100%;
-  height: 100%;
-  min-height: 220px;
-  max-height: 520px;
+  min-height: 240px;
   border-radius: var(--r-card);
   border: var(--outline);
   box-shadow: var(--shadow);
@@ -165,9 +174,7 @@
   .ppl-onb__step--hello .ppl-onb__stage {
     max-height: 640px;
   }
-  .ppl-onb__scene {
-    max-height: none;
-  }
+
 }
 
 /* ------------------------------------------------------------ fold */
@@ -241,7 +248,8 @@
   isolation: isolate;
 }
 
-.ppl-onb__flystage {
+/* Two classes: the stage's own stylesheet (loaded later) makes it position: relative. */
+.ppl-onb__fly > .ppl-onb__flystage {
   position: absolute;
   inset: 0;
 }
@@ -293,20 +301,33 @@
   gap: var(--s-1);
 }
 
-.ppl-onb__numbers {
-  display: flex;
-  align-items: center;
-  gap: var(--s-4);
+.ppl-onb__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+  background: var(--card);
+  border: var(--outline);
+  border-radius: var(--r-card);
+  overflow: hidden;
 }
 
-.ppl-onb__numbers > .ppl-stat {
-  flex: 1;
-  min-width: 0;
+.ppl-onb__table th,
+.ppl-onb__table td {
+  padding: var(--s-1) var(--s-3);
+  text-align: left;
+  font-weight: 400;
+  white-space: nowrap;
 }
 
-.ppl-onb__who {
-  flex: none;
-  width: 44px;
+.ppl-onb__table thead th {
+  padding-top: var(--s-2);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+.ppl-onb__table tbody th {
+  width: 1%;
   font-size: var(--fs-xs);
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -314,23 +335,23 @@
   color: var(--ink-2);
 }
 
+.ppl-onb__table tbody tr:last-child > * {
+  padding-bottom: var(--s-2);
+}
+
+.ppl-onb__table b {
+  font-size: var(--fs-md);
+  font-weight: 700;
+}
+
+.ppl-onb__table tr.is-mine th {
+  color: var(--accent-ink);
+}
+
 .ppl-onb__compare {
   display: flex;
   flex-direction: column;
   gap: var(--s-2);
-  padding: var(--s-3);
-  background: var(--card);
-  border: var(--outline);
-  border-radius: var(--r-card);
-}
-
-.ppl-onb__compare .ppl-onb__numbers + .ppl-onb__numbers {
-  padding-top: var(--s-2);
-  border-top: var(--stroke) solid var(--line);
-}
-
-.ppl-onb__compare .ppl-onb__numbers:nth-child(2) .ppl-onb__who {
-  color: var(--accent-ink);
 }
 
 /* ------------------------------------------------------------ graduation */
@@ -358,7 +379,50 @@
 
 .ppl-onb__cert-plane {
   width: 100%;
-  max-width: 420px;
+  max-width: 260px;
+}
+
+@media (min-width: 900px) {
+  .ppl-onb__cert-plane {
+    max-width: 420px;
+  }
+
+  /* Graduation: name under the Professor, the certificate beside him, the three doors in a row underneath. */
+  .ppl-onb__step--graduate {
+    grid-template-rows: auto auto auto;
+    grid-template-areas:
+      'says stage'
+      'extra stage'
+      'actions actions';
+    row-gap: var(--s-4);
+    align-content: center;
+  }
+
+  .ppl-onb__step--graduate .ppl-onb__side {
+    display: contents;
+  }
+
+  .ppl-onb__step--graduate .ppl-onb__says {
+    grid-area: says;
+    align-self: end;
+  }
+
+  .ppl-onb__step--graduate .ppl-onb__extra {
+    grid-area: extra;
+    align-self: start;
+  }
+
+  .ppl-onb__step--graduate .ppl-onb__actions {
+    grid-area: actions;
+  }
+
+  .ppl-onb__step--graduate .ppl-onb__doors {
+    flex-direction: row;
+  }
+
+  .ppl-onb__step--graduate .ppl-onb__door {
+    flex: 1 1 0;
+  }
 }
 
 .ppl-onb__cert-best {
@@ -409,13 +473,11 @@
   width: 100%;
 }
 
-.ppl-onb__door {
+.ppl-onb__door-row {
   display: flex;
   align-items: center;
   gap: var(--s-3);
-  min-height: 60px;
-  color: var(--ink);
-  text-decoration: none;
+  min-height: 48px;
 }
 
 .ppl-onb__door-icon {

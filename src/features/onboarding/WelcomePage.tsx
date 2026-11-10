@@ -6,7 +6,19 @@ import type { FlightSummary } from '../../app/types';
 import { Button } from '../../ui/Button';
 import { Spinner } from '../../ui/Spinner';
 import { Stepper } from '../../ui/Stepper';
-import { clearProgress, flyIntro, INTRO_CONDITIONS, INTRO_ENV_ID, loadProgress, makePlayerDesign, saveProgress, STEP_IDS, STEP_LABELS, type Progress, type StepId } from './flow';
+import {
+  clearProgress,
+  flyIntro,
+  INTRO_CONDITIONS,
+  INTRO_ENV_ID,
+  loadProgress,
+  makePlayerDesign,
+  saveProgress,
+  STEP_IDS,
+  STEP_LABELS,
+  type Progress,
+  type StepId,
+} from './flow';
 import { HelloStep } from './HelloStep';
 import { SKIP_LABEL } from './script';
 import type { StepProps } from './StepFrame';

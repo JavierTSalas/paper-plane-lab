@@ -126,16 +126,7 @@ export function YourFold({ progress, update, next }: StepProps): ReactElement {
     <StepFrame
       className="ppl-onb__step--your-fold"
       pose={done >= flatCount ? 'cheer' : done === 0 ? 'point' : 'talk'}
-      stage={
-        <GuidedFold
-          compact
-          design={design}
-          done={done}
-          onDoneChange={(n) => update({ foldDone: n })}
-          onComplete={next}
-          finishLabel="Throw it"
-        />
-      }
+      stage={<GuidedFold compact design={design} done={done} onDoneChange={(n) => update({ foldDone: n })} onComplete={next} finishLabel="Throw it" />}
       actions={
         done === 0 ? (
           <Button variant="ghost" size="sm" icon="back" onClick={() => update({ color: null })}>

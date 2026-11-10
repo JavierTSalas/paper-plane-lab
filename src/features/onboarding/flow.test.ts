@@ -2,7 +2,18 @@ import { describe, expect, it } from 'vitest';
 import { getPlaneBuild } from '../../app/hooks';
 import { PAPER_COLORS } from '../../core/paper';
 import { buildTimeline } from '../fold/view';
-import { flyIntro, freshProgress, getWrenDesign, makePlayerDesign, PLAYER_COLORS, PLAYER_START_LAUNCH, sanitizeProgress, STEP_IDS, WREN_COLOR, WREN_LAUNCH } from './flow';
+import {
+  flyIntro,
+  freshProgress,
+  getWrenDesign,
+  makePlayerDesign,
+  PLAYER_COLORS,
+  PLAYER_START_LAUNCH,
+  sanitizeProgress,
+  STEP_IDS,
+  WREN_COLOR,
+  WREN_LAUNCH,
+} from './flow';
 import * as script from './script';
 
 function allLines(): string[] {
@@ -82,7 +93,16 @@ describe('progress', () => {
 
   it('keeps valid fields and clamps the rest', () => {
     const p = sanitizeProgress(
-      { v: 1, step: 4, reached: 9, color: 'sky', foldDone: 3, planeId: 'mine', throws: [WREN_LAUNCH, { speed: 'x' }, { ...WREN_LAUNCH, speed: 99 }], name: 'Ada' },
+      {
+        v: 1,
+        step: 4,
+        reached: 9,
+        color: 'sky',
+        foldDone: 3,
+        planeId: 'mine',
+        throws: [WREN_LAUNCH, { speed: 'x' }, { ...WREN_LAUNCH, speed: 99 }],
+        name: 'Ada',
+      },
       'id',
     );
     expect(p.step).toBe(4);

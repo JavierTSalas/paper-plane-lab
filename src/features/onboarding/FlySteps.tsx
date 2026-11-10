@@ -8,7 +8,6 @@ import { formatSpeed, lengthParts, signedDeg, timeParts, type UnitSystem } from 
 import { Icon } from '../../ui/icons';
 import { InfoDot } from '../../ui/InfoDot';
 import { useReducedMotion } from '../../ui/motion';
-import { Stat } from '../../ui/Stat';
 import { FlightStage, swipeToThrow, ThrowPad, trailOf, type FlightStagePlane } from '../fly';
 import { clamp, clampLaunch } from '../fly/flight';
 import { flyIntro, getWrenDesign, INTRO_MAX_SPEED, introEnv, makePlayerDesign, MAX_THROWS, PLAYER_START_LAUNCH, WREN_LAUNCH } from './flow';
@@ -17,7 +16,11 @@ import { StepFrame, type StepProps } from './StepFrame';
 
 type Phase = 'ready' | 'flying' | 'landed';
 
-const stagePlane = (b: PlaneBuild): FlightStagePlane => ({ model: b.model, paper: b.design.paper, airframe: b.airframe });
+const stagePlane = (b: PlaneBuild): FlightStagePlane => ({
+  model: b.model,
+  paper: b.design.paper,
+  airframe: b.airframe,
+});
 
 function useWrenFlight(): { build: PlaneBuild; result: FlightResult } {
   const build = usePlaneBuild(getWrenDesign())!;
@@ -36,16 +39,37 @@ const TIME_INFO = (
   </InfoDot>
 );
 
-/** Distance and time of one flight, as two small stats. */
-function FlightNumbers({ result, units, who }: { result: FlightResult; units: UnitSystem; who?: string }): ReactElement {
-  const d = lengthParts(result.metrics.distance, units);
-  const t = timeParts(result.metrics.airtime);
+/** Distance and time of one or more flights, as a compact table. */
+function FlightTable({ rows, units }: { rows: readonly { who: string; result: FlightResult; mine?: boolean }[]; units: UnitSystem }): ReactElement {
   return (
-    <div className="ppl-onb__numbers">
-      {who && <span className="ppl-onb__who">{who}</span>}
-      <Stat size="sm" label="Distance" value={d.value} unit={d.unit} info={DISTANCE_INFO} />
-      <Stat size="sm" label="Time" value={t.value} unit={t.unit} info={TIME_INFO} />
-    </div>
+    <table className="ppl-onb__table ppl-num">
+      <thead>
+        <tr>
+          <th scope="col">
+            <span className="ppl-sr-only">Thrower</span>
+          </th>
+          <th scope="col">Distance {DISTANCE_INFO}</th>
+          <th scope="col">Time {TIME_INFO}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map(({ who, result, mine }) => {
+          const d = lengthParts(result.metrics.distance, units);
+          const t = timeParts(result.metrics.airtime);
+          return (
+            <tr key={who} className={cx(mine && 'is-mine')}>
+              <th scope="row">{who}</th>
+              <td>
+                <b>{d.value}</b> {d.unit}
+              </td>
+              <td>
+                <b>{t.value}</b> {t.unit}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
 }
 
@@ -82,7 +106,7 @@ export function WatchThrow({ next }: StepProps): ReactElement {
             flight={phase === 'ready' ? null : result}
             launch={WREN_LAUNCH}
             autoPlay
-            camera="chase"
+            camera={phase === 'landed' ? 'thrower' : 'chase'}
             units={units}
             reducedMotion={reduced}
             onEnd={() => setPhase('landed')}
@@ -90,7 +114,7 @@ export function WatchThrow({ next }: StepProps): ReactElement {
           />
         </div>
       }
-      extra={phase === 'landed' ? <FlightNumbers result={result} units={units} /> : undefined}
+      extra={phase === 'landed' ? <FlightTable rows={[{ who: 'Wren', result }]} units={units} /> : undefined}
       actions={
         phase === 'landed' ? (
           <>
@@ -141,7 +165,11 @@ export function YourThrow({ progress, update, next }: StepProps): ReactElement {
   throwsRef.current = progress.throws;
   const doThrow = (l: Launch): void => {
     const clamped = clampLaunch(l);
-    const safe: Launch = { ...clamped, speed: Math.min(clamped.speed, INTRO_MAX_SPEED), pitchDeg: clamp(clamped.pitchDeg, -20, 60) };
+    const safe: Launch = {
+      ...clamped,
+      speed: Math.min(clamped.speed, INTRO_MAX_SPEED),
+      pitchDeg: clamp(clamped.pitchDeg, -20, 60),
+    };
     setLaunch(safe);
     setThrown(safe);
     setPhase('flying');
@@ -167,7 +195,12 @@ export function YourThrow({ progress, update, next }: StepProps): ReactElement {
   };
   const onDown = (e: ReactPointerEvent<HTMLDivElement>): void => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    swipe.current = { id: e.pointerId, x: e.clientX, y: e.clientY, trail: [{ x: e.clientX, y: e.clientY, t: e.timeStamp }] };
+    swipe.current = {
+      id: e.pointerId,
+      x: e.clientX,
+      y: e.clientY,
+      trail: [{ x: e.clientX, y: e.clientY, t: e.timeStamp }],
+    };
   };
   const onMove = (e: ReactPointerEvent<HTMLDivElement>): void => {
     const s = swipe.current;
@@ -196,12 +229,16 @@ export function YourThrow({ progress, update, next }: StepProps): ReactElement {
   const landed = phase === 'landed' && result !== null;
   let line: string = YOUR_THROW.ready;
   if (phase === 'flying') line = YOUR_THROW.flying;
-  if (landed) line = `${compareLine(result.metrics.distance, wren.result.metrics.distance)} ${diag ? DIAGNOSIS_HEADLINE[diag.code] : ''}`.trim();
+  if (landed) line = diag ? DIAGNOSIS_HEADLINE[diag.code] : YOUR_THROW.again;
+  const title = landed ? compareLine(result.metrics.distance, wren.result.metrics.distance) : YOUR_THROW.title;
 
   return (
     <StepFrame
       className={cx('ppl-onb__step--your-throw', landed && 'is-landed')}
-      pose={phase === 'ready' ? 'idle' : phase === 'flying' ? 'point' : result && result.metrics.distance >= wren.result.metrics.distance * 0.9 ? 'cheer' : 'think'}
+      title={title}
+      pose={
+        phase === 'ready' ? 'idle' : phase === 'flying' ? 'point' : result && result.metrics.distance >= wren.result.metrics.distance * 0.9 ? 'cheer' : 'think'
+      }
       stage={
         <div className="ppl-onb__fly">
           <FlightStage
@@ -213,7 +250,7 @@ export function YourThrow({ progress, update, next }: StepProps): ReactElement {
             aim={aim}
             ghosts={ghosts}
             autoPlay
-            camera="chase"
+            camera={phase === 'landed' ? 'thrower' : 'chase'}
             units={units}
             reducedMotion={reduced}
             onEnd={() => setPhase('landed')}
@@ -249,17 +286,16 @@ export function YourThrow({ progress, update, next }: StepProps): ReactElement {
       extra={
         landed ? (
           <div className="ppl-onb__compare">
-            <FlightNumbers result={wren.result} units={units} who="Wren" />
-            <FlightNumbers result={result} units={units} who="You" />
+            <FlightTable rows={[{ who: 'Wren', result: wren.result }, { who: 'You', result, mine: true }]} units={units} />
             {diag && diag.code !== 'clean-glide' && (diag.fix || diag.why) && (
-              <p className="ppl-onb__note">
+              <div className="ppl-onb__note">
                 {diag.fix || diag.why}{' '}
                 {diag.fix && diag.why && (
                   <InfoDot label="Why did it fly like that?" title="Why">
                     {diag.why}
                   </InfoDot>
                 )}
-              </p>
+              </div>
             )}
           </div>
         ) : undefined

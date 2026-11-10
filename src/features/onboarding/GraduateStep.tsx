@@ -17,9 +17,24 @@ interface Door {
 }
 
 const DOORS: readonly Door[] = [
-  { path: '/hangar', icon: 'hangar', title: 'Explore the plane library', sub: 'Classic designs, each with its story and folds.' },
-  { path: '/fold?new=1', icon: 'fold', title: 'Design my own', sub: 'Fold anything; the lab works out how it flies.' },
-  { path: '/fly', icon: 'fly', title: 'Go flying', sub: 'Gym, hangar, meadow and a windy cliff.' },
+  {
+    path: '/hangar',
+    icon: 'hangar',
+    title: 'Explore the plane library',
+    sub: 'Classic designs, each with its story and folds.',
+  },
+  {
+    path: '/fold?new=1',
+    icon: 'fold',
+    title: 'Design my own',
+    sub: 'Fold anything; the lab works out how it flies.',
+  },
+  {
+    path: '/fly',
+    icon: 'fly',
+    title: 'Go flying',
+    sub: 'Gym, hangar, meadow and a windy cliff.',
+  },
 ];
 
 /** Step 6: graduation. Optional name, the player's dart on show, three doors into the lab. */
@@ -92,14 +107,14 @@ export function GraduateStep({ progress, update, finish }: StepProps): ReactElem
         <nav className="ppl-onb__doors" aria-label="Where to next">
           {DOORS.map((d) => (
             <CardLink key={d.path} href={`#${d.path}`} padding="sm" className="ppl-onb__door" onClick={(e) => go(e, d.path)}>
-              <span className="ppl-onb__door-icon" aria-hidden="true">
+              <span className="ppl-onb__door-row"><span className="ppl-onb__door-icon" aria-hidden="true">
                 <Icon name={d.icon} size={24} />
               </span>
               <span className="ppl-onb__door-text">
                 <span className="ppl-onb__door-title">{d.title}</span>
                 <span className="ppl-onb__door-sub">{d.sub}</span>
               </span>
-              <Icon name="next" size={20} />
+              <Icon name="next" size={20} /></span>
             </CardLink>
           ))}
         </nav>
