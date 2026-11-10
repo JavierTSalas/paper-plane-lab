@@ -105,14 +105,15 @@ export const ENVIRONMENTS: readonly Environment[] = [
     pressurePa: PRESSURE,
     humidity: 0.5,
     // U10 = 1.5 m/s over open grass (z0 = 0.03 m); one thermal with w* = 1.5 m/s under a 1000 m layer.
-    // The thermal's place, a few metres ahead and a little right of the throw line, is a design choice.
+    // Its place is a design choice: 10 m ahead and a little right of the throw line, so that a throw passes
+    // through the core (about 0.4 m/s of lift at head height) while the thrower stands near its rim.
     wind: {
       speed: 1.5,
       towardDeg: 0,
       roughness: 0.03,
       turbulence: null,
       gustiness: 0.5,
-      thermals: [{ x: 18, z: 2, wStar: 1.5, mixedLayerHeight: 1000 }],
+      thermals: [{ x: 10, z: 2, wStar: 1.5, mixedLayerHeight: 1000 }],
     },
     adjustableWind: true,
     maxWind: 6,

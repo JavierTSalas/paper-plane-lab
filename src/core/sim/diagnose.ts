@@ -14,6 +14,8 @@ import type { Airframe, Diagnosis, DiagnosisCode, Environment, FlightResult, Lau
 
 /** Share of its weight the air must have carried, averaged over the flight, for it to count as flying at all. */
 const UNSUPPORTED_BELOW = 0.4;
+/** The same for a plane that has no trimmed glide at all: it only stays up while the throw's speed lasts. */
+const UNTRIMMED_BELOW = 0.8;
 /** An unsupported flight from a throw at least this hard is a thrown arc, not a dive, m/s (above the casual band of doc 02 section 5). */
 const BALLISTIC_FROM_SPEED = 12;
 /** Thrown below this fraction of its glide speed, a plane cannot carry its weight (lift goes with speed squared: 56 %). */
@@ -43,8 +45,10 @@ const LOOP_MAX_ROLL = 1.0;
 /** Wind counts as having carried the flight when it moved the air this far, metres and share of the path. */
 const WIND_MIN_DRIFT = 2;
 const WIND_DRIFT_SHARE = 0.25;
-/** Rising air counts when it lifted the surrounding air by this much during the flight, metres. */
+/** Rising air counts when it lifted the surrounding air by this much during the flight, metres ... */
 const WIND_MIN_LIFT = 1;
+/** ... and it is the headline when it made up at least this share of the plane's sink through the air. */
+const WIND_LIFT_SHARE = 0.25;
 /** The Professor makes at most this many remarks about one flight. */
 const MAX_DIAGNOSES = 3;
 
@@ -295,7 +299,11 @@ const WRITERS: Record<DiagnosisCode, (c: Context) => Diagnosis> = {
       why = `The wing spent ${pct(r.stalledFraction)} % of the flight beyond its stall angle of ${f0(c.stallDeg)}°: much drag, little lift.`;
       fix = bendDownAdvice(c);
     }
-    return { code: 'stall-mush', what: 'It reared up, lost its speed and mushed down nose-high.', why, fix };
+    const what =
+      r.stalledFraction >= MUSH_FRACTION
+        ? 'It reared up, lost its speed and mushed down nose-high.'
+        : 'It climbed until the speed was gone, stalled and dropped.';
+    return { code: 'stall-mush', what, why, fix };
   },
 
   porpoise: (c) => {
@@ -318,9 +326,18 @@ const WRITERS: Record<DiagnosisCode, (c: Context) => Diagnosis> = {
 
   loop: (c) => {
     const { trim, r } = c;
+    const what = 'It pulled up, went over on its back and looped.';
+    if (!trim.pitchStable) {
+      return {
+        code: 'loop',
+        what,
+        why: `The centre of gravity sits ${marginText(trim)}, so once the nose started up nothing stopped it.`,
+        fix: 'Move weight forward: slide a paper clip onto the nose, or fold the nose over once more.',
+      };
+    }
     return {
       code: 'loop',
-      what: 'It pulled up, went over on its back and looped.',
+      what,
       why:
         trim.speed !== null
           ? `Lift grows with the square of speed: at ${f1(r.launchAirspeed)} m/s, against a glide speed of ${f1(trim.speed)} m/s, the wing made about ${f0(Math.max(2, r.peakLoad))} times the plane's weight.`
@@ -352,7 +369,10 @@ const WRITERS: Record<DiagnosisCode, (c: Context) => Diagnosis> = {
 
   'wind-carried': (c) => {
     const { r } = c;
-    const lifted = r.windLift >= WIND_MIN_LIFT && r.windLift >= r.windDrift;
+    // Rising air is the story when it made up a good part of the plane's sink through the air.
+    const samples = c.result.samples;
+    const lost = samples[0].pos[1] - samples[samples.length - 1].pos[1];
+    const lifted = r.windLift >= WIND_MIN_LIFT && r.windLift >= WIND_LIFT_SHARE * (r.windLift + Math.max(lost, 0));
     const speed = c.result.metrics.meanAirspeed;
     return {
       code: 'wind-carried',
@@ -491,12 +511,14 @@ export function diagnose(result: FlightResult, airframe: Airframe, launch: Launc
   // 3. Pitch behaviour, unless the attitude was lost anyway.
   if (codes.length === 0 || codes[0] === 'spiral' || codes[0] === 'roll-off') {
     const slow = trim.trimmable && trim.speed !== null && r.launchAirspeed < TOO_SLOW_RATIO * trim.speed;
-    const stalledOut = r.stalledFraction >= MUSH_FRACTION || (r.endsStalled && m.stallCount >= 1);
+    // Mushing, or a stall that the flight never got over: one stall and a drop back to the ground.
+    const stalledOut =
+      r.stalledFraction >= MUSH_FRACTION || (m.stallCount >= 1 && (r.endsStalled || r.support < UNSUPPORTED_BELOW));
     const lateralFault = codes.length > 0;
     if (slow && !hitCeiling && (m.stallCount >= 1 || r.support < 0.8)) codes.push('too-slow');
     else if (!lateralFault && (m.stallCount >= 2 || r.humps >= 2)) codes.push('porpoise');
     else if (stalledOut) codes.push('stall-mush');
-    else if (!lateralFault && !hitWall && !hitCeiling && r.support < UNSUPPORTED_BELOW) {
+    else if (!lateralFault && !hitWall && !hitCeiling && r.support < (trim.trimmable ? UNSUPPORTED_BELOW : UNTRIMMED_BELOW)) {
       codes.push(launch.speed >= BALLISTIC_FROM_SPEED ? 'ballistic' : 'nose-dive');
     }
   }
