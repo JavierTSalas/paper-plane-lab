@@ -673,6 +673,21 @@ describe('contact and termination', () => {
     expect(short.metrics.airtime).toBeCloseTo(2, 9);
   });
 
+  it('an airframe the integrator cannot hold (almost no inertia) ends the flight instead of returning NaN', () => {
+    const feather: Airframe = {
+      ...dart,
+      inertia: dart.inertia.map((v) => v * 1e-12) as unknown as Mat3,
+      apparentInertia: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    };
+    const r = simulateFlight(feather, throwOf(8, 5, { aoaDeg: 3 }), stillAir(gym), { envId: 'gym' }, 1);
+    expect(r.metrics.airtime).toBeLessThan(60);
+    for (const s of r.samples) {
+      for (const v of [...s.pos, ...s.vel, ...s.quat, ...s.omega, s.airspeed, s.alpha, s.cl, s.cd]) expect(Number.isFinite(v)).toBe(true);
+    }
+    for (const v of Object.values(r.metrics)) if (v !== null) expect(Number.isFinite(v)).toBe(true);
+    expect(r.diagnosis.length).toBeGreaterThan(0);
+  });
+
   it('a plane released inside the floor does not fly', () => {
     const r = simulateFlight(dart, throwOf(5, 0), releasedAt(stillAir(gym), 0.001), { envId: 'gym' }, 1);
     expect(r.outcome).toBe('ground');

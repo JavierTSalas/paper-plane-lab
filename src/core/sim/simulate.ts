@@ -109,6 +109,22 @@ export function launchVelocity(launch: Launch): Vec3 {
 const addMat = (a: Mat3, b: Mat3): Mat3 => a.map((v, i) => v + b[i]) as unknown as Mat3;
 
 /**
+ * Inverse of a mass or inertia matrix. The matrix is scaled to order one first (the inertia of a paper plane
+ * is around 1e-6 kg m², and `mat3Inverse` judges singularity by an absolute threshold). A matrix that is
+ * singular even so, which no folded sheet produces, gives the zero matrix: that degree of freedom does not respond.
+ */
+function invertScaled(m: Mat3): Mat3 {
+  let scale = 0;
+  for (const v of m) scale = Math.max(scale, Math.abs(v));
+  if (!(scale > 0) || !Number.isFinite(scale)) return [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  try {
+    return mat3Inverse(m.map((v) => v / scale) as unknown as Mat3).map((v) => v / scale) as unknown as Mat3;
+  } catch {
+    return [0, 0, 0, 0, 0, 0, 0, 0, 0];
+  }
+}
+
+/**
  * Simulate one throw from release to the first touch of the ground, a wall or the ceiling, or to the time
  * limit. Deterministic: the same arguments give a bit-identical result.
  */
@@ -128,9 +144,9 @@ export function simulateFlight(
   const I = airframe.inertia;
   const A: Mat3 = aero ? airframe.apparentMass : [0, 0, 0, 0, 0, 0, 0, 0, 0];
   const hasApparent = A.some((v) => v !== 0);
-  const Mi = mat3Inverse(addMat([m, 0, 0, 0, m, 0, 0, 0, m], A));
+  const Mi = invertScaled(addMat([m, 0, 0, 0, m, 0, 0, 0, m], A));
   const J = aero ? addMat(I, airframe.apparentInertia) : I;
-  const Ji = mat3Inverse(J);
+  const Ji = invertScaled(J);
   const [A0, A1, A2, A3, A4, A5, A6, A7, A8] = A;
   const [M0, M1, M2, M3, M4, M5, M6, M7, M8] = Mi;
   const [I0, I1, I2, I3, I4, I5, I6, I7, I8] = I;
@@ -156,6 +172,7 @@ export function simulateFlight(
       reach = Math.max(reach, Math.hypot(rx, ry, rz) + 0.5 * e.chord);
     }
     stiffness = Math.max(aboutX / J[0], aboutY / J[4], aboutZ / J[8], heave / m);
+    if (!(stiffness >= 0)) stiffness = 0;
   }
 
   /* ---- contact geometry ---- */
@@ -524,6 +541,9 @@ export function simulateFlight(
   let outcome: FlightResult['outcome'] = 'timeout';
   let touch: Vec3 | null = null;
   let tEnd = 0;
+  // The state and wind the flight ended with (the last good ones if the loop is left early).
+  let endState = s;
+  const endWind: Triple = [wind0[0], wind0[1], wind0[2]];
   let step = 0;
   let nextSample = 1;
   let ended = gaps(s, gapNow) < 0;
@@ -565,7 +585,6 @@ export function simulateFlight(
       // The numbers have run away (an airframe far outside what the model was built for). End the flight at
       // the last good state instead of handing out NaN.
       s.set(before);
-      step--;
       tEnd = tBefore;
       outcome = 'ground';
       touch = [s[PX], s[PX + 1], s[PX + 2]];
@@ -612,7 +631,11 @@ export function simulateFlight(
 
     // The state at the end of the step (or at the touch).
     const span = tEnd - tBefore;
-    observe(final, wind0[0] + ax * span, wind0[1] + ay * span, wind0[2] + az * span);
+    endState = final;
+    endWind[0] = wind0[0] + ax * span;
+    endWind[1] = wind0[1] + ay * span;
+    endWind[2] = wind0[2] + az * span;
+    observe(final, endWind[0], endWind[1], endWind[2]);
     const dx = final[PX] - before[PX];
     const dy = final[PX + 1] - before[PX + 1];
     const dz = final[PX + 2] - before[PX + 2];
@@ -655,14 +678,7 @@ export function simulateFlight(
   }
 
   /* ---- final sample, events, metrics ---- */
-  if (tEnd > 0) {
-    // wind0 and wind1 still hold the two ends of the last step.
-    const span = tEnd - (step - 1) * dt;
-    const wx = wind0[0] + ((wind1[0] - wind0[0]) / dt) * span;
-    const wy = wind0[1] + ((wind1[1] - wind0[1]) / dt) * span;
-    const wz = wind0[2] + ((wind1[2] - wind0[2]) / dt) * span;
-    samples.push(sampleOf(outcome === 'timeout' ? s : mid, tEnd, wx, wy, wz));
-  }
+  if (tEnd > 0) samples.push(sampleOf(endState, tEnd, endWind[0], endWind[1], endWind[2]));
   const end = samples[samples.length - 1];
   if (apexT > 0 && maxHeight - env.launch[1] >= MIN_APEX_RISE) events.push({ t: apexT, kind: 'apex', pos: [apex[0], apex[1], apex[2]] });
   events.push({ t: tEnd, kind: outcome, pos: touch ?? end.pos });
