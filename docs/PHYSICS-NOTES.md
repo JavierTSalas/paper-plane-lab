@@ -24,7 +24,7 @@ A second pass re-derived formulas and recomputed tables. It could not open sourc
 | Single-surface polars | Match the research note's target table |
 | Slender-delta roll due to sideslip | Within 1 % of `-(pi/3) alpha` for aspect ratio 0.33 to 2 |
 | Classic Dart geometry on A4 | Span 107.1 mm, length 311.8 mm, CG 52.4 % from the nose, as derived in the research note |
-| Fold engine | 20,000 random fold sequences keep area, isometry, layer order, and crease consistency |
+| Fold engine | Random fold sequences keep area, isometry, layer order, and crease consistency (180 in the suite; 20,000 in one manual run) |
 
 ## Preset calibration (recommended sheet, factory trim, still air)
 
