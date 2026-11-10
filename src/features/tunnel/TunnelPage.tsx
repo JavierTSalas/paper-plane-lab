@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import { STANDARD_GRAVITY } from '../../core/airframe';
 import { computePolar, tunnelReading } from '../../core/tunnel';
 import { STANDARD_AIR, useCurrentDesign, usePlaneBuild, useTrimAnalysis } from '../../app/hooks';
@@ -29,6 +29,9 @@ const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.m
 export default function TunnelPage(): ReactElement {
   const units = useLab((s) => s.settings.units);
   const planeId = useLab((s) => s.currentPlaneId);
+  const markAssignment = useLab((s) => s.markAssignment);
+  // Opening the tunnel counts for the Professor's "try the wind tunnel" assignment.
+  useEffect(() => markAssignment('try-tunnel'), [markAssignment]);
   const updateTrim = useLab((s) => s.updateTrim);
   const stored = useCurrentDesign();
 
