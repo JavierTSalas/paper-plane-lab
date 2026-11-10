@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client';
 import './ui/tokens.css';
 import './ui/base.css';
 import { App } from './app/App';
+import { installHashQueryNormaliser } from './app/hashQuery';
+
+installHashQueryNormaliser();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
