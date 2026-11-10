@@ -78,21 +78,19 @@ export function DetailsSheet({ open, onClose, record, units, time, onSeek }: Det
         />
 
         <LineChart
-          title="Height over distance"
+          title={`Height over distance (${lu})`}
           description="The flight path seen from the side."
           series={[{ id: 'h', label: 'Height', points: charts.height }]}
           xLabel={`Distance (${lu})`}
-          yLabel={`Height (${lu})`}
           formatX={(v) => fixed(v, 1)}
           formatY={(v) => fixed(v, 1)}
           cursorX={charts.downAt(time)}
           height={180}
         />
         <LineChart
-          title="Airspeed"
+          title={`Airspeed (${su})`}
           series={[{ id: 'v', label: 'Airspeed', points: charts.speed, slot: 2 }]}
           xLabel="Time (s)"
-          yLabel={`Airspeed (${su})`}
           formatX={(v) => fixed(v, 1)}
           formatY={(v) => fixed(v, 1)}
           cursorX={time}
@@ -101,10 +99,9 @@ export function DetailsSheet({ open, onClose, record, units, time, onSeek }: Det
           height={160}
         />
         <LineChart
-          title="Angle of attack"
+          title="Angle of attack (°)"
           series={[{ id: 'a', label: 'Angle of attack', points: charts.alpha, slot: 3 }]}
           xLabel="Time (s)"
-          yLabel="Angle (°)"
           formatX={(v) => fixed(v, 1)}
           formatY={(v) => fixed(v, 0)}
           cursorX={time}

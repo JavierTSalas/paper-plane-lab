@@ -239,13 +239,15 @@ function gym(env: Environment, mat: THREE.Material): Scenery {
     parts.push(key);
     ring(xe - s * 5.8, 1.8, s > 0 ? Math.PI / 2 : -Math.PI / 2, s > 0 ? (3 * Math.PI) / 2 : Math.PI / 2);
     ring(xe - s * 1.575, 6.75, s > 0 ? Math.PI * 0.6 : -Math.PI * 0.4, s > 0 ? Math.PI * 1.4 : Math.PI * 0.4);
-    // Hoop: post, backboard, rim.
-    const xp = xe + s * 1.0;
-    parts.push(box(0.15, 3.3, 0.15, '#6b665c', xp, 1.65, 0));
-    parts.push(box(0.05, 1.05, 1.8, PALETTE.card, xe - s * 1.2 + s * 0.0, 3.4, 0));
-    parts.push(box(0.9 + 0.0, 0.08, 0.08, '#6b665c', xe - s * 0.75 + s * 0.1, 3.3, 0));
+  }
+  // Practice hoops on the left wall, clear of the throw line (the simulation only knows the walls).
+  for (const x of [cx - 7, cx + 7]) {
+    const zw = b.zMin;
+    parts.push(box(0.12, 0.12, 1.1, '#6b665c', x, 3.35, zw + 0.55));
+    parts.push(box(1.8, 1.05, 0.05, PALETTE.card, x, 3.4, zw + 1.1));
+    parts.push(box(0.6, 0.45, 0.06, PALETTE.accent, x, 3.25, zw + 1.08));
     const rim = paint(new THREE.TorusGeometry(0.23, 0.02, 4, 14).rotateX(Math.PI / 2), PALETTE.accent);
-    rim.translate(xe - s * 1.2 - s * 0.25, 3.05, 0);
+    rim.translate(x, 3.05, zw + 1.38);
     parts.push(rim);
   }
   // Bleachers along the right wall: five stepped tiers.
@@ -462,9 +464,12 @@ function outdoor(
   group.add(sock.pole, sock.pivot);
 
   const clouds: Drifter[] = [];
+  // Clouds glow a little so their undersides stay white instead of catching the ground light.
+  const cloudMat = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true, emissive: 0xe8e2d6, emissiveIntensity: 0.55 });
   for (let i = 0; i < 9; i++) {
-    const c = new THREE.Mesh(cloudGeometry(rnd), mat);
-    c.position.set(-300 + rnd() * 700, 70 + rnd() * 60, -350 + rnd() * 700);
+    const c = new THREE.Mesh(cloudGeometry(rnd), cloudMat);
+    c.position.set(-300 + rnd() * 700, 120 + rnd() * 80, -350 + rnd() * 700);
+    c.scale.setScalar(1.6 + rnd());
     group.add(c);
     clouds.push({ obj: c, speed: 0.6 + rnd() * 0.5 });
   }
@@ -547,7 +552,8 @@ function grassTufts(rnd: () => number, n: number, xr: [number, number], zr: numb
   for (let i = 0; i < n; i++) {
     const x = xr[0] + rnd() * (xr[1] - xr[0]);
     const z = (rnd() * 2 - 1) * zr;
-    if (!ok(x)) continue;
+    // Keep the strip along the throw line clear: low cameras fly there.
+    if (!ok(x) || Math.abs(z) < 3) continue;
     const flower = rnd() < 0.15;
     parts.push(cone(0.08 + rnd() * 0.06, 0.25 + rnd() * 0.2, 3, flower ? (rnd() < 0.5 ? '#f4d77a' : PALETTE.card) : PALETTE.grassDark, x, ground(x) + 0.1, z));
   }
@@ -573,7 +579,7 @@ function meadow(env: Environment, mat: THREE.Material): Scenery {
   extra.push(box(0.4, 0.25, 0.3, '#c9a877', -1.4, 0.13, 1.8, 0.4));
   const trees = scatter(rnd, 40, [-60, 160], [-90, 90], 18, () => 0);
   const roundTrees = scatter(rnd, 25, [-60, 160], [-90, 90], 18, () => 0);
-  return outdoor(env, mat, { ground, extra, trees, roundTrees, sockAt: [3, 0, -5], skyTop: '#8cc1e3', horizon: '#f2ead8', gulls: false }, rnd);
+  return outdoor(env, mat, { ground, extra, trees, roundTrees, sockAt: [7, 0, -10], skyTop: '#8cc1e3', horizon: '#f2ead8', gulls: false }, rnd);
 }
 
 function hill(env: Environment, mat: THREE.Material): Scenery {
@@ -599,7 +605,7 @@ function hill(env: Environment, mat: THREE.Material): Scenery {
   }
   const trees = scatter(rnd, 50, [-200, 260], [-160, 160], 20, g);
   const roundTrees = scatter(rnd, 30, [-200, 260], [-160, 160], 20, g);
-  return outdoor(env, mat, { ground, extra, trees, roundTrees, sockAt: [3, g(3), -5], skyTop: '#86bde2', horizon: '#eef0e2', gulls: false }, rnd);
+  return outdoor(env, mat, { ground, extra, trees, roundTrees, sockAt: [7, g(7), -10], skyTop: '#86bde2', horizon: '#eef0e2', gulls: false }, rnd);
 }
 
 function cliff(env: Environment, mat: THREE.Material): Scenery {
@@ -647,7 +653,7 @@ function cliff(env: Environment, mat: THREE.Material): Scenery {
   const behind = (x: number): boolean => x < t.edgeX - 8;
   const trees = scatter(rnd, 30, [-200, t.edgeX - 10], [-160, 160], 14, g, behind);
   const roundTrees = scatter(rnd, 16, [-200, t.edgeX - 10], [-160, 160], 14, g, behind);
-  return outdoor(env, mat, { ground, extra, trees, roundTrees, sockAt: [-2, g(-2), -5], skyTop: '#7fb6df', horizon: '#eef1ea', gulls: true, seaY }, rnd);
+  return outdoor(env, mat, { ground, extra, trees, roundTrees, sockAt: [-3, g(-3), -10], skyTop: '#7fb6df', horizon: '#eef1ea', gulls: true, seaY }, rnd);
 }
 
 export function buildScenery(env: Environment, mat: THREE.Material): Scenery {

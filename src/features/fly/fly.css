@@ -178,11 +178,11 @@
 
 @media (min-width: 900px) {
   .ppl-fly__readouts {
-    top: auto;
-    bottom: var(--s-5);
-    left: var(--s-4);
+    top: calc(var(--safe-top) + var(--s-3));
+    left: auto;
+    right: var(--s-5);
     transform: none;
-    padding: var(--s-3) var(--s-5);
+    padding: var(--s-2) var(--s-5);
   }
   .ppl-fly__readouts dd {
     font-size: var(--fs-lg);
@@ -199,6 +199,9 @@
   z-index: 1;
   inset: 0;
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   cursor: grab;
 }
 
@@ -604,6 +607,7 @@
 
 .ppl-fly-plane {
   align-items: center;
+  overflow: hidden;
 }
 
 /* ------------------------------------------------------------ details */

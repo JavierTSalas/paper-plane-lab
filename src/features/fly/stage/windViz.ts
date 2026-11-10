@@ -7,9 +7,9 @@ import { terrainHeight } from '../../../core/env';
 import type { Environment, WindField } from '../../../core/types';
 import { paint, seeded } from './geo';
 
-const COUNT = 260;
+const COUNT = 200;
 /** Half sizes of the box of air around the focus point that holds the particles, metres. */
-const HALF: readonly [number, number, number] = [22, 5, 16];
+const HALF: readonly [number, number, number] = [22, 2.2, 16];
 /** A windsock stands out fully at about 15 knots (7.7 m/s). */
 const SOCK_FULL = 7.7;
 

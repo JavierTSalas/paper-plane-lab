@@ -96,11 +96,10 @@ export function ResultCard({ record, units, personalBest, arenas, onAgain, onRep
             <Stat label="Top speed" size="sm" value={vmax.value} unit={vmax.unit} />
           </StatGrid>
           <LineChart
-            title="Flight path"
+            title={`Flight path (${lu})`}
             description="Height over distance, seen from the side."
             series={[{ id: 'h', label: 'Height', points: path }]}
             xLabel={`Distance (${lu})`}
-            yLabel={`Height (${lu})`}
             formatX={(v) => fixed(v, 0)}
             formatY={(v) => fixed(v, 1)}
             height={150}

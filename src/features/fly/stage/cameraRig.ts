@@ -59,8 +59,10 @@ export class CameraRig {
       }
       case 'side': {
         const d = 1.9 * this.scale;
-        this.wantEye.set(focus.x + 0.6 * this.scale, focus.y + 0.35 * this.scale, focus.z + d);
-        this.wantTarget.set(focus.x + 0.6 * this.scale, focus.y, focus.z);
+        // Look a little ahead of a fast plane.
+        const lead = THREE.MathUtils.clamp(vel.x * 0.08, -0.5, 0.5) * this.scale;
+        this.wantEye.set(focus.x + lead, focus.y + 0.35 * this.scale, focus.z + d);
+        this.wantTarget.set(focus.x + lead, focus.y, focus.z);
         fov = 45;
         break;
       }

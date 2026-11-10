@@ -71,7 +71,7 @@ export function conditionsFor(env: Environment, wind: { speed: number; towardDeg
 /* ------------------------------------------------------------------ swipe to throw */
 
 /** Swipe speed (screen heights per second) to release speed, m/s. One quick flick of half a screen is a firm throw. */
-const SWIPE_SPEED_GAIN = 3.5;
+const SWIPE_SPEED_GAIN = 4.5;
 /** Shortest swipe that counts as a throw, px. */
 export const MIN_SWIPE_PX = 36;
 
