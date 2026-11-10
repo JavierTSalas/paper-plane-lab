@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 export interface TweenLeg {
   to: number;
@@ -58,5 +58,5 @@ export function useTween(set: (v: number) => void, reduced: boolean): { run: (fr
   );
 
   useEffect(() => stop, [stop]);
-  return { run, stop };
+  return useMemo(() => ({ run, stop }), [run, stop]);
 }

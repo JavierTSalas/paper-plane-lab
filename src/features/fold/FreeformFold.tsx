@@ -8,7 +8,7 @@ import { InfoDot } from '../../ui/InfoDot';
 import { SegmentedControl } from '../../ui/SegmentedControl';
 import { toast } from '../../ui/Toast';
 import { PaperCanvas } from './view';
-import { dist, lineStep, maxLayers, nearest, pointToPointStep, snapAngle, trySteps, withMirrorStep, type Trial } from './geometry';
+import { dist, lineStep, maxLayers, movedPieces, nearest, pointToPointStep, snapAngle, trySteps, withMirrorStep, type Trial } from './geometry';
 import './fold.css';
 
 export interface FreeformFoldProps {
@@ -206,7 +206,7 @@ export function FreeformFold({ design, onSteps, canUndo, canRedo, onUndo, onRedo
   return (
     <div className="ppl-free">
       <div className="ppl-free__stagewrap">
-        <div className="ppl-free__stage" style={{ width: `min(100%, calc((100dvh - 380px) * ${aspect.toFixed(3)}))` }} onPointerCancel={() => setDrag(null)}>
+        <div className="ppl-free__stage" style={{ width: `min(100%, calc((100dvh - 450px) * ${aspect.toFixed(3)}))` }} onPointerCancel={() => setDrag(null)}>
           <PaperCanvas
             paper={paper}
             state={flat}
@@ -214,7 +214,7 @@ export function FreeformFold({ design, onSteps, canUndo, canRedo, onUndo, onRedo
             fitTo={bounds}
             aspect={aspect}
             shadows={false}
-            ghost={preview?.trial.ok && !creaseOnly ? preview.trial.state : null}
+            ghost={preview?.trial.ok && !creaseOnly ? movedPieces(preview.trial, 0.0006) : null}
             highlight={highlightLine ? { line: highlightLine, dir: creaseOnly ? 'valley' : dir } : null}
             label="Your sheet, seen from above. Drag a dot onto another point to fold."
             className={cx('ppl-desk', !ok && 'ppl-free--bad')}
@@ -265,6 +265,23 @@ export function FreeformFold({ design, onSteps, canUndo, canRedo, onUndo, onRedo
                   ? 'Drag a corner or any dot onto another point. The fold line lands halfway between them.'
                   : 'Drag another dot to keep folding.')}
         </p>
+        <div className="ppl-free__toolbar" role="toolbar" aria-label="Folding tools">
+          <IconButton icon="undo" label="Undo" onClick={onUndo} disabled={!canUndo} />
+          <IconButton icon="redo" label="Redo" onClick={onRedo} disabled={!canRedo} />
+          <IconButton icon="flip" label="Turn the paper over" onClick={() => onSteps([...steps, { kind: 'flip' }])} />
+          <IconButton icon="trash" label="Start over with a flat sheet" onClick={() => steps.length && onSteps([])} disabled={steps.length === 0} />
+          <span className="ppl-free__spacer" />
+          <Chip selected={mirror} icon="mirror" onClick={() => setMirror((m) => !m)}>
+            Mirror
+          </Chip>
+          <Chip selected={creaseOnly} icon="crease" onClick={() => setCreaseOnly((c) => !c)}>
+            Crease
+          </Chip>
+          <InfoDot label="Mirror and crease" title="Mirror and crease">
+            Mirror repeats every fold on the other half, so the plane stays balanced. Crease folds and unfolds, leaving a guide line and
+            snap points without changing the shape.
+          </InfoDot>
+        </div>
       </div>
 
       <div className="ppl-free__panel">
@@ -303,24 +320,6 @@ export function FreeformFold({ design, onSteps, canUndo, canRedo, onUndo, onRedo
             A valley fold brings the paper toward you and lands it on top; a mountain fold tucks it away underneath. "Top flap" moves only
             the uppermost loose flap instead of every layer on that side.
           </InfoDot>
-        </div>
-        <div className="ppl-free__row">
-          <Chip selected={mirror} icon="mirror" onClick={() => setMirror((m) => !m)}>
-            Mirror
-          </Chip>
-          <Chip selected={creaseOnly} icon="crease" onClick={() => setCreaseOnly((c) => !c)}>
-            Crease only
-          </Chip>
-          <InfoDot label="Mirror and crease only" title="Mirror and crease only">
-            Mirror repeats every fold on the other half, so the plane stays balanced. Crease only folds and unfolds, leaving a guide line
-            and snap points without changing the shape.
-          </InfoDot>
-        </div>
-        <div className="ppl-free__row ppl-free__tools">
-          <IconButton icon="undo" label="Undo" onClick={onUndo} disabled={!canUndo} />
-          <IconButton icon="redo" label="Redo" onClick={onRedo} disabled={!canRedo} />
-          <IconButton icon="flip" label="Turn the paper over" onClick={() => onSteps([...steps, { kind: 'flip' }])} />
-          <IconButton icon="trash" label="Start over with a flat sheet" onClick={() => steps.length && onSteps([])} disabled={steps.length === 0} />
         </div>
 
         <div className="ppl-free__readout">

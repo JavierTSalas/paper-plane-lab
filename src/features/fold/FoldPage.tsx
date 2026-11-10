@@ -203,7 +203,7 @@ export default function FoldPage(): ReactElement {
   };
 
   const units = useLab((s) => s.settings.units);
-  const showHistory = draft && stage !== 'choose' && !(stage === 'fold' && draft.mode === 'freeform');
+  const showHistory = draft !== null && stage !== 'choose' && !(stage === 'fold' && draft.mode === 'freeform');
 
   return (
     <div className="ppl-page ppl-fold">
@@ -225,13 +225,26 @@ export default function FoldPage(): ReactElement {
             })}
           </ol>
         </nav>
-        {showHistory && (
-          <div className="ppl-fold__history">
-            <IconButton icon="undo" label="Undo" size="sm" onClick={() => dispatch({ type: 'undo' })} disabled={!draft.past.length} />
-            <IconButton icon="redo" label="Redo" size="sm" onClick={() => dispatch({ type: 'redo' })} disabled={!draft.future.length} />
-          </div>
-        )}
       </div>
+
+      {draft && stage !== 'choose' && (
+        <div className="ppl-fold__titlerow">
+          <h1 className="ppl-fold__title">{draft.design.name || 'Your own design'}</h1>
+          <div className="ppl-fold__history">
+            {stage === 'fold' && draft.mode === 'guided' && (
+              <Button size="sm" variant="ghost" icon="edit" onClick={editCopy}>
+                Edit a copy
+              </Button>
+            )}
+            {showHistory && (
+              <>
+                <IconButton icon="undo" label="Undo" size="sm" onClick={() => dispatch({ type: 'undo' })} disabled={!draft.past.length} />
+                <IconButton icon="redo" label="Redo" size="sm" onClick={() => dispatch({ type: 'redo' })} disabled={!draft.future.length} />
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {stage === 'choose' && (
         <ChooseStage
@@ -252,19 +265,12 @@ export default function FoldPage(): ReactElement {
 
       {draft && stage === 'fold' && draft.mode === 'guided' && (
         <div className="ppl-fold__stage">
-          <div className="ppl-fold__titlerow">
-            <h1 className="ppl-fold__title">{draft.design.name}</h1>
-            <Button size="sm" variant="ghost" icon="edit" onClick={editCopy}>
-              Edit a copy
-            </Button>
-          </div>
           <GuidedFold design={draft.design} done={draft.guidedDone} onDoneChange={onDoneChange} onComplete={() => dispatch({ type: 'stage', stage: 'shape' })} finishLabel="Shape it" />
         </div>
       )}
 
       {draft && stage === 'fold' && draft.mode === 'freeform' && (
         <div className="ppl-fold__stage">
-          <h1 className="ppl-sr-only">Design your own fold</h1>
           <FreeformFold
             design={draft.design}
             onSteps={onSteps}
@@ -279,7 +285,6 @@ export default function FoldPage(): ReactElement {
 
       {draft && stage === 'shape' && recommended && (
         <div className="ppl-fold__stage">
-          <h1 className="ppl-sr-only">Shape the plane</h1>
           <ShapeStage design={draft.design} recommended={recommended} onShape={(shape, key) => edit({ ...draft.design, shape }, key)} />
           <div className="ppl-fold__next">
             <Button variant="primary" size="lg" icon="next" onClick={() => dispatch({ type: 'stage', stage: 'trim' })}>
@@ -291,13 +296,13 @@ export default function FoldPage(): ReactElement {
 
       {draft && build && stage === 'trim' && (
         <div className="ppl-fold__stage ppl-trimstage">
-          <h1 className="ppl-sr-only">Trim the plane</h1>
           <div className="ppl-trimstage__view">
             <PlaneView
               model={build.model}
               paper={draft.design.paper}
               interactive
               backdrop
+              aspect={1.5}
               markers={analysis ? [{ x: build.airframe.cg[0], kind: 'cg' }, { x: analysis.neutralPointX, kind: 'np' }] : undefined}
             />
             <StabilityStrip analysis={analysis} units={units} />

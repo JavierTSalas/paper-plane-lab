@@ -4,7 +4,7 @@ import { BarMeter } from '../../ui/charts';
 import { cx } from '../../ui/cx';
 import { fixed, formatRatio, speedParts, type UnitSystem } from '../../ui/format';
 import { InfoDot } from '../../ui/InfoDot';
-import { ProfessorSays } from '../../ui/Professor';
+import { Professor } from '../../ui/Professor';
 import { Stat } from '../../ui/Stat';
 
 /** Static margin that flies well for paper darts and gliders, percent of the mean chord (doc 02 section 4, doc 05). */
@@ -77,9 +77,10 @@ export function StabilityStrip({ analysis, units, className }: StabilityStripPro
         />
       </div>
       {advice && (
-        <ProfessorSays pose="think" size={56} live className="ppl-stab__prof">
-          {advice}
-        </ProfessorSays>
+        <div className="ppl-stab__prof" role="status">
+          <Professor pose="think" size={52} animate={false} title="Professor Wren" />
+          <p>{advice}</p>
+        </div>
       )}
     </div>
   );

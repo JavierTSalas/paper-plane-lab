@@ -77,16 +77,17 @@ export function ShapeStage({ design, recommended, onShape }: ShapeStageProps): R
           paper={design.paper}
           interactive
           backdrop
+          aspect={1.5}
           markers={analysis ? [{ x: build.airframe.cg[0], kind: 'cg' }, { x: analysis.neutralPointX, kind: 'np' }] : undefined}
           label="Your plane in 3D. Drag to turn it."
         />
-        <p className="ppl-shape__caption">
+        <div className="ppl-shape__caption">
           Drag to turn it. CG is the balance point, NP the neutral point.
           <InfoDot label="What are CG and NP?" title="Balance and neutral point" topic="stability-and-trim">
             The plane balances on its CG. The lift acts as if it pivots about the NP. The CG must sit ahead of the NP, toward the nose, for a
             steady glide.
           </InfoDot>
-        </p>
+        </div>
         <StabilityStrip analysis={analysis} units={units} />
       </div>
 

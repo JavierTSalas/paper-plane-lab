@@ -94,7 +94,9 @@
 }
 .ppl-fold__history {
   display: flex;
+  align-items: center;
   flex: none;
+  gap: 2px;
 }
 
 .ppl-fold__stage {
@@ -148,6 +150,20 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+.ppl-guided__countrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  margin-bottom: -6px;
+}
+.ppl-guided__minor {
+  display: flex;
+  align-items: center;
+}
+.ppl-guided__actions > .ppl-btn {
+  flex: 1 1 auto;
 }
 .ppl-guided__text {
   margin: 0;
@@ -289,10 +305,28 @@
 }
 .ppl-free__hint {
   margin: 0;
-  min-height: 2.9em;
+  min-height: 2.6em;
   color: var(--ink-2);
   font-size: var(--fs-sm);
   text-align: center;
+}
+.ppl-free__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 2px var(--s-1);
+}
+.ppl-free__spacer {
+  flex: 0 1 var(--s-3);
+}
+.ppl-free .ppl-scene__ghost {
+  opacity: 0.72;
+}
+.ppl-free .ppl-scene__ghost .ppl-face__base {
+  stroke: var(--viz-2);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
 }
 .ppl-free__marks {
   pointer-events: none;
@@ -490,7 +524,19 @@
   gap: var(--s-3);
 }
 .ppl-stab__prof {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-2);
   min-width: 0;
+}
+.ppl-stab__prof p {
+  flex: 1;
+  margin: 0;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-card) var(--r-card) var(--r-card) 4px;
+  background: var(--mustard-wash);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
 }
 
 /* ------------------------------------------------------------------ trim */
@@ -611,6 +657,7 @@
   background: linear-gradient(180deg, var(--card), #fdf0e8);
 }
 .ppl-choose__thumb {
+  overflow: hidden;
   display: grid;
   place-items: center;
   flex: none;
@@ -652,12 +699,24 @@
 .ppl-choose__dot.is-on {
   background: var(--ink-2);
 }
+.ppl-choose__go {
+  position: sticky;
+  bottom: calc(var(--tabbar-h) + var(--safe-bottom) + var(--s-3));
+  z-index: 2;
+  border-radius: var(--r-control);
+  box-shadow: 0 8px 24px rgb(60 50 30 / 0.18);
+}
 @media (min-width: 900px) {
   .ppl-choose {
     display: grid;
     grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
     align-items: start;
-    gap: var(--s-6);
+    column-gap: var(--s-6);
+    row-gap: var(--s-4);
+  }
+  .ppl-choose__go {
+    grid-column: 2;
+    bottom: calc(var(--safe-bottom) + var(--s-3));
   }
 }
 

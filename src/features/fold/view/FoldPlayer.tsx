@@ -105,13 +105,11 @@ export function FoldPlayer({
     if (mode === 'manual') setPlaying(true);
   }, [current, mode, drawAt]);
 
-  // New design: start over.
-  const firstDesign = useRef(true);
+  // New design: start over. Compared by identity so StrictMode's repeated mount effect does not rewind.
+  const shownTl = useRef(tl);
   useEffect(() => {
-    if (firstDesign.current) {
-      firstDesign.current = false;
-      return;
-    }
+    if (shownTl.current === tl) return;
+    shownTl.current = tl;
     completed.current = false;
     goTo(0, 0);
   }, [tl, goTo]);

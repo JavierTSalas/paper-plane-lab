@@ -1,5 +1,5 @@
 /** Pure helpers for the fold workbench: drag handles, snapping, mirrored folds, shape lines. */
-import { applyStep, foldPointToPoint, mirrorStep, piecePolygon, tableBounds } from '../../core/fold';
+import { applyStep, foldPointToPoint, frameAt, mirrorStep, piecePolygon, tableBounds, type AnimPiece } from '../../core/fold';
 import type { FlatState, FoldIssue, FoldLine, FoldStep, StepFrame, Vec2 } from '../../core/types';
 
 export interface DragHandle {
@@ -104,6 +104,7 @@ export function withMirrorStep(step: FoldStep, mirror: boolean, centreX: number)
 
 export interface Trial {
   state: FlatState;
+  frames: StepFrame[];
   issues: FoldIssue[];
   /** True when every step applied without an error. */
   ok: boolean;
@@ -113,12 +114,19 @@ export interface Trial {
 export function trySteps(state: FlatState, steps: readonly FoldStep[], firstIndex: number): Trial {
   let s = state;
   const issues: FoldIssue[] = [];
+  const frames: StepFrame[] = [];
   steps.forEach((step, i) => {
     const out = applyStep(s, step, firstIndex + i);
     s = out.state;
+    frames.push(out.frame);
     issues.push(...out.issues);
   });
-  return { state: s, issues, ok: !issues.some((i) => i.severity === 'error') };
+  return { state: s, frames, issues, ok: !issues.some((i) => i.severity === 'error') };
+}
+
+/** The flaps a trial moves, in their landing places: a preview to draw over the unchanged paper. */
+export function movedPieces(trial: Trial, layerGap: number): AnimPiece[] {
+  return trial.frames.flatMap((f) => (f.step.kind === 'fold' ? frameAt(f, 1, layerGap).filter((p) => p.moving) : []));
 }
 
 /** A drag-to-fold step: the perpendicular bisector of from -> to, moving the side `from` is on. */

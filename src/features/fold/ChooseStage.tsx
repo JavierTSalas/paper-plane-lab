@@ -115,10 +115,12 @@ export function ChooseStage({ presetId, paper, onSelect, onPaper, onStart, start
       <section className="ppl-choose__paper" aria-labelledby="ppl-paper-title">
         <SectionHeader id="ppl-paper-title" title="Paper" subtitle={preset ? `${preset.name} folds on any size; ${preset.recommendedSizeId.toUpperCase()} is ideal.` : 'Size and colours of your sheet.'} />
         <PaperPicker value={paper} onChange={(p) => onPaper(paperForPreset(preset, p))} units={units} allowLandscape={!preset} />
+      </section>
+      <div className="ppl-choose__go">
         <Button variant="primary" size="lg" block icon="next" onClick={onStart}>
           {startLabel}
         </Button>
-      </section>
+      </div>
     </div>
   );
 }

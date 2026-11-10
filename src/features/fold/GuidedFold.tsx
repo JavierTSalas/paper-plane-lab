@@ -149,7 +149,9 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
   const onMove = (_p: Vec2, e: PointerEvent<SVGSVGElement>): void => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
-    setProgress(Math.max(0, Math.min(1, progressAlong(d.from, d.to, [e.clientX, e.clientY]))));
+    // Seen from above, the corner of a flap turned by pi * t has travelled (1 - cos(pi t)) / 2 of the way: invert that so it stays under the finger.
+    const p = Math.max(0, Math.min(1, progressAlong(d.from, d.to, [e.clientX, e.clientY])));
+    setProgress(Math.acos(1 - 2 * p) / Math.PI);
   };
   const release = (e: { pointerId: number; clientX: number; clientY: number }, cancelled: boolean): void => {
     const d = drag.current;
@@ -193,7 +195,7 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
         <>
           <div
             className="ppl-guided__stage"
-            style={{ width: `min(100%, calc((100dvh - ${compact ? 360 : 330}px) * ${aspect.toFixed(3)}))` }}
+            style={{ width: `min(100%, calc((100dvh - ${compact ? 460 : 440}px) * ${aspect.toFixed(3)}))` }}
             onPointerCancel={(e) => release(e, true)}
           >
             <PaperCanvas
@@ -201,6 +203,8 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
               frame={frame}
               t={t}
               tilt={22}
+              // Contact shadows while a flap swings crash the renderer in Chromium (reported); show them at rest only.
+              shadows={busy === 'idle'}
               fitTo={fitTo}
               aspect={aspect}
               highlight={frame.axis && atRest ? { line: frame.axis, dir: frame.step.kind === 'fold' && frame.step.dir === 'mountain' ? 'mountain' : 'valley' } : null}
@@ -242,23 +246,27 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
           </div>
           <div className="ppl-guided__panel">
             <div className="ppl-guided__caption" aria-live="polite">
-              <span className="ppl-eyebrow ppl-num">
-                Step {done + 1} of {count}
-              </span>
+              <div className="ppl-guided__countrow">
+                <span className="ppl-eyebrow ppl-num">
+                  Step {done + 1} of {count}
+                </span>
+                <span className="ppl-guided__minor">
+                  <IconButton icon="undo" label="Back one step" size="sm" onClick={() => setDone(done - 1)} disabled={done === 0 || busy !== 'idle'} />
+                  <IconButton icon="menu" label="All steps" size="sm" onClick={() => setListOpen(true)} />
+                  <Button size="sm" variant="ghost" icon={playAll ? 'pause' : 'play'} onClick={() => setPlayAll((p) => !p)}>
+                    {playAll ? 'Stop' : 'Play all'}
+                  </Button>
+                </span>
+              </div>
               <p className="ppl-guided__text">{caption}</p>
               <p className="ppl-guided__hint">{hint}</p>
             </div>
             <div className="ppl-guided__actions">
-              <IconButton icon="undo" label="Back one step" onClick={() => setDone(done - 1)} disabled={done === 0 || busy !== 'idle'} />
-              <IconButton icon="menu" label="All steps" onClick={() => setListOpen(true)} />
               <Button size="md" icon="eye" onClick={showMe} disabled={busy !== 'idle' || playAll}>
                 Show me
               </Button>
               <Button size="md" variant="primary" icon={isFlip ? 'flip' : 'fold'} onClick={() => finishStep(0)} disabled={busy !== 'idle' || playAll}>
                 {isFlip ? 'Turn it over' : 'Fold it for me'}
-              </Button>
-              <Button size="md" variant="ghost" icon={playAll ? 'pause' : 'play'} onClick={() => setPlayAll((p) => !p)}>
-                {playAll ? 'Stop' : 'Play all'}
               </Button>
             </div>
           </div>
@@ -269,10 +277,11 @@ export function GuidedFold({ design, onComplete, compact = false, done: doneProp
             <FoldPlayer key={`${build.geometryKey}`} design={design} mode="auto" defaultStep={count} autoPlay showControls={false} onComplete={() => setShaped(true)} />
           </div>
           <div className="ppl-guided__panel">
-            <div className="ppl-guided__caption" aria-live="polite">
-              <span className="ppl-eyebrow">{shaped ? 'Folded' : 'Shaping'}</span>
-              <p className="ppl-guided__text">{shaped ? `Your ${design.name} is folded.` : 'Now it becomes a plane: fold it in half, then fold the wings down and open them.'}</p>
-            </div>
+            {shaped && (
+              <div className="ppl-guided__caption" aria-live="polite">
+                <p className="ppl-guided__text">Your {design.name || 'plane'} is folded. Next, fine-tune its shape.</p>
+              </div>
+            )}
             <div className="ppl-guided__actions">
               {count > 0 && <IconButton icon="undo" label="Back to the last fold" onClick={() => setDone(count - 1)} />}
               <Button variant="ghost" icon="replay" onClick={restart}>
