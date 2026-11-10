@@ -345,7 +345,11 @@ async function main() {
     await shot(page, 'b1-preset-sheet');
     await tap(sheet(page).getByRole('button', { name: 'Fold this plane' }));
     await page.waitForURL(/#\/fold/, { timeout: 10_000 });
-    // The link from the library starts the guided fold on the recommended sheet (paper can be changed under "Choose").
+    // The link from the library stops at the Choose stage with the plane picked, so paper size and colours come first.
+    const start = page.locator('.ppl-choose__go').getByRole('button');
+    await page.locator('.ppl-choose').waitFor({ timeout: 15_000 });
+    await shot(page, 'b1-choose');
+    await tap(start);
     await button(page, 'Play all').waitFor({ timeout: 15_000 });
     expect((await page.locator('.ppl-fold__title').innerText()).includes('Nakamura'), 'the workbench did not open the Nakamura Lock');
 

@@ -13,6 +13,13 @@ npm run typecheck
 npm run build        # production build in dist/
 ```
 
+End-to-end check in a real browser (local tool, not in CI; needs Playwright):
+
+```sh
+npx vite build && npx vite preview --port 4173 --strictPort &
+node scripts/smoke.cjs http://localhost:4173
+```
+
 Deploy: `npm run build && npx wrangler deploy` (Cloudflare Workers static assets). See `docs/DEPLOY.md`.
 
 ## What is in it

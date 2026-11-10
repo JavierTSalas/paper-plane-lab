@@ -52,7 +52,7 @@ export function PresetSheet({ preset, onClose }: PresetSheetProps): ReactElement
       description={byline ? `Designed by ${byline}` : undefined}
       footer={
         preset && (
-          <Button variant="primary" block icon="fold" onClick={() => navigate(`/fold?preset=${encodeURIComponent(preset.id)}`)}>
+          <Button variant="primary" block icon="fold" onClick={() => navigate(`/fold?preset=${encodeURIComponent(preset.id)}&choose=1`)}>
             Fold this plane
           </Button>
         )

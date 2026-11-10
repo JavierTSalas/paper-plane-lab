@@ -92,7 +92,9 @@ export default function FoldPage(): ReactElement {
       const p = paperFromQuery(q, presetPaper(preset), preset.orientation);
       setPresetId(preset.id);
       setPaper(p);
-      dispatch({ type: 'start', design: makeDesign(preset, p, { id: 'draft' }), mode: 'guided', stage: 'fold' });
+      // ?choose=1 stops at the Choose stage with the plane picked, so the player sets paper size and colours first.
+      if (q.get('choose')) dispatch({ type: 'clear' });
+      else dispatch({ type: 'start', design: makeDesign(preset, p, { id: 'draft' }), mode: 'guided', stage: 'fold' });
       handled = true;
     } else if (q.get('new')) {
       const p = paperFromQuery(q, makePaper(), q.get('orientation') === 'landscape' ? 'landscape' : 'portrait');
