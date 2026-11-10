@@ -33,7 +33,10 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine,
       wingletDeg: 80,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 5, elevatorChordFrac: 0.1 },
+    // Factory trim: dihedral 12 degrees, fins 80 degrees up (doc 06 section 4: 75 to 90). The doc suggests +5
+    // degrees of elevator; in the tunnel that trims at 19 degrees, close to a mush, so the preset uses +1
+    // degree, which sits at the lowest sink rate.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: 1, elevatorChordFrac: 0.1 },
   };
 }
 

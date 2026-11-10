@@ -32,7 +32,9 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: null,
       wingletDeg: 0,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 2, elevatorChordFrac: 0.1 },
+    // Factory trim: dihedral 10 degrees ("Y") and a flat trailing edge, the bottom of the documented 0 to +6
+    // degrees (doc 06 section 3): it then glides near its best glide ratio at about 3.5 m/s.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: 0, elevatorChordFrac: 0.1 },
   };
 }
 

@@ -44,7 +44,9 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: null,
       wingletDeg: 0,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 0, elevatorChordFrac: 0.1 },
+    // Factory trim: dihedral 7 degrees (doc 06 section 2). The doc's default elevator is 0; +1 degree brings
+    // the glide to the nose-high 8 degrees and 3.8 m/s the doc describes (flat, it trims at 4.5 degrees and 5 m/s).
+    trim: { ...DEFAULT_TRIM, elevatorDeg: 1, elevatorChordFrac: 0.1 },
   };
 }
 

@@ -1,6 +1,6 @@
 import type { PaperSpec } from '../../types';
 import { dartFolds, TAN_22_5 } from '../families';
-import { DEFAULT_TRIM, line } from '../helpers';
+import { bySheet, DEFAULT_TRIM, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
 /** Keel depth as a share of the sheet width: 25 mm on A4 (doc 05 section 1.4, the doc 04 variant). */
@@ -24,11 +24,14 @@ function build(paper: PaperSpec): PresetBuild {
       keel: 'valley',
       keelSpreadDeg: 4,
       wingLine,
-      dihedralDeg: 3,
+      dihedralDeg: 5,
       wingletLine: null,
       wingletDeg: 0,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 6, elevatorChordFrac: 0.08 },
+    // Factory trim: up-elevator for a glide near 5 m/s, the speed measured for a dart of this kind (Ng et al.,
+    // doc 02 section 6.1). The shallow keel does not weathercock, so the wings get the top of the documented
+    // dihedral range (0 to 5 degrees) to hold the heading.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: bySheet(paper, 5.5, 10), elevatorChordFrac: 0.08 },
   };
 }
 

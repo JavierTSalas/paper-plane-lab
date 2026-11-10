@@ -1,6 +1,6 @@
 import type { PaperSpec } from '../../types';
 import { lockFolds } from '../families';
-import { DEFAULT_TRIM, line } from '../helpers';
+import { bySheet, DEFAULT_TRIM, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
 /**
@@ -25,7 +25,9 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: null,
       wingletDeg: 0,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 2, elevatorChordFrac: 0.1 },
+    // Factory trim: dihedral 7 degrees and +2 degrees of elevator on a 12 mm strip (doc 06 section 1); glides
+    // near 4.2 m/s, just above the documented 3.1 to 4.0 m/s.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: bySheet(paper, 2, 3), elevatorChordFrac: 0.1 },
   };
 }
 

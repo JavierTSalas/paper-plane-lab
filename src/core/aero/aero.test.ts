@@ -341,21 +341,28 @@ describe('sideslip loading of slender wings (roll due to sideslip without dihedr
   const rollCoefficient = (af: Airframe, alpha: number, beta: number): number =>
     loadsAt(af, windVelocity(5, alpha, beta)).moment[0] / (qS(af, 5) * af.ref.span);
 
-  it('a flat delta gets the slender-wing value Cl = -(pi / 3) sin a sin b times its finite-AR weight', () => {
+  it('a flat delta gets the slender-wing value Cl = -(pi / 3) sin a sin b, whatever its aspect ratio', () => {
     for (const model of [a4AreaDelta(0.5), a4AreaDelta(1), a4AreaDelta(2), flatDeltaModel(0.05, 0.3)]) {
       const af = buildAirframe(model, NEUTRAL_TRIM);
       const s = af.surfaces[0];
-      const weight = slipLoadingWeight(s);
       expect(s.deltaness).toBeCloseTo(1, 6);
-      // The weight is the lift slope over the slender-wing slope pi AR / 2: near 0.8 for these deltas, at most 1.
-      expect(weight).toBeCloseTo(s.kp / (0.5 * Math.PI * s.aspectRatio), 12);
-      expect(weight).toBeGreaterThan(0.7);
-      expect(weight).toBeLessThanOrEqual(1);
+      expect(slipLoadingWeight(s)).toBeCloseTo(1, 6);
       for (const [a, b] of [[5, 5], [10, 5], [5, -5], [8, 3]]) {
-        const theory = -(Math.PI / 3) * Math.sin(a * DEG) * Math.sin(b * DEG) * weight;
+        const theory = -(Math.PI / 3) * Math.sin(a * DEG) * Math.sin(b * DEG);
         expect(rollCoefficient(af, a * DEG, b * DEG) / theory).toBeCloseTo(1, 2);
       }
+      // As a stability derivative: Cl_beta = -(pi / 3) alpha per radian of sideslip.
+      const clBeta = (rollCoefficient(af, 8 * DEG, 1 * DEG) - rollCoefficient(af, 8 * DEG, -1 * DEG)) / (2 * DEG);
+      expect(clBeta / (-(Math.PI / 3) * 8 * DEG)).toBeCloseTo(1, 1);
     }
+  });
+
+  it('the weight follows the sweep: none on a straight leading edge, all of it on a delta', () => {
+    expect(slipLoadingWeight({ deltaness: 0 })).toBe(0);
+    expect(slipLoadingWeight({ deltaness: 0.4 })).toBeCloseTo(0.4, 12);
+    expect(slipLoadingWeight({ deltaness: 1 })).toBe(1);
+    expect(slipLoadingWeight({ deltaness: 1.7 })).toBe(1);
+    expect(slipLoadingWeight({ deltaness: -0.2 })).toBe(0);
   });
 
   it('wind from the right raises the right wing; no slip or no lift, no roll; the lift itself is unchanged', () => {

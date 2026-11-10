@@ -34,6 +34,7 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: null,
       wingletDeg: 0,
     },
+    // Factory trim: +3 degrees for glide and 7 degrees of dihedral (doc 05 section 3.3); glides near 3.4 m/s.
     trim: { ...DEFAULT_TRIM, elevatorDeg: 3, elevatorChordFrac: 0.08 },
   };
 }

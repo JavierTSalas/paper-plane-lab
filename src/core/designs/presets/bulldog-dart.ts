@@ -1,6 +1,6 @@
 import type { PaperSpec } from '../../types';
 import { dartFolds } from '../families';
-import { DEFAULT_TRIM, foldAlong, line } from '../helpers';
+import { bySheet, DEFAULT_TRIM, foldAlong, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
 /** 1 / (2 sqrt 2): the nose fold lies this many sheet-widths below the point (doc 05 section 2.2). */
@@ -32,11 +32,13 @@ function build(paper: PaperSpec): PresetBuild {
       keel: 'valley',
       keelSpreadDeg: 4,
       wingLine,
-      dihedralDeg: 3,
+      dihedralDeg: 5,
       wingletLine: null,
       wingletDeg: 0,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 8, elevatorChordFrac: 0.08 },
+    // Factory trim: the heavy nose needs a clear up-bend (doc 05 section 2.3: +5 to +10 degrees); this one
+    // gives a glide near 5 m/s. Dihedral 5 degrees, the top of the documented 0 to 5.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: bySheet(paper, 5.5, 10), elevatorChordFrac: 0.08 },
   };
 }
 

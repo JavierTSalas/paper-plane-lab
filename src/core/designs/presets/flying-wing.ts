@@ -46,7 +46,11 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: line([W - fin, 0], [W - fin, top]),
       wingletDeg: 90,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 5, elevatorChordFrac: 0.15 },
+    // Factory trim: V dihedral 8 degrees, tip fins 90 degrees (doc 06 section 5). The doc asks for +10 degrees
+    // of reflex on the rear 15 %, reasoning from a fixed aerodynamic centre. With the centre of pressure moving
+    // aft with incidence (doc 01 section 6) the wing already trims flat, at 12 to 13 degrees and 2.1 m/s, and
+    // any up-bend beyond 1 degree puts it into the stall. So: no reflex.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: 0, elevatorChordFrac: 0.15 },
   };
 }
 

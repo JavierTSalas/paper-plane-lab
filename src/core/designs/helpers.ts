@@ -1,5 +1,5 @@
 import { mirrorStep } from '../fold';
-import type { FoldLine, FoldStep, FoldStepCrease, FoldStepFold, TrimSpec, Vec2 } from '../types';
+import type { FoldLine, FoldStep, FoldStepCrease, FoldStepFold, PaperSpec, TrimSpec, Vec2 } from '../types';
 
 /** No bends, no ballast. Presets override what they need. */
 export const DEFAULT_TRIM: TrimSpec = {
@@ -11,6 +11,24 @@ export const DEFAULT_TRIM: TrimSpec = {
 };
 
 export const DEG = Math.PI / 180;
+
+/** Proportions (long side / short side) of the two sheets every preset is tuned on. */
+const A4_RATIO = 297 / 210;
+const LETTER_RATIO = 279.4 / 215.9;
+/** How far past the two tuned sheets the interpolation runs before it is held, in units of their difference. */
+const SHEET_EXTRAPOLATION = 0.4;
+
+/**
+ * A trim angle tuned on two sheets: `a4` on A-series proportions, `letter` on US Letter, linear in H / W
+ * between them and a little beyond. A squarer sheet folds into a shorter plane around the same nose, so its
+ * centre of gravity sits further forward and it needs more up-bend to hold the same glide; a real folder
+ * makes the same correction by feel.
+ */
+export function bySheet(paper: PaperSpec, a4: number, letter: number): number {
+  const ratio = Math.max(paper.width, paper.height) / Math.min(paper.width, paper.height);
+  const t = (A4_RATIO - ratio) / (A4_RATIO - LETTER_RATIO);
+  return a4 + (letter - a4) * Math.max(-SHEET_EXTRAPOLATION, Math.min(1 + SHEET_EXTRAPOLATION, t));
+}
 
 /** Which side of the directed line a->b the point p lies on. */
 export function sideOf(a: Vec2, b: Vec2, p: Vec2): 'left' | 'right' {

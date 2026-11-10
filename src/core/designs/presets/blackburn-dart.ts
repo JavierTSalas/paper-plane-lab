@@ -1,50 +1,50 @@
-import type { PaperSpec, Vec2 } from '../../types';
-import { DART_K, dartFolds } from '../families';
-import { clipLine, DEFAULT_TRIM, DEG, line } from '../helpers';
+import type { PaperSpec } from '../../types';
+import { dartFolds, TAN_22_5 } from '../families';
+import { bySheet, DEFAULT_TRIM, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
-const HINGE_ANGLE = 11.25 * DEG;
-/** Wingtip height at its front corner: half an inch on Letter paper (doc 05 section 4.2, unverified there). */
+/** Body height as a share of the sheet width: 25 mm on A4, the Wide Dart's keel. */
+const BODY_HEIGHT = 25 / 210;
+/** Wingtip height: half an inch on Letter paper (doc 05 section 4.2, unverified there). */
 const TIP_HEIGHT = 12.7 / 215.9;
-/** Least wingtip height left at the trailing edge, as a share of the sheet width (keeps the fold on the bottom edge). */
-const MIN_TAIL_TIP = 0.015;
 
 /**
- * Ken Blackburn's Basic Dart: the Classic Dart with the wingtips folded up and the wings in a slight "Y"
- * (docs/research/05-designs-darts.md section 4). The wingtip line runs parallel to the wing hinge.
+ * Ken Blackburn's Basic Dart: the dart's flat folds, wingtips folded up and the wings in a slight "Y"
+ * (docs/research/05-designs-darts.md section 4).
+ *
+ * The handout's fold-line positions are not known. The doc assumes the Classic Dart's wing fold (leading edge
+ * onto the keel). With that wing, turning the tips up removes the rear outer wing area and the neutral point
+ * moves ahead of the centre of gravity (static margin -4 to -8 % in the tunnel): it cannot glide. This preset
+ * therefore folds the wings parallel to the keel like the Wide Dart, which keeps a margin of 10 to 17 %.
  */
 function build(paper: PaperSpec): PresetBuild {
   const W = paper.width;
   const H = paper.height;
   const cx = W / 2;
-  const { steps, nose, shoulder, rightOutline } = dartFolds(paper);
-  const sin = Math.sin(HINGE_ANGLE);
-  const cos = Math.cos(HINGE_ANGLE);
-  const wingEnd: Vec2 = [cx + H * Math.tan(HINGE_ANGLE), 0];
-
-  // Distance of the shoulder from the hinge, measured square to the hinge: the widest point of the wing.
-  const reach = (shoulder[0] - cx) * cos - (H - shoulder[1]) * sin;
-  // On long sheets the side edge runs away from the hinge toward the tail; the tip is made tall enough
-  // to still reach the trailing edge (doc 05 section 4.2 gives the limit (H - kW) sin 11.25 degrees).
-  const sideDrop = Math.max(0, H - DART_K * W) * sin;
-  const tipHeight = Math.min(0.6 * reach, Math.max(TIP_HEIGHT * W, sideDrop + MIN_TAIL_TIP * W));
-  const offset = reach - tipHeight;
-  // A point on the winglet line: `offset` square out from the hinge at the nose, then along the hinge direction.
-  const start: Vec2 = [nose[0] + offset * cos, nose[1] + offset * sin];
-  const along: Vec2 = [start[0] + sin, start[1] - cos];
-  const wingletLine = clipLine(start, along, rightOutline);
+  const { steps, shoulder } = dartFolds(paper);
+  // Keep a wing between body and wingtip even on squarish sheets, whose darts are narrow at the tail.
+  const reach = shoulder[0] - cx;
+  const body = Math.min(BODY_HEIGHT * W, 0.3 * reach);
+  const tip = Math.min(TIP_HEIGHT * W, 0.25 * reach);
+  const wingX = cx + body;
+  const tipX = cx + reach - tip;
+  // Both lines start where they meet the leading edge.
+  const wingLine = line([wingX, 0], [wingX, H - body / TAN_22_5]);
+  const wingletLine = line([tipX, 0], [tipX, H - (reach - tip) / TAN_22_5]);
 
   return {
     steps,
     shape: {
       keel: 'valley',
       keelSpreadDeg: 4,
-      wingLine: line(nose, wingEnd),
+      wingLine,
       dihedralDeg: 7,
       wingletLine,
       wingletDeg: 90,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 6, elevatorChordFrac: 0.08 },
+    // Factory trim: "bend the elevators up slightly", wings in a slight "Y" (7 degrees; doc: 5 to 10), wingtips
+    // vertical. Glides near 4.7 m/s.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: bySheet(paper, 2.5, 5), elevatorChordFrac: 0.08 },
   };
 }
 
@@ -53,10 +53,10 @@ export const blackburnDart: PlanePreset = {
   name: 'Blackburn Dart',
   category: 'dart',
   designer: 'Ken Blackburn',
-  blurb: 'The classic dart, tuned by a record holder: wingtips up, wings in a shallow Y.',
+  blurb: 'A dart tuned by a record holder: wingtips up, wings in a shallow Y.',
   story:
     'Ken Blackburn, an aerospace engineer who held the world record for time aloft four times, teaches this dart in ' +
-    'The World Record Paper Airplane Book. It is the Classic Dart with two refinements: the wingtips are folded up into small fins, ' +
+    'The World Record Paper Airplane Book. It is the familiar dart with two refinements: the wingtips are folded up into small fins, ' +
     'and the wings are raised into a slight Y. Both help it hold its heading, so more of the throw turns into distance.',
   difficulty: 2,
   orientation: 'portrait',

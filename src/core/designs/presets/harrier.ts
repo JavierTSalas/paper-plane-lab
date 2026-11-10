@@ -1,6 +1,6 @@
 import type { PaperSpec } from '../../types';
 import { lockFolds, TAN_22_5 } from '../families';
-import { DEFAULT_TRIM, line } from '../helpers';
+import { bySheet, DEFAULT_TRIM, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
 /** Gap left under the folded-down point: half an inch on Letter paper (doc 05 section 3.1). */
@@ -25,7 +25,8 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: null,
       wingletDeg: 0,
     },
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 4, elevatorChordFrac: 0.08 },
+    // Factory trim: +3 to +5 degrees for glide and 5 degrees of dihedral (doc 05 section 3.3); glides near 5 m/s.
+    trim: { ...DEFAULT_TRIM, elevatorDeg: bySheet(paper, 3, 6), elevatorChordFrac: 0.08 },
   };
 }
 

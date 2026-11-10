@@ -1,6 +1,6 @@
 import type { PaperSpec, Vec2 } from '../../types';
 import { dartFolds } from '../families';
-import { DEFAULT_TRIM, DEG, line } from '../helpers';
+import { bySheet, DEFAULT_TRIM, DEG, line } from '../helpers';
 import type { PlanePreset, PresetBuild } from '../types';
 
 /**
@@ -26,8 +26,9 @@ function build(paper: PaperSpec): PresetBuild {
       wingletLine: null,
       wingletDeg: 0,
     },
-    // A flat wing with a forward centre of gravity needs a little up-elevator to glide (doc 05 section 1.3).
-    trim: { ...DEFAULT_TRIM, elevatorDeg: 6, elevatorChordFrac: 0.08 },
+    // Factory trim. A flat wing with a forward centre of gravity needs a little up-elevator to glide (doc 05
+    // section 1.3): about 1 mm of up-bend, which trims it near 5.5 m/s. Dihedral 3 degrees (doc: 0 to 5).
+    trim: { ...DEFAULT_TRIM, elevatorDeg: bySheet(paper, 3, 5.5), elevatorChordFrac: 0.08 },
   };
 }
 

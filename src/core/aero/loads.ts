@@ -81,18 +81,17 @@ interface Compiled {
  * Plain strip theory has none of this (doc 01 "Open questions": sideslip roll), so a flat-winged dart had no
  * dihedral effect at all and could not hold its heading. The term is applied
  *  - to wing strips only, as an extra normal force at the strip's centre of pressure, faded out by the stall;
- *  - weighted by the surface's `deltaness` (it is established for swept, delta-like planforms; the weaker
- *    tip-vortex effect of unswept low-AR plates stays unmodelled) and by Kp / (pi AR / 2), the ratio of the
- *    surface's lift slope to the slender-wing slope, i.e. the finite-AR correction the lift itself gets;
+ *  - weighted by the surface's `deltaness`: it is established for swept, delta-like planforms, and the weaker
+ *    tip-vortex effect of unswept low-AR plates stays unmodelled. No finite-aspect-ratio reduction is applied:
+ *    paper darts have AR 0.6 to 1.2, where the slender-wing value is at most a quarter to a third high, and
+ *    the stabilising load the keel's pressure field puts on the wing above it in a slip is left out altogether;
  *  - never larger than the strip's own attached normal force: a slip can at most move the load to one side.
  */
 const SLIP_LOADING = 2 * Math.PI;
 
-/** Slender-wing weight of the sideslip loading for one surface, 0 to 1. */
-export function slipLoadingWeight(surface: Pick<LiftingSurface, 'deltaness' | 'kp' | 'aspectRatio'>): number {
-  const slenderSlope = 0.5 * Math.PI * surface.aspectRatio;
-  if (!(slenderSlope > 0)) return 0;
-  return Math.max(0, Math.min(1, surface.deltaness)) * Math.min(1, surface.kp / slenderSlope);
+/** Weight of the sideslip loading for one surface, 0 to 1: its deltaness. */
+export function slipLoadingWeight(surface: Pick<LiftingSurface, 'deltaness'>): number {
+  return Math.max(0, Math.min(1, surface.deltaness));
 }
 
 /** Largest incidence shift a bend may produce, radians: keeps the shifted angle inside the model's range. */
