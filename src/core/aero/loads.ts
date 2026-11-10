@@ -252,6 +252,7 @@ export interface ElementLoad {
  *  - CN: potential + vortex term, smoothstep blend into the bluff-plate curve; the centre of pressure is
  *    blended with the loads (force-weighted), which equals the document's x_cp outside the stall band;
  *  - friction on the in-plane velocity; normal force at the centre of pressure, friction at mid-chord;
+ *  - sideslip loading of swept wings (not in the document's pseudocode, see SLIP_LOADING);
  *  - pitch-rate couple (not in the document's pseudocode, see below).
  *
  * The pseudocode switches on the sign of the chordwise velocity vx in two places: which 3/4-chord point is

@@ -9,9 +9,9 @@ const STRIP = 1 / 8;
 const FIN = 1 / 20;
 
 const ROLL_LABELS = [
-  'Fold the top edge back behind the sheet by a thumb-width.',
-  'Fold the thick edge back behind the sheet again, the same width.',
-  'Roll it back a third time.',
+  'Fold the top edge back behind the sheet, one eighth of the way down.',
+  'Fold the thick edge back behind the sheet again, by the same width.',
+  'Roll the thick edge back a third time.',
   'Roll it back once more. The thick strip is the front of the wing.',
 ];
 
@@ -50,7 +50,7 @@ function build(paper: PaperSpec): PresetBuild {
     // of reflex on the rear 15 %, reasoning from a fixed aerodynamic centre. In the tunnel the centre of pressure
     // moves aft with incidence (doc 01 section 6), which already balances this wing: flat, it trims at 12 to 13
     // degrees, on the edge of its stall, and any up-bend stalls it. One degree of DOWN-bend sets it at 10
-    // degrees and 2.3 m/s with room to spare. The disagreement with the doc is reported, not hidden.
+    // degrees and 2.3 m/s with room to spare.
     trim: { ...DEFAULT_TRIM, elevatorDeg: -1, elevatorChordFrac: 0.15 },
   };
 }

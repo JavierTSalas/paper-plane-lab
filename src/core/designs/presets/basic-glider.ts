@@ -4,7 +4,10 @@ import type { PlanePreset, PresetBuild } from '../types';
 
 /** Extra nose folds after the square nose, each one strip wide (doc 06 section 2: n = 2, strip W / 8). */
 const NOSE_ROLLS = 2;
-const ROLL_LABELS = ['Fold the top edge down by a thumb-width to thicken the nose.', 'Fold the top edge down by the same amount once more.'];
+const ROLL_LABELS = [
+  'Fold the top edge down by an eighth of the sheet width, about a thumb, to thicken the nose.',
+  'Fold the top edge down by the same amount once more.',
+];
 
 /**
  * Square-nose basic glider: docs/research/06-designs-gliders-records.md section 2. Corners to the centre,

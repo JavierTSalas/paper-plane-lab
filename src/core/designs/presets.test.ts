@@ -7,8 +7,10 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { getEnvironment } from '../env';
 import { isSymmetric, piecePolygon, SHAPE_STEP, snapPoints } from '../fold';
+import { DEG, quatRotate } from '../math';
 import { makePaper, sheetMass } from '../paper';
 import { simulateFlight } from '../sim';
+import { releasedAt, stillAir } from '../sim/simFixtures';
 import { analyzeTrim } from '../tunnel';
 import type { DiagnosisCode, FlatState, PlaneCategory, TrimAnalysis, Vec2 } from '../types';
 import { airOf, buildPreset, throwAt } from './calibrate';
@@ -403,5 +405,31 @@ describe('preset library: snapshot of the key numbers', () => {
       expect((trim.glideRatio ?? NaN) / glideRatio).toBeGreaterThan(0.97);
       expect((trim.glideRatio ?? NaN) / glideRatio).toBeLessThan(1.03);
     });
+  }
+});
+
+describe('preset library: holding a heading', () => {
+  // Released in still air from 12 m at trim speed, 5 degrees banked: a long glide shows what a 2 s throw hides.
+  const tower = releasedAt(stillAir(getEnvironment('hangar')), 12);
+
+  for (const p of PRESETS) {
+    for (const sizeId of TUNED_SIZES) {
+      it(`${p.id} on ${sizeId}: levels its wings and keeps its line after a banked release`, () => {
+        const { built, trim } = plane(p, sizeId);
+        const gamma = Math.atan(1 / (trim.glideRatio ?? 1)) / DEG;
+        const launch = { speed: trim.speed ?? 4, pitchDeg: -gamma, yawDeg: 0, rollDeg: 5, aoaDeg: trim.alphaDeg ?? 0 };
+        const r = simulateFlight(built.airframe, launch, tower, { envId: 'hangar' }, 1, { maxTime: 6 });
+        expect(r.diagnosis.map((d) => d.code)).toEqual(['clean-glide']);
+        expect(r.metrics.airtime).toBeGreaterThan(5.9);
+        // Wing tilt and heading over the last second. The shallow-keeled darts and the Nakamura Lock keep a
+        // slow wobble of 10 to 17 degrees on Letter paper (their keels do not weathercock); it must not grow.
+        for (const s of r.samples.filter((q) => q.t >= 5)) {
+          const bank = Math.asin(Math.max(-1, Math.min(1, -quatRotate(s.quat, [0, 0, 1])[1]))) / DEG;
+          const heading = Math.atan2(s.vel[2], s.vel[0]) / DEG;
+          expect(Math.abs(bank)).toBeLessThan(sizeId === 'a4' ? 10 : 20);
+          expect(Math.abs(heading)).toBeLessThan(25);
+        }
+      });
+    }
   }
 });
