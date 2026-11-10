@@ -70,7 +70,7 @@ export default function TunnelPage(): ReactElement {
 
   return (
     <div className="ppl-page ppl-tunnel">
-      <SectionHeader as="h1" eyebrow="Wind tunnel" title={design.name} subtitle="Hold the plane still in moving air and read the forces on it." />
+      <SectionHeader as="h2" eyebrow="In the tunnel" title={design.name} subtitle="Hold the plane still in moving air and read the forces on it." />
 
       <div className="ppl-tunnel__grid">
         <div className="ppl-tunnel__main">
