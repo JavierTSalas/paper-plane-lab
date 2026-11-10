@@ -1,0 +1,263 @@
+.ppl-ranks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-4);
+}
+
+.ppl-ranks__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.ppl-ranks__controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--s-3);
+}
+
+@media (min-width: 760px) {
+  .ppl-ranks__controls {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    align-items: end;
+  }
+}
+
+.ppl-ranks__arena {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s-2);
+}
+
+.ppl-ranks__arena > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.ppl-ranks__arena > :last-child {
+  margin-bottom: 10px;
+}
+
+.ppl-ranks__banner {
+  display: flex;
+  gap: var(--s-2);
+  align-items: flex-start;
+  padding: var(--s-3);
+  border-radius: var(--r-control);
+  background: var(--sky-wash);
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+}
+
+.ppl-ranks__banner svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--focus);
+}
+
+.ppl-ranks__listhead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s-2) var(--s-3);
+}
+
+.ppl-ranks__loading {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.ppl-ranks__foot {
+  text-align: center;
+  max-width: 52ch;
+  margin-inline: auto;
+}
+
+.ppl-rlist {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: 0;
+  margin: 0;
+}
+
+.ppl-rgroup {
+  background: var(--card);
+  border: var(--outline);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.ppl-rrow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: 64px;
+  padding: var(--s-2) var(--s-3);
+  text-align: left;
+  transition: background-color var(--dur-1) var(--ease);
+}
+
+@media (hover: hover) {
+  .ppl-rrow:hover {
+    background: var(--paper);
+  }
+}
+
+.ppl-rrow:active {
+  background: var(--paper-2);
+}
+
+.ppl-rrow.is-mine {
+  background: var(--accent-wash);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.ppl-rrow.is-sub {
+  min-height: 56px;
+  border-top: 1px solid var(--line);
+}
+
+.ppl-rrow__rank {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.ppl-rrow__rank.is-top1 {
+  background: var(--mustard);
+  color: var(--ink);
+}
+
+.ppl-rrow__rank.is-top2 {
+  background: var(--line);
+  color: var(--ink);
+}
+
+.ppl-rrow__rank.is-top3 {
+  background: #e2b48f;
+  color: var(--ink);
+}
+
+.ppl-rrow__thumb {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--paper-2);
+}
+
+.ppl-rrow__thumb .ppl-thumb {
+  max-width: 92%;
+  max-height: 92%;
+  width: auto;
+  height: auto;
+}
+
+.ppl-rrow__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ppl-rrow__plane {
+  font-weight: 700;
+  font-size: var(--fs-sm);
+  line-height: var(--lh-tight);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ppl-rrow__who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 8px;
+  min-width: 0;
+}
+
+.ppl-rrow__you {
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+.ppl-rrow__score {
+  flex: none;
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+
+.ppl-rgroup__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: var(--tap);
+  padding: 0 var(--s-3) 0 calc(var(--s-3) + 30px + var(--s-3));
+  border-top: 1px dashed var(--line);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  color: var(--ink-2);
+  text-align: left;
+}
+
+.ppl-rgroup__toggle > span {
+  flex: 1;
+}
+
+.ppl-rgroup__chev {
+  transition: transform var(--dur-2) var(--ease);
+}
+
+.ppl-rgroup.is-open .ppl-rgroup__chev {
+  transform: rotate(180deg);
+}
+
+.ppl-rgroup__more {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+}
+
+.ppl-rentry__view {
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--paper-2);
+  touch-action: none;
+}
+
+.ppl-rentry__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-2);
+}
+
+@media (min-width: 900px) {
+  .ppl-rlist {
+    gap: var(--s-3);
+  }
+
+  .ppl-rrow {
+    min-height: 76px;
+  }
+
+  .ppl-rrow__thumb {
+    width: 72px;
+    height: 58px;
+  }
+}
