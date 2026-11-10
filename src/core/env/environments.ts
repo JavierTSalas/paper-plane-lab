@@ -74,8 +74,9 @@ export const ENVIRONMENTS: readonly Environment[] = [
     name: 'Record Hangar',
     blurb: 'A vast, still hall where the doors stay closed and records are set.',
     indoor: true,
-    // Long enough for the 98.43 m distance record and high enough for a record time-aloft climb
-    // (peak 11 - 22 m, doc 02 sections 5 and 6.2).
+    // Long enough for the 88.31 m distance record of 2022 (and for the 98.43 m mark reported since, which the
+    // research notes could not verify) and high enough for a record time-aloft climb (peak 11 - 22 m, doc 02
+    // sections 5 and 6.2).
     bounds: room(120, 60, 25),
     terrain: { kind: 'flat' },
     tempC: 18,

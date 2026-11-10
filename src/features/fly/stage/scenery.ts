@@ -313,10 +313,11 @@ function hangar(env: Environment, mat: THREE.Material): Scenery {
   parts.push(box(1, 1, 1, '#b9935f', b.xMin + 1.2, 1.7, b.zMin + 3.1, 0.3));
   parts.push(box(1.2, 1.2, 1.2, '#c9a877', b.xMin + 2.6, 0.6, b.zMin + 3.4, 0.2));
   parts.push(box(3, 0.9, 1, '#8a6440', 6, 0.45, b.zMax - 2));
-  // Record banner high on the far wall.
+  // Record banner high on the far wall: 88.31 m, the 2022 Guinness distance record, the newest mark the
+  // research notes could verify (docs/research/04 section 6). Later claims are only "reported".
   parts.push(box(0.2, 2.4, 22, PALETTE.accent, b.xMax - 0.5, 19.5, 0));
-  parts.push(numeral('98', 1.6, PALETTE.card, (u, v) => [b.xMax - 0.62, 19.5 + v, u - 7]));
-  parts.push(numeral('43', 1.6, PALETTE.card, (u, v) => [b.xMax - 0.62, 19.5 + v, u - 3]));
+  parts.push(numeral('88', 1.6, PALETTE.card, (u, v) => [b.xMax - 0.62, 19.5 + v, u - 7]));
+  parts.push(numeral('31', 1.6, PALETTE.card, (u, v) => [b.xMax - 0.62, 19.5 + v, u - 3]));
   parts.push(box(0.1, 0.25, 0.25, PALETTE.card, b.xMax - 0.62, 18.8, -5));
   group.add(mesh(merge(parts), mat));
   return staticScenery(group, '#ded6c4', 70, 220);
