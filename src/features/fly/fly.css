@@ -410,6 +410,127 @@
   color: var(--ink-2);
 }
 
+.ppl-fly-result__norank {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  font-size: var(--fs-xs);
+  color: var(--ink-2);
+}
+
+.ppl-fly-result__norank > svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+/* ------------------------------------------------------------ enter the ranking */
+
+.ppl-fly-rank__boards {
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.ppl-fly-rank__legend {
+  padding: 0;
+  margin-bottom: var(--s-1);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.ppl-fly-rank__list {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.ppl-fly-rank__row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-height: var(--tap);
+  padding: var(--s-2) var(--s-3);
+  border: var(--outline);
+  border-radius: var(--r-control);
+  background: var(--card);
+}
+
+.ppl-fly-rank__row--pick {
+  cursor: pointer;
+}
+
+.ppl-fly-rank__row--pick:has(:checked) {
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+
+.ppl-fly-rank__check {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.ppl-fly-rank__text {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px var(--s-2);
+  min-width: 0;
+}
+
+.ppl-fly-rank__board {
+  font-weight: 600;
+}
+
+.ppl-fly-rank__reasons {
+  flex-basis: 100%;
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.ppl-fly-rank__score {
+  flex: none;
+  font-weight: 700;
+  font-size: var(--fs-md);
+}
+
+.ppl-fly-rank__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--s-2);
+  font-size: var(--fs-sm);
+  color: var(--ink-2);
+}
+
+.ppl-fly-rank__note > svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.ppl-fly-rank__name {
+  display: grid;
+}
+
+.ppl-fly-rank__input {
+  min-height: var(--tap);
+  padding: 0 var(--s-3);
+  border: var(--outline);
+  border-radius: var(--r-control);
+  background: var(--card);
+  color: var(--ink);
+  font: 500 var(--fs-md) / 1 var(--font-ui);
+}
+
+.ppl-fly-rank__input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
 @keyframes ppl-fly-rise {
   from {
     transform: translateY(24px);

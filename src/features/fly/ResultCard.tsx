@@ -1,24 +1,29 @@
 import { useMemo, type ReactElement, type Ref } from 'react';
-import type { Arena, Diagnosis } from '../../core/types';
+import type { Diagnosis } from '../../core/types';
 import { Button } from '../../ui/Button';
 import { Tag } from '../../ui/Chip';
 import { cx } from '../../ui/cx';
 import { LineChart, type ChartPoint } from '../../ui/charts';
 import { convertLength, fixed, formatRatio, lengthParts, speedParts, timeParts, type UnitSystem } from '../../ui/format';
+import { Icon } from '../../ui/icons';
 import { ProfessorSays } from '../../ui/Professor';
 import { Stat, StatGrid } from '../../ui/Stat';
+import { arenaNames, refusalSummary, type RankingCheck } from './ranking';
 import type { ThrowRecord } from './types';
 
 export interface ResultCardProps {
   record: ThrowRecord;
   units: UnitSystem;
   personalBest: boolean;
-  arenas: readonly Arena[];
+  /** Which boards the throw may enter, from `checkRanking`. */
+  ranking: RankingCheck;
+  /** The throw is already on a board. */
+  ranked?: boolean;
   onAgain: () => void;
   onReplay: () => void;
   onTrim: () => void;
   onDetails: () => void;
-  onRank: (arena: Arena) => void;
+  onRank: () => void;
   /** Room to spare (desktop): also show the flight path and a few more numbers. */
   wide?: boolean;
   className?: string;
@@ -33,7 +38,7 @@ export function professorPose(d: Diagnosis | undefined): 'cheer' | 'think' | 'po
   return d.fix ? 'point' : 'think';
 }
 
-export function ResultCard({ record, units, personalBest, arenas, onAgain, onReplay, onTrim, onDetails, onRank, wide = false, className, ref }: ResultCardProps): ReactElement {
+export function ResultCard({ record, units, personalBest, ranking, ranked = false, onAgain, onReplay, onTrim, onDetails, onRank, wide = false, className, ref }: ResultCardProps): ReactElement {
   const m = record.result.metrics;
   const dist = lengthParts(m.distance, units, { digits: 1 });
   const air = timeParts(m.airtime);
@@ -50,6 +55,7 @@ export function ResultCard({ record, units, personalBest, arenas, onAgain, onRep
   }, [record, lu]);
   const maxH = lengthParts(m.maxHeight, units, { digits: 1 });
   const vmax = speedParts(m.maxSpeed, units);
+  const noRank = refusalSummary(ranking);
   return (
     <section ref={ref} className={cx('ppl-fly-result', className)} aria-label="Flight result">
       <div className="ppl-fly-result__stats">
@@ -106,13 +112,24 @@ export function ResultCard({ record, units, personalBest, arenas, onAgain, onRep
           />
         </>
       )}
-      {arenas.length > 0 && (
+      {ranking.boards.length > 0 ? (
         <div className="ppl-fly-result__rank">
-          <Button variant="ghost" icon="ranks" onClick={() => onRank(arenas[0])}>
-            Enter ranking
+          <Button variant="ghost" icon={ranked ? 'check' : 'ranks'} onClick={onRank}>
+            {ranked ? 'Entered' : 'Enter ranking'}
           </Button>
-          <span className="ppl-fly-result__rank-note">Fair conditions for {arenas.map((a) => a.name).join(' and ')}.</span>
+          <span className="ppl-fly-result__rank-note">
+            {ranked ? 'This throw is on the board.' : `Fair conditions for the ${arenaNames(ranking.boards).join(' and the ')}.`}
+          </span>
         </div>
+      ) : (
+        noRank && (
+          <p className="ppl-fly-result__norank">
+            <Icon name="info" size={16} />
+            <span>
+              <strong>Not a ranked throw.</strong> {noRank}
+            </span>
+          </p>
+        )
       )}
     </section>
   );

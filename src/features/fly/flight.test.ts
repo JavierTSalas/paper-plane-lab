@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { getEnvironment } from '../../core/env';
-import type { Arena, FlightResult, FlightSample, Vec3 } from '../../core/types';
+import { defaultDesign } from '../../core/designs';
+import type { Arena, FlightMetrics, FlightResult, FlightSample, FlightTicket, Vec3 } from '../../core/types';
 import { armStrength, beaufort, clampLaunch, conditionsFor, nextSeed, pushGhost, STILL_AIR_SEED, swipeToThrow, trailOf, windDirectionLabel } from './flight';
-import { matchingArenas } from './ranking';
+import { arenaNames, checkRanking, plainReason, refusalSummary, ticketOf } from './ranking';
 import { createLiveSample, PlaybackClock, sampleInto } from './stage/playback';
 
 function fakeFlight(n: number, hz = 120): FlightResult {
@@ -118,13 +119,53 @@ describe('trails and playback', () => {
   });
 });
 
-describe('ranking adapter', () => {
-  const arena: Arena = { id: 'a', name: 'A', envId: 'hangar', conditions: { envId: 'hangar' }, maxThrowSpeed: 10, blurb: '' };
+describe('ranking', () => {
+  const classic: Arena = { id: 'c', name: 'Classic', envId: 'hangar', conditions: { envId: 'hangar' }, maxThrowSpeed: 10, blurb: '' };
+  const open: Arena = { id: 'o', name: 'Open', envId: 'hangar', conditions: { envId: 'hangar' }, maxThrowSpeed: 27, blurb: '' };
   const launch = { speed: 9, pitchDeg: 5, yawDeg: 0, rollDeg: 0, aoaDeg: 0 };
-  it('matches place, wind settings and the speed cap', () => {
-    expect(matchingArenas({ envId: 'hangar' }, launch, [arena])).toHaveLength(1);
-    expect(matchingArenas({ envId: 'gym' }, launch, [arena])).toHaveLength(0);
-    expect(matchingArenas({ envId: 'hangar' }, { ...launch, speed: 12 }, [arena])).toHaveLength(0);
-    expect(matchingArenas({ envId: 'hangar', windSpeed: 1 }, launch, [arena])).toHaveLength(0);
+  const design = defaultDesign();
+  const metrics = { distance: 12.3456, airtime: 2.3456 } as FlightMetrics;
+  const ticket = (over: Partial<FlightTicket> = {}): FlightTicket => ({ design, launch, conditions: { envId: 'hangar' }, seed: 1, ...over });
+
+  it('builds the ticket of a throw', () => {
+    expect(ticketOf({ build: { design }, launch, conditions: { envId: 'hangar' }, seed: 7 })).toEqual({ design, launch, conditions: { envId: 'hangar' }, seed: 7 });
+  });
+
+  it('offers both categories of every arena whose rules the throw meets, with scores', () => {
+    const check = checkRanking(ticket(), metrics, 'metric', [open, classic]);
+    expect(check.inArenaPlace).toBe(true);
+    expect(check.refused).toEqual([]);
+    expect(check.boards.map((b) => `${b.arena.id}|${b.category}|${b.score}`)).toEqual(['o|distance|12.346', 'o|airtime|2.346', 'c|distance|12.346', 'c|airtime|2.346']);
+    expect(arenaNames(check.boards)).toEqual(['Open', 'Classic']);
+    expect(refusalSummary(check)).toBeNull();
+  });
+
+  it('is silent away from the arenas', () => {
+    const check = checkRanking(ticket({ conditions: { envId: 'gym' } }), metrics, 'metric', [open, classic]);
+    expect(check).toEqual({ inArenaPlace: false, boards: [], refused: [] });
+    expect(refusalSummary(check)).toBeNull();
+  });
+
+  it('says why an arena refuses a throw: speed above the cap', () => {
+    const fast = checkRanking(ticket({ launch: { ...launch, speed: 12 } }), metrics, 'metric', [open, classic]);
+    expect(fast.boards.map((b) => b.arena.id)).toEqual(['o', 'o']);
+    expect(fast.refused).toHaveLength(1);
+    expect(fast.refused[0]!.reasons[0]).toMatch(/faster than the Classic allows/);
+    const tooFast = checkRanking(ticket({ launch: { ...launch, speed: 29 } }), metrics, 'metric', [open, classic]);
+    expect(tooFast.boards).toEqual([]);
+    expect(refusalSummary(tooFast)).toMatch(/faster than the Open allows/);
+  });
+
+  it('says why an arena refuses a throw: a paper clip, wind settings', () => {
+    const clipped = checkRanking(ticket({ design: { ...design, trim: { ...design.trim, clip: { mass: 0.0005, x: 0.2 } } } }), metrics, 'metric', [open, classic]);
+    expect(clipped.boards).toEqual([]);
+    expect(refusalSummary(clipped)).toMatch(/paper clip/);
+    const windy = checkRanking(ticket({ conditions: { envId: 'hangar', windSpeed: 1 } }), metrics, 'metric', [open]);
+    expect(refusalSummary(windy)).toMatch(/wind settings/);
+  });
+
+  it('puts leaderboard reasons into plain words and passes unknown ones through', () => {
+    expect(plainReason('claimed score 3 does not match the re-simulated 4', ticket(), open)).toMatch(/re-flew/);
+    expect(plainReason('something new', ticket(), open)).toBe('Something new.');
   });
 });

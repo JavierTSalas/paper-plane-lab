@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactElement } from 'react';
-import { useLocation } from 'wouter';
-import { ARENAS, formatScore, groupByDesign, type DesignGroup } from '../../core/leaderboard';
+import { useLocation, useSearch } from 'wouter';
+import { ARENAS, formatScore, getArena, groupByDesign, isRankCategory, type DesignGroup } from '../../core/leaderboard';
 import { getPaperSize } from '../../core/paper';
 import type { RankCategory, RankEntry } from '../../core/types';
 import { useLab } from '../../app/store';
@@ -21,6 +21,9 @@ import '../hangar/hangar.css';
 import './ranks.css';
 
 type View = 'design' | 'all';
+
+/** Groups up to this size open by themselves when they hold the player's own flight. */
+const AUTO_OPEN_MAX = 8;
 
 interface BoardState {
   key: string;
@@ -72,9 +75,10 @@ function EntryRow({ rank, entry, category, units, mine, onOpen, sub = false }: R
 }
 
 function GroupRow({ group, rank, category, units, me, onOpen }: { group: DesignGroup; rank: number; category: RankCategory; units: UnitSystem; me: string; onOpen: (e: RankEntry) => void }): ReactElement {
-  const [open, setOpen] = useState(false);
   const more = group.entries.length - 1;
   const mine = group.entries.some((e) => isMine(e, me));
+  // The player's own flight is never hidden behind a better one of the same design (unless the group is long).
+  const [open, setOpen] = useState(() => mine && !isMine(group.best, me) && group.entries.length <= AUTO_OPEN_MAX);
   return (
     <li className={cx('ppl-rgroup', open && 'is-open')}>
       <EntryRow rank={rank} entry={group.best} category={category} units={units} mine={isMine(group.best, me)} onOpen={() => onOpen(group.best)} />
@@ -106,8 +110,14 @@ export default function RanksPage(): ReactElement {
   const units = useLab((s) => s.settings.units);
   const me = useLab((s) => s.profile.name);
   const [, navigate] = useLocation();
-  const [arenaId, setArenaId] = useState(ARENAS[0]!.id);
-  const [category, setCategory] = useState<RankCategory>('distance');
+  const search = useSearch();
+  // Deep link to one board: /ranks?arena=<id>&rank=<category> (from "View rankings" after a submission).
+  const query = useMemo(() => new URLSearchParams(search), [search]);
+  const [arenaId, setArenaId] = useState(() => getArena(query.get('arena') ?? '')?.id ?? ARENAS[0]!.id);
+  const [category, setCategory] = useState<RankCategory>(() => {
+    const c = query.get('rank');
+    return isRankCategory(c) ? c : 'distance';
+  });
   const [view, setView] = useState<View>('design');
   const [board, setBoard] = useState<BoardState>({ key: '', entries: null, error: null });
   const [selected, setSelected] = useState<RankEntry | null>(null);

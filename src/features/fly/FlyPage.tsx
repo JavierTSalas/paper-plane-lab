@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactElement } from 'react';
+import { useLocation } from 'wouter';
 import { usePlaneBuild, useCurrentDesign } from '../../app/hooks';
 import { useLab } from '../../app/store';
 import type { FlightSummary } from '../../app/types';
 import { getPreset } from '../../core/designs';
 import { DEFAULT_ENVIRONMENT_ID, ENVIRONMENTS, getEnvironment, groundHeight } from '../../core/env';
 import { defaultLaunch, simulateFlight, THROW_LIMITS } from '../../core/sim';
-import type { Arena, Launch, PlaneDesign, TrimSpec, Vec3 } from '../../core/types';
+import type { Launch, PlaneDesign, RankCategory, TrimSpec, Vec3 } from '../../core/types';
 import { Button, IconButton } from '../../ui/Button';
 import { Chip } from '../../ui/Chip';
 import { cx } from '../../ui/cx';
@@ -23,7 +24,8 @@ import { DetailsSheet } from './DetailsSheet';
 import { defaultWind, EnvironmentSheet, placeSummary, type WindSetting } from './EnvironmentSheet';
 import { clampLaunch, conditionsFor, nextSeed, pushGhost, swipeToThrow, trailOf } from './flight';
 import { PlaneSheet } from './PlaneSheet';
-import { matchingArenas } from './ranking';
+import { checkRanking, ticketOf } from './ranking';
+import { RankSheet } from './RankSheet';
 import { ResultCard } from './ResultCard';
 import { FlightStage, type FlightStageHandle } from './stage/FlightStage';
 import type { CameraMode } from './stage/cameraRig';
@@ -34,7 +36,7 @@ import { useOverlayInsets } from './useOverlayInsets';
 import './fly.css';
 
 type Phase = 'ready' | 'flying' | 'landed';
-type SheetId = 'env' | 'plane' | 'trim' | 'details' | null;
+type SheetId = 'env' | 'plane' | 'trim' | 'details' | 'rank' | null;
 
 const CAMERA_LABEL: Record<CameraMode, string> = { chase: 'Chase', side: 'Side', thrower: 'From the thrower', orbit: 'Free orbit' };
 const CAMERA_HINT: Record<CameraMode, string> = {
@@ -106,6 +108,8 @@ export default function FlyPage(): ReactElement {
   const [sheet, setSheet] = useState<SheetId>(null);
   const [aim, setAim] = useState<Launch | null>(null);
   const [time, setTime] = useState(0);
+  const [rankedId, setRankedId] = useState<string | null>(null);
+  const [, navigate] = useLocation();
   const stage = useRef<FlightStageHandle>(null);
   const pageRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLElement>(null);
@@ -250,9 +254,9 @@ export default function FlyPage(): ReactElement {
     else savePlane({ ...design, trim });
   };
 
-  const rank = (arena: Arena): void => {
-    toast({ title: `This throw meets the ${arena.name} rules`, body: 'Compare it with the lab benchmarks in Ranks.', tone: 'success' });
-    window.location.hash = `#/ranks`;
+  const viewRanks = (board: { arenaId: string; category: RankCategory }): void => {
+    setSheet(null);
+    navigate(`/ranks?arena=${encodeURIComponent(board.arenaId)}&rank=${board.category}`);
   };
 
   /* ------------------------------------------------------------ swipe to throw */
@@ -301,7 +305,7 @@ export default function FlyPage(): ReactElement {
 
   const plane = useMemo(() => (build ? { model: build.model, paper: design.paper, airframe: build.airframe } : null), [build, design.paper]);
   const ghostTrails = showTrails ? ghosts : [];
-  const arenas = useMemo(() => (record ? matchingArenas(record.conditions, record.launch) : []), [record]);
+  const ranking = useMemo(() => (record ? checkRanking(ticketOf(record), record.result.metrics, units) : null), [record, units]);
   const personalBest = useMemo(() => {
     if (!record) return false;
     const others = flights.filter((f) => f.id !== record.id && f.planeId === record.build.design.id && f.envId === record.env.id);
@@ -471,7 +475,7 @@ export default function FlyPage(): ReactElement {
         </aside>
       )}
 
-      {showResult && record && (
+      {showResult && record && ranking && (
         <ResultCard
           ref={resultRef}
           className="ppl-fly__result"
@@ -479,12 +483,13 @@ export default function FlyPage(): ReactElement {
           units={units}
           personalBest={personalBest}
           wide={wide}
-          arenas={arenas}
+          ranking={ranking}
+          ranked={rankedId === record.id}
           onAgain={again}
           onReplay={replay}
           onTrim={() => setSheet('trim')}
           onDetails={() => setSheet('details')}
-          onRank={rank}
+          onRank={() => setSheet('rank')}
         />
       )}
 
@@ -520,6 +525,18 @@ export default function FlyPage(): ReactElement {
       >
         <TrimPanel design={design} onChange={onTrim} />
       </Sheet>
+      {record && ranking && ranking.boards.length > 0 && (
+        <RankSheet
+          key={record.id}
+          open={sheet === 'rank'}
+          onClose={() => setSheet(null)}
+          record={record}
+          check={ranking}
+          units={units}
+          onEntered={() => setRankedId(record.id)}
+          onViewRanks={viewRanks}
+        />
+      )}
       {record && (
         <DetailsSheet
           open={sheet === 'details'}
